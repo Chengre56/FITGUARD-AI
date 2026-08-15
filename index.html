@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitGuard AI | Smart Size Assistant</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .glass-morphism {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .modal-overlay {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            transition: all 0.3s ease-in-out;
+        }
+        .size-card.active {
+            border-color: #6366f1;
+            background-color: #f5f3ff;
+            ring: 2px;
+            ring-color: #6366f1;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-slate-900">
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/80 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center gap-2">
+                    <div class="bg-indigo-600 p-2 rounded-lg">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path></svg>
+                    </div>
+                    <span class="text-xl font-bold tracking-tight text-slate-900">FitGuard <span class="text-indigo-600">AI</span></span>
+                </div>
+                <div class="flex gap-4">
+                    <button onclick="switchView('admin')" id="adminBtn" class="px-4 py-2 rounded-full text-sm font-semibold transition-all bg-indigo-50 text-indigo-700">Merchant Dashboard</button>
+                    <button onclick="switchView('shopper')" id="shopperBtn" class="px-4 py-2 rounded-full text-sm font-semibold transition-all text-slate-600 hover:bg-slate-100">Storefront Preview</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 py-12">
+        
+        <!-- MODE 1: MERCHANT DASHBOARD -->
+        <section id="admin-view" class="space-y-8">
+            <div class="max-w-3xl">
+                <h1 class="text-4xl font-extrabold text-slate-900 mb-2">Garment Specification Engine</h1>
+                <p class="text-slate-500 text-lg">Define your product dimensions to power the AI matching algorithm.</p>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
+                <div class="p-8 border-b border-slate-100 bg-slate-50/50">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Product Name</label>
+                            <input type="text" id="prod-name" value="Signature Heavyweight Hoodie" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Measurement Unit</label>
+                            <select class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all">
+                                <option>Inches (in)</option>
+                                <option>Centimeters (cm)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-8 overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr class="text-slate-400 text-sm uppercase tracking-wider">
+                                <th class="pb-4 font-semibold">Size</th>
+                                <th class="pb-4 font-semibold text-center">Chest (Circumference)</th>
+                                <th class="pb-4 font-semibold text-center">Waist</th>
+                                <th class="pb-4 font-semibold text-center">Length</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100" id="specs-body">
+                            <!-- Rows generated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="p-6 bg-slate-50 flex justify-end gap-3">
+                    <button class="px-6 py-2.5 rounded-xl font-medium text-slate-600 hover:bg-slate-200 transition-all">Discard Changes</button>
+                    <button onclick="saveSpecs()" class="px-6 py-2.5 bg-indigo-600 text-white rounded-xl font-medium hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition-all">Save & Sync Widget</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- MODE 2: SHOPPER STOREFRONT PREVIEW -->
+        <section id="shopper-view" class="hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div class="aspect-square bg-slate-200 rounded-3xl overflow-hidden shadow-inner flex items-center justify-center">
+                    <img src="https://images.unsplash.com/photo-1556821840-3a63f95609a7?auto=format&fit=crop&q=80&w=800" alt="Product" class="w-full h-full object-cover">
+                </div>
+                <div class="space-y-6">
+                    <span class="px-3 py-1 bg-indigo-100 text-indigo-700 text-xs font-bold uppercase rounded-full">New Arrival</span>
+                    <h1 id="preview-title" class="text-5xl font-bold text-slate-900 leading-tight">Signature Heavyweight Hoodie</h1>
+                    <p class="text-3xl text-slate-600 font-light">$89.00</p>
+                    <p class="text-slate-500 leading-relaxed">Crafted from 450GSM French Terry cotton. This piece features a dropped shoulder design and a structured silhouette designed to last a lifetime.</p>
+                    
+                    <div class="pt-6 border-t border-slate-200">
+                        <div class="flex items-center gap-4 mb-8">
+                            <button onclick="toggleModal(true)" class="flex-1 flex items-center justify-center gap-3 bg-slate-900 text-white py-4 rounded-xl font-bold hover:bg-slate-800 transition-all group">
+                                <svg class="w-5 h-5 text-indigo-400 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 20 20"><path d="M5 4a1 1 0 00-2 0v7.268a2 2 0 000 3.464V16a1 1 0 102 0v-1.268a2 2 0 000-3.464V4zM11 4a1 1 0 10-2 0v1.268a2 2 0 000 3.464V16a1 1 0 102 0V8.732a2 2 0 000-3.464V4zM16 3a1 1 0 011 1v7.268a2 2 0 010 3.464V16a1 1 0 11-2 0v-1.268a2 2 0 010-3.464V4a1 1 0 011-1z"></path></svg>
+                                Find My Size
+                            </button>
+                            <button class="p-4 border border-slate-200 rounded-xl hover:bg-slate-50 transition-all">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                            </button>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm text-emerald-600 font-medium">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                            FitGuard AI Integrated: 98% sizing accuracy
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- SHOPPER WIDGET MODAL -->
+    <div id="size-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
+        <div class="modal-overlay absolute inset-0" onclick="toggleModal(false)"></div>
+        <div class="glass-morphism w-full max-w-xl rounded-3xl shadow-2xl overflow-hidden relative transition-all scale-95 opacity-0 duration-300" id="modal-content">
+            
+            <!-- Step 1: Input -->
+            <div id="modal-step-1" class="p-8">
+                <div class="flex justify-between items-center mb-8">
+                    <div>
+                        <h3 class="text-2xl font-bold text-slate-900">Find Your Perfect Fit</h3>
+                        <p class="text-slate-500">AI-powered recommendation in seconds.</p>
+                    </div>
+                    <button onclick="toggleModal(false)" class="text-slate-400 hover:text-slate-600 transition-all">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-2">
+                            <label class="text-sm font-semibold text-slate-700">Height (cm)</label>
+                            <input type="number" id="user-height" placeholder="180" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-sm font-semibold text-slate-700">Weight (kg)</label>
+                            <input type="number" id="user-weight" placeholder="75" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all">
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="text-sm font-semibold text-slate-700">Preferred Fit Style</label>
+                        <div class="grid grid-cols-3 gap-3">
+                            <button onclick="setFitStyle('tight')" class="fit-opt p-3 border border-slate-200 rounded-xl text-sm font-medium hover:border-indigo-400 transition-all">Skinny</button>
+                            <button onclick="setFitStyle('regular')" class="fit-opt p-3 border-2 border-indigo-600 bg-indigo-50 text-indigo-700 rounded-xl text-sm font-bold transition-all">Regular</button>
+                            <button onclick="setFitStyle('loose')" class="fit-opt p-3 border border-slate-200 rounded-xl text-sm font-medium hover:border-indigo-400 transition-all">Oversized</button>
+                        </div>
+                    </div>
+
+                    <button onclick="calculateRecommendation()" class="w-full py-4 bg-indigo-600 text-white rounded-2xl font-bold hover:bg-indigo-700 shadow-xl shadow-indigo-200 transform transition-all active:scale-[0.98]">
+                        Calculate My Size
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 2: Result -->
+            <div id="modal-step-2" class="hidden p-8">
+                <div class="text-center space-y-6">
+                    <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-emerald-100 text-emerald-600 mb-2">
+                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    </div>
+                    <div>
+                        <p class="text-indigo-600 font-bold uppercase tracking-widest text-sm">Your Match Found</p>
+                        <h2 id="recommended-size" class="text-6xl font-black text-slate-900 mt-2">Large</h2>
+                        <div class="mt-4 flex items-center justify-center gap-2">
+                            <div class="h-2 w-32 bg-slate-100 rounded-full overflow-hidden">
+                                <div id="match-bar" class="h-full bg-emerald-500 rounded-full" style="width: 94%"></div>
+                            </div>
+                            <span id="match-percent" class="text-emerald-600 font-bold">94% Match</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50 p-4 rounded-2xl text-left border border-slate-100">
+                        <p id="size-explanation" class="text-slate-600 text-sm leading-relaxed">
+                            Based on your profile, the <b>Large</b> will provide the regular fit you prefer. The <b>Medium</b> would be too tight around the chest (only 0.5" clearance).
+                        </p>
+                    </div>
+
+                    <div class="flex items-center justify-between px-2 text-xs font-semibold text-slate-400 uppercase">
+                        <span>Return Risk: Low</span>
+                        <span class="text-indigo-500">FitGuard AI Protected</span>
+                    </div>
+
+                    <button onclick="toggleModal(false)" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-bold hover:bg-slate-800 transition-all">
+                        Add Size Large to Cart
+                    </button>
+                    <button onclick="resetModal()" class="text-slate-400 text-sm font-medium hover:text-slate-600">Start over</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // State Management
+        let appState = {
+            view: 'admin',
+            fitStyle: 'regular',
+            product: {
+                name: "Signature Heavyweight Hoodie",
+                specs: [
+                    { size: 'Small', chest: 38, waist: 34, length: 27 },
+                    { size: 'Medium', chest: 41, waist: 37, length: 28 },
+                    { size: 'Large', chest: 44, waist: 40, length: 29 },
+                    { size: 'XL', chest: 48, waist: 44, length: 30 }
+                ]
+            }
+        };
+
+        // Initialize Admin Dashboard
+        function initAdmin() {
+            const body = document.getElementById('specs-body');
+            body.innerHTML = appState.product.specs.map((s, idx) => `
+                <tr class="group hover:bg-slate-50 transition-colors">
+                    <td class="py-4 font-bold text-slate-700">${s.size}</td>
+                    <td class="py-4 text-center">
+                        <input type="number" value="${s.chest}" onchange="updateSpec(${idx}, 'chest', this.value)" class="w-20 px-2 py-1 border border-slate-200 rounded text-center focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </td>
+                    <td class="py-4 text-center">
+                        <input type="number" value="${s.waist}" onchange="updateSpec(${idx}, 'waist', this.value)" class="w-20 px-2 py-1 border border-slate-200 rounded text-center focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </td>
+                    <td class="py-4 text-center">
+                        <input type="number" value="${s.length}" onchange="updateSpec(${idx}, 'length', this.value)" class="w-20 px-2 py-1 border border-slate-200 rounded text-center focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function updateSpec(index, field, value) {
+            appState.product.specs[index][field] = parseFloat(value);
+        }
+
+        function saveSpecs() {
+            appState.product.name = document.getElementById('prod-name').value;
+            document.getElementById('preview-title').innerText = appState.product.name;
+            const btn = event.target;
+            btn.innerText = "Synced Successfully!";
+            btn.classList.replace('bg-indigo-600', 'bg-emerald-600');
+            setTimeout(() => {
+                btn.innerText = "Save & Sync Widget";
+                btn.classList.replace('bg-emerald-600', 'bg-indigo-600');
+            }, 2000);
+        }
+
+        // View Toggling
+        function switchView(view) {
+            appState.view = view;
+            const admin = document.getElementById('admin-view');
+            const shopper = document.getElementById('shopper-view');
+            const adminBtn = document.getElementById('adminBtn');
+            const shopperBtn = document.getElementById('shopperBtn');
+
+            if (view === 'admin') {
+                admin.classList.remove('hidden');
+                shopper.classList.add('hidden');
+                adminBtn.className = "px-4 py-2 rounded-full text-sm font-semibold transition-all bg-indigo-50 text-indigo-700";
+                shopperBtn.className = "px-4 py-2 rounded-full text-sm font-semibold transition-all text-slate-600 hover:bg-slate-100";
+            } else {
+                admin.classList.add('hidden');
+                shopper.classList.remove('hidden');
+                shopperBtn.className = "px-4 py-2 rounded-full text-sm font-semibold transition-all bg-indigo-50 text-indigo-700";
+                adminBtn.className = "px-4 py-2 rounded-full text-sm font-semibold transition-all text-slate-600 hover:bg-slate-100";
+            }
+        }
+
+        // Modal Logic
+        function toggleModal(show) {
+            const modal = document.getElementById('size-modal');
+            const content = document.getElementById('modal-content');
+            if (show) {
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    content.classList.remove('scale-95', 'opacity-0');
+                    content.classList.add('scale-100', 'opacity-100');
+                }, 10);
+            } else {
+                content.classList.add('scale-95', 'opacity-0');
+                content.classList.remove('scale-100', 'opacity-100');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                    resetModal();
+                }, 300);
+            }
+        }
+
+        function setFitStyle(style) {
+            appState.fitStyle = style;
+            document.querySelectorAll('.fit-opt').forEach(btn => {
+                btn.className = "fit-opt p-3 border border-slate-200 rounded-xl text-sm font-medium hover:border-indigo-400 transition-all";
+            });
+            event.target.className = "fit-opt p-3 border-2 border-indigo-600 bg-indigo-50 text-indigo-700 rounded-xl text-sm font-bold transition-all";
+        }
+
+        function calculateRecommendation() {
+            const h = parseFloat(document.getElementById('user-height').value);
+            const w = parseFloat(document.getElementById('user-weight').value);
+
+            if (!h || !w) {
+                alert("Please enter valid height and weight metrics.");
+                return;
+            }
+
+            // Simplified Body Dimension Heuristic
+            // Estimation: Chest (inches) is roughly weight(kg) * 0.5 + some height factor
+            const estimatedChest = (w * 0.52) + (h * 0.05);
+            
+            // Apply fit buffer
+            let buffer = 2; // Default Regular
+            if (appState.fitStyle === 'tight') buffer = 0.5;
+            if (appState.fitStyle === 'loose') buffer = 4.5;
+
+            const targetChest = estimatedChest + buffer;
+            
+            // Logic: Find closest size where size.chest >= targetChest
+            let bestSize = appState.product.specs[0];
+            let minDiff = 100;
+
+            appState.product.specs.forEach(s => {
+                let diff = s.chest - targetChest;
+                if (diff >= -1 && diff < minDiff) {
+                    minDiff = diff;
+                    bestSize = s;
+                }
+            });
+
+            // Generate Match Score (Simulated)
+            const matchScore = Math.max(75, 100 - Math.abs(minDiff * 5)).toFixed(0);
+
+            // Display Results
+            document.getElementById('modal-step-1').classList.add('hidden');
+            document.getElementById('modal-step-2').classList.remove('hidden');
+            document.getElementById('recommended-size').innerText = bestSize.size;
+            document.getElementById('match-percent').innerText = `${matchScore}% Match`;
+            document.getElementById('match-bar').style.width = `${matchScore}%`;
+
+            const altSize = minDiff < 1 ? "smaller" : "larger";
+            document.getElementById('size-explanation').innerHTML = `
+                Based on your ${h}cm / ${w}kg profile, the <b>${bestSize.size}</b> will provide the <b>${appState.fitStyle}</b> look you want. 
+                Estimated return risk reduction: <b>85%</b> compared to generic size charts.
+            `;
+        }
+
+        function resetModal() {
+            document.getElementById('modal-step-1').classList.remove('hidden');
+            document.getElementById('modal-step-2').classList.add('hidden');
+            document.getElementById('user-height').value = '';
+            document.getElementById('user-weight').value = '';
+        }
+
+        // Initialize
+        initAdmin();
+    </script>
+</body>
+</html>
