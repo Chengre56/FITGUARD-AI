@@ -3,194 +3,227 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FitGuard AI | The Gold Standard in Size Optimization</title>
+    <title>FitGuard AI | Merchant Command Center</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --brand-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
-            --glass-bg: rgba(255, 255, 255, 0.7);
+            --brand-primary: #6366f1;
+            --brand-gradient: linear-gradient(135deg, var(--brand-primary) 0%, #a855f7 100%);
         }
-        body { font-family: 'Inter', sans-serif; background-color: #fafafa; }
-        h1, h2, h3, .font-sora { font-family: 'Sora', sans-serif; }
-
-        .bg-mesh {
-            background-color: #fafafa;
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(168, 85, 247, 0.15) 0px, transparent 50%);
-        }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        h1, h2, h3, h4, .font-sora { font-family: 'Sora', sans-serif; }
 
         .glass-panel {
-            background: var(--glass-bg);
+            background: rgba(255, 255, 255, 0.7);
             backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.5);
         }
 
-        .gradient-border {
-            position: relative;
-            border-radius: 1rem;
-        }
-        .gradient-border::before {
-            content: "";
-            position: absolute;
-            inset: -1px;
-            background: var(--brand-gradient);
-            border-radius: 1.05rem;
-            z-index: -1;
-            opacity: 0.3;
-        }
-
-        .btn-primary {
-            background: var(--brand-gradient);
+        .btn-brand {
+            background: var(--brand-primary);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px -10px rgba(99, 102, 241, 0.5);
+            color: white;
         }
 
-        .view-transition {
-            transition: opacity 0.4s ease, transform 0.4s ease;
+        .btn-brand:hover {
+            filter: brightness(1.1);
+            transform: translateY(-1px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         }
 
-        .tab-active {
+        .custom-toggle {
+            appearance: none;
+            width: 40px;
+            height: 20px;
+            background: #cbd5e1;
+            border-radius: 20px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .custom-toggle:checked { background: var(--brand-primary); }
+        .custom-toggle::before {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
             background: white;
-            color: #18181b;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s;
         }
+        .custom-toggle:checked::before { transform: translateX(20px); }
 
-        /* Shimmer animation for AI loading */
-        @keyframes shimmer {
-            0% { background-position: -200% 0; }
-            100% { background-position: 200% 0; }
+        .notification {
+            transform: translateY(100px);
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .shimmer {
-            background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
-            background-size: 200% 100%;
-            animation: shimmer 1.5s infinite;
-        }
+        .notification.show { transform: translateY(0); }
+
+        /* Preview Scale */
+        .preview-container { transform: scale(0.9); transform-origin: top center; }
     </style>
 </head>
-<body class="bg-mesh min-h-screen text-zinc-900 overflow-x-hidden">
+<body class="min-h-screen text-zinc-900">
 
-    <!-- NAVIGATION BAR -->
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 z-[1000] notification">
+        <div class="bg-zinc-900 text-white px-6 py-3 rounded-2xl shadow-2xl flex items-center gap-3 border border-zinc-700">
+            <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+            <span class="text-sm font-bold tracking-tight" id="toast-message">Settings Synchronized</span>
+        </div>
+    </div>
+
+    <!-- NAVIGATION -->
     <nav class="sticky top-0 z-[100] w-full px-6 py-4">
-        <div class="max-w-7xl mx-auto flex items-center justify-between glass-panel rounded-2xl px-6 py-3 border border-zinc-200/50">
+        <div class="max-w-7xl mx-auto flex items-center justify-between glass-panel rounded-2xl px-6 py-3 border border-zinc-200">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl btn-primary flex items-center justify-center text-white shadow-lg">
+                <div class="w-10 h-10 rounded-xl btn-brand flex items-center justify-center shadow-lg" id="nav-logo-bg">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                 </div>
-                <div>
-                    <span class="text-lg font-bold tracking-tight block leading-none">FitGuard <span class="text-indigo-600">AI</span></span>
-                    <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Enterprise Suite</span>
-                </div>
+                <span class="text-lg font-bold tracking-tight">FitGuard <span class="text-indigo-600" id="brand-accent-text">AI</span></span>
             </div>
 
-            <!-- Tabbed Switcher -->
-            <div class="hidden md:flex bg-zinc-100 p-1 rounded-xl border border-zinc-200">
-                <button onclick="switchView('admin')" id="adminTab" class="px-5 py-2 rounded-lg text-sm font-semibold transition-all tab-active">
-                    Merchant Portal
-                </button>
-                <button onclick="switchView('shopper')" id="shopperTab" class="px-5 py-2 rounded-lg text-sm font-semibold transition-all text-zinc-500 hover:text-zinc-800">
-                    Storefront Live
-                </button>
-            </div>
-
-            <div class="flex items-center gap-4">
-                <span class="hidden sm:flex items-center gap-2 text-xs font-medium text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-100">
-                    <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-                    API Active
-                </span>
-                <div class="w-10 h-10 rounded-full bg-zinc-200 border-2 border-white overflow-hidden shadow-sm">
-                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="Admin">
-                </div>
+            <div class="bg-zinc-100 p-1 rounded-xl border border-zinc-200 flex gap-1">
+                <button onclick="switchView('admin')" id="adminTab" class="px-5 py-2 rounded-lg text-sm font-bold transition-all bg-white shadow-sm">Dashboard</button>
+                <button onclick="switchView('shopper')" id="shopperTab" class="px-5 py-2 rounded-lg text-sm font-bold transition-all text-zinc-500">Live Store</button>
             </div>
         </div>
     </nav>
 
-    <main class="max-w-7xl mx-auto px-6 py-10">
+    <main class="max-w-7xl mx-auto px-6 py-8">
         
-        <!-- SECTION 1: MERCHANT DASHBOARD -->
-        <section id="admin-view" class="view-transition space-y-8">
-            <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
-                <div class="space-y-2">
-                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 text-indigo-600 text-xs font-bold uppercase tracking-wider border border-indigo-100">
-                        Smart Cataloging
-                    </div>
-                    <h1 class="text-4xl font-extrabold text-zinc-900 tracking-tight">Garment Specification Hub</h1>
-                    <p class="text-zinc-500 max-w-xl">Configure your technical sketches. FitGuard AI uses these measurements to predict user sizing with 98.4% precision.</p>
-                </div>
-                
-                <!-- Dashboard Quick Stats -->
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="glass-panel p-4 rounded-2xl border border-zinc-100 min-w-[140px]">
-                        <p class="text-[10px] font-bold text-zinc-400 uppercase">Return Reduction</p>
-                        <p class="text-2xl font-bold text-emerald-600">-42.5%</p>
-                    </div>
-                    <div class="glass-panel p-4 rounded-2xl border border-zinc-100 min-w-[140px]">
-                        <p class="text-[10px] font-bold text-zinc-400 uppercase">Conversion Lift</p>
-                        <p class="text-2xl font-bold text-indigo-600">+18.2%</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <!-- Config Card -->
-                <div class="lg:col-span-2 glass-panel rounded-3xl overflow-hidden border border-white shadow-2xl">
-                    <div class="p-8 border-b border-zinc-100/50 bg-white/40 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                        <div class="space-y-1">
-                            <h3 class="font-bold text-lg">Product Details</h3>
-                            <p class="text-sm text-zinc-400">Current SKU: <span class="font-mono text-zinc-600">SH-HOD-001</span></p>
+        <!-- DASHBOARD VIEW -->
+        <section id="admin-view" class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <!-- LEFT COLUMN: INPUTS (7 COLS) -->
+            <div class="lg:col-span-7 space-y-8">
+                <!-- PERFORMANCE METRICS -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="glass-panel p-5 rounded-3xl border border-white">
+                        <h4 class="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-1">Return Reduction</h4>
+                        <div class="flex items-baseline gap-2">
+                            <span class="text-3xl font-black text-zinc-900" id="stat-returns">0%</span>
+                            <span class="text-emerald-500 text-xs font-bold">↑</span>
                         </div>
-                        <input type="text" id="prod-name" value="Signature Heavyweight Hoodie" class="bg-white px-4 py-2 rounded-xl border border-zinc-200 text-sm font-semibold focus:ring-2 focus:ring-indigo-500 outline-none w-full sm:w-64">
                     </div>
+                    <div class="glass-panel p-5 rounded-3xl border border-white">
+                        <h4 class="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-1">Conversion Lift</h4>
+                        <div class="flex items-baseline gap-2">
+                            <span class="text-3xl font-black text-zinc-900" id="stat-conversion">0%</span>
+                            <span class="text-indigo-500 text-xs font-bold">↑</span>
+                        </div>
+                    </div>
+                    <div class="glass-panel p-5 rounded-3xl border border-white">
+                        <h4 class="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-1">Data Confidence</h4>
+                        <div class="flex items-baseline gap-2">
+                            <span class="text-3xl font-black text-zinc-900" id="stat-confidence">Poor</span>
+                        </div>
+                    </div>
+                </div>
 
+                <!-- GARMENT SPECS -->
+                <div class="glass-panel rounded-[2rem] border border-white overflow-hidden shadow-sm">
+                    <div class="p-8 border-b border-zinc-100 bg-white/50">
+                        <h3 class="text-xl font-bold">Garment Specifications</h3>
+                        <p class="text-sm text-zinc-500">Enter technical measurements in inches for precision matching.</p>
+                    </div>
                     <div class="p-8 overflow-x-auto">
                         <table class="w-full text-left">
                             <thead>
-                                <tr class="text-zinc-400 text-[11px] uppercase tracking-[0.2em] font-bold">
-                                    <th class="pb-6">Size Label</th>
-                                    <th class="pb-6 text-center">Chest (in)</th>
-                                    <th class="pb-6 text-center">Waist (in)</th>
-                                    <th class="pb-6 text-center">Length (in)</th>
+                                <tr class="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-black">
+                                    <th class="pb-6">Size</th>
+                                    <th class="pb-6">Chest</th>
+                                    <th class="pb-6">Waist</th>
+                                    <th class="pb-6">Length</th>
                                 </tr>
                             </thead>
-                            <tbody id="specs-body" class="divide-y divide-zinc-100">
-                                <!-- Generated by JS -->
+                            <tbody id="specs-table" class="divide-y divide-zinc-100">
+                                <!-- JS Populated -->
                             </tbody>
                         </table>
                     </div>
+                </div>
 
-                    <div class="p-6 bg-zinc-50/50 border-t border-zinc-100 flex justify-end gap-3">
-                        <button class="px-6 py-2.5 rounded-xl font-bold text-zinc-500 hover:bg-zinc-100 transition-all text-sm">Reset Defaults</button>
-                        <button onclick="saveSpecs()" class="btn-primary px-8 py-2.5 text-white rounded-xl font-bold text-sm shadow-lg shadow-indigo-100">
-                            Save & Push Updates
-                        </button>
+                <!-- WIDGET CUSTOMIZATION -->
+                <div class="glass-panel p-8 rounded-[2rem] border border-white shadow-sm space-y-6">
+                    <h3 class="text-xl font-bold">Widget Personalization</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="space-y-4">
+                            <label class="block text-sm font-bold text-zinc-700">Brand Primary Color</label>
+                            <div class="flex items-center gap-4">
+                                <input type="color" id="color-picker" value="#6366f1" oninput="updateLiveSettings()" class="w-12 h-12 rounded-lg cursor-pointer border-none bg-transparent">
+                                <span class="font-mono text-sm text-zinc-500 uppercase" id="color-hex">#6366f1</span>
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            <label class="block text-sm font-bold text-zinc-700">Display Logic</label>
+                            <div class="flex items-center justify-between p-3 bg-white/50 rounded-xl border border-zinc-100">
+                                <span class="text-sm font-medium">Show Return Risk Metric</span>
+                                <input type="checkbox" id="toggle-risk" checked onchange="updateLiveSettings()" class="custom-toggle">
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- AI Insights Sidebar -->
-                <div class="space-y-6">
-                    <div class="gradient-border bg-white p-6 shadow-xl">
-                        <h4 class="font-bold mb-4 flex items-center gap-2">
-                            <svg class="w-5 h-5 text-indigo-500" fill="currentColor" viewBox="0 0 20 20"><path d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM15.657 5.757a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM18 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zM5.05 6.464A1 1 0 106.464 5.05l-.707-.707a1 1 0 00-1.414 1.414l.707.707zM5 10a1 1 0 01-1 1H3a1 1 0 110-2h1a1 1 0 011 1zM8 16v-1a1 1 0 112 0v1a1 1 0 11-2 0zM13.536 14.243a1 1 0 011.414 1.414l-.707.707a1 1 0 01-1.414-1.414l.707-.707zM16.243 16.243a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414l-.707.707z"></path></svg>
-                            AI Optimization Tip
-                        </h4>
-                        <p class="text-sm text-zinc-500 leading-relaxed italic">"Your Medium and Large chest measurements are only 2 inches apart. Consider increasing the gap to 3 inches to better serve athletic body types and reduce size-switching returns."</p>
-                    </div>
+                <button onclick="saveDashboardChanges()" class="w-full py-5 btn-brand rounded-2xl font-black text-lg shadow-xl flex items-center justify-center gap-3">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                    Sync Production Settings
+                </button>
+            </div>
 
-                    <div class="glass-panel p-6 rounded-3xl border border-zinc-100">
-                        <h4 class="font-bold mb-4 text-sm uppercase tracking-widest text-zinc-400">Widget Customization</h4>
-                        <div class="space-y-4">
-                            <div class="flex items-center justify-between">
-                                <span class="text-sm font-medium">Brand Primary Color</span>
-                                <div class="w-6 h-6 rounded-full btn-primary border-2 border-white shadow-sm"></div>
+            <!-- RIGHT COLUMN: PREVIEW & AI (5 COLS) -->
+            <div class="lg:col-span-5 space-y-8">
+                <!-- AI INSIGHTS -->
+                <div class="bg-zinc-900 text-white p-8 rounded-[2rem] shadow-2xl relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-4 opacity-10">
+                        <svg class="w-24 h-24" fill="currentColor" viewBox="0 0 20 20"><path d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3z"></path></svg>
+                    </div>
+                    <div class="relative z-10 space-y-4">
+                        <div class="flex items-center gap-2 px-3 py-1 bg-white/10 rounded-full w-fit border border-white/10">
+                            <span class="w-2 h-2 bg-indigo-400 rounded-full"></span>
+                            <span class="text-[10px] font-black uppercase tracking-widest">AI Auditor</span>
+                        </div>
+                        <h4 class="text-lg font-bold">Optimization Strategy</h4>
+                        <p id="ai-tip" class="text-sm text-zinc-400 leading-relaxed italic">Analyzing your measurement data...</p>
+                    </div>
+                </div>
+
+                <!-- LIVE PREVIEW CONTAINER -->
+                <div class="space-y-4">
+                    <h3 class="text-sm font-black text-zinc-400 uppercase tracking-widest px-4 text-center">Live Component Preview</h3>
+                    <div class="preview-container glass-panel rounded-[2.5rem] border border-white shadow-2xl overflow-hidden scale-[0.85] origin-top">
+                        <div id="preview-widget-ui" class="p-10 space-y-8">
+                            <div class="flex justify-between items-start">
+                                <div class="space-y-1">
+                                    <h2 class="text-2xl font-bold tracking-tight">Find My Size</h2>
+                                    <p class="text-xs text-zinc-500">AI Personalization Engine</p>
+                                </div>
+                                <div class="w-8 h-8 rounded-full bg-zinc-100 flex items-center justify-center text-zinc-400">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                </div>
                             </div>
-                            <div class="flex items-center justify-between">
-                                <span class="text-sm font-medium">Show Return Risk</span>
-                                <div class="w-10 h-5 bg-indigo-600 rounded-full relative"><div class="absolute right-1 top-1 w-3 h-3 bg-white rounded-full"></div></div>
+                            
+                            <div class="space-y-4">
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div class="h-12 bg-zinc-50 border border-zinc-100 rounded-xl flex items-center px-4 text-xs font-bold text-zinc-400">Height</div>
+                                    <div class="h-12 bg-zinc-50 border border-zinc-100 rounded-xl flex items-center px-4 text-xs font-bold text-zinc-400">Weight</div>
+                                </div>
+                                <div class="h-24 bg-zinc-50 border border-zinc-100 rounded-xl flex flex-col justify-center px-4 gap-2">
+                                    <div class="h-2 w-1/2 bg-zinc-200 rounded-full"></div>
+                                    <div class="flex gap-2">
+                                        <div class="h-8 flex-1 bg-white border-2 border-indigo-600 rounded-lg preview-brand-border"></div>
+                                        <div class="h-8 flex-1 bg-white border border-zinc-200 rounded-lg"></div>
+                                        <div class="h-8 flex-1 bg-white border border-zinc-200 rounded-lg"></div>
+                                    </div>
+                                </div>
+                                <button class="w-full py-4 rounded-xl font-bold text-white shadow-lg preview-brand-bg">Calculate My Size</button>
+                                <div id="preview-risk-footer" class="flex items-center justify-center gap-2 text-[10px] font-black uppercase text-emerald-600 tracking-tighter">
+                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"></path></svg>
+                                    Return Risk Reduced by 85%
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -198,326 +231,210 @@
             </div>
         </section>
 
-        <!-- SECTION 2: SHOPPER FRONTEND PREVIEW -->
-        <section id="shopper-view" class="view-transition hidden py-10 opacity-0 translate-y-4">
-            <div class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
-                <!-- Product Image -->
-                <div class="relative group">
-                    <div class="absolute -inset-4 bg-gradient-to-tr from-indigo-500/20 to-purple-500/20 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
-                    <div class="relative rounded-[2.5rem] overflow-hidden shadow-2xl border border-white">
-                        <img src="https://images.unsplash.com/photo-1556821840-3a63f95609a7?auto=format&fit=crop&q=80&w=1000" alt="Product" class="w-full h-full object-cover">
-                        <div class="absolute top-6 left-6 flex gap-2">
-                            <span class="bg-white/90 backdrop-blur px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-tighter shadow-sm">Sustainable</span>
-                            <span class="bg-indigo-600 text-white px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-tighter shadow-sm">Best Seller</span>
-                        </div>
-                    </div>
+        <!-- STOREFRONT VIEW -->
+        <section id="shopper-view" class="hidden opacity-0 translate-y-8 transition-all duration-500 py-12">
+            <div class="max-w-4xl mx-auto flex flex-col md:flex-row items-center gap-12">
+                <div class="flex-1">
+                    <img src="https://images.unsplash.com/photo-1556821840-3a63f95609a7?auto=format&fit=crop&q=80&w=800" class="rounded-[2.5rem] shadow-2xl border-4 border-white">
                 </div>
-
-                <!-- Product Details -->
-                <div class="space-y-8">
-                    <div class="space-y-4">
-                        <h1 id="preview-title" class="text-5xl font-extrabold text-zinc-900 leading-tight tracking-tight">Signature Heavyweight Hoodie</h1>
-                        <div class="flex items-center gap-4">
-                            <p class="text-3xl font-light text-zinc-400 line-through">$120.00</p>
-                            <p class="text-4xl font-bold text-zinc-900 font-sora">$89.00</p>
-                        </div>
-                    </div>
-
-                    <p class="text-zinc-500 leading-relaxed text-lg">Indie-crafted from 450GSM French Terry. Designed for a modern boxy silhouette that drapes perfectly on any frame.</p>
-                    
-                    <div class="pt-8 border-t border-zinc-200 space-y-6">
-                        <!-- THE HERO WIDGET TRIGGER -->
-                        <div class="p-1 glass-panel rounded-2xl border border-zinc-200 inline-flex w-full">
-                            <button onclick="toggleModal(true)" class="flex-1 flex items-center justify-center gap-3 bg-zinc-900 text-white py-4 px-6 rounded-xl font-bold hover:bg-black transition-all group shadow-xl">
-                                <div class="w-6 h-6 rounded-lg bg-indigo-500/20 flex items-center justify-center group-hover:bg-indigo-500 transition-colors">
-                                    <svg class="w-3.5 h-3.5 text-indigo-400 group-hover:text-white" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.464 5.05l-.707-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"></path></svg>
-                                </div>
-                                <span class="tracking-tight">Personalize My Size</span>
-                            </button>
-                        </div>
-                        
-                        <div class="flex items-center justify-center gap-8 py-2">
-                            <div class="flex items-center gap-2 text-[11px] font-bold text-zinc-400 uppercase tracking-widest">
-                                <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                Verified Fit
-                            </div>
-                            <div class="flex items-center gap-2 text-[11px] font-bold text-zinc-400 uppercase tracking-widest">
-                                <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                Zero Carbon Shipping
-                            </div>
-                        </div>
+                <div class="flex-1 space-y-6">
+                    <h1 class="text-5xl font-black tracking-tight" id="live-prod-name">Signature Hoodie</h1>
+                    <p class="text-zinc-500 text-lg leading-relaxed">Premium 450GSM cotton designed for a lifetime. Ethically sourced and tailored for the modern minimalist.</p>
+                    <div class="pt-6 border-t border-zinc-200">
+                        <button onclick="openRealWidget()" class="w-full py-5 rounded-2xl font-black text-xl text-white shadow-2xl btn-brand preview-brand-bg">
+                            Personalize My Size
+                        </button>
                     </div>
                 </div>
             </div>
         </section>
     </main>
 
-    <!-- SHOPPER WIDGET MODAL (GLASSMORPHISM OVERHAUL) -->
-    <div id="size-modal" class="fixed inset-0 z-[200] hidden flex items-center justify-center p-4 sm:p-6 transition-all duration-500">
-        <div class="absolute inset-0 bg-zinc-900/40 backdrop-blur-md" onclick="toggleModal(false)"></div>
-        
-        <div class="relative w-full max-w-xl glass-panel rounded-[2.5rem] shadow-[0_32px_64px_-15px_rgba(0,0,0,0.3)] overflow-hidden scale-95 opacity-0 transition-all duration-300" id="modal-content">
-            
-            <!-- Close Button -->
-            <button onclick="toggleModal(false)" class="absolute top-6 right-6 w-10 h-10 flex items-center justify-center rounded-full bg-zinc-100 text-zinc-400 hover:bg-zinc-200 hover:text-zinc-800 transition-all z-10">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-            </button>
-
-            <!-- Modal Content Wrapper -->
-            <div class="p-10 sm:p-12">
-                <!-- STEP 1: CONFIGURATION -->
-                <div id="modal-step-1" class="space-y-10">
-                    <div class="space-y-2">
-                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 text-indigo-600 text-[10px] font-black uppercase tracking-[0.2em] border border-indigo-100">
-                            AI Concierge
-                        </div>
-                        <h2 class="text-3xl font-extrabold tracking-tight text-zinc-900">What's your profile?</h2>
-                        <p class="text-zinc-500">We'll compare your build against 10,000+ data points.</p>
-                    </div>
-
-                    <div class="space-y-8">
-                        <div class="grid grid-cols-2 gap-6">
-                            <div class="space-y-3">
-                                <label class="text-xs font-bold text-zinc-400 uppercase tracking-widest">Height (cm)</label>
-                                <input type="number" id="user-height" placeholder="175" class="w-full bg-zinc-50 px-6 py-4 rounded-2xl border-2 border-transparent focus:border-indigo-500 focus:bg-white focus:ring-0 outline-none transition-all font-bold text-lg">
-                            </div>
-                            <div class="space-y-3">
-                                <label class="text-xs font-bold text-zinc-400 uppercase tracking-widest">Weight (kg)</label>
-                                <input type="number" id="user-weight" placeholder="70" class="w-full bg-zinc-50 px-6 py-4 rounded-2xl border-2 border-transparent focus:border-indigo-500 focus:bg-white focus:ring-0 outline-none transition-all font-bold text-lg">
-                            </div>
-                        </div>
-
-                        <div class="space-y-3">
-                            <label class="text-xs font-bold text-zinc-400 uppercase tracking-widest">Preferred Silhouette</label>
-                            <div class="grid grid-cols-3 gap-3">
-                                <button onclick="setFitStyle('tight', this)" class="fit-opt px-4 py-4 rounded-2xl border border-zinc-200 text-sm font-bold text-zinc-500 hover:border-indigo-300 transition-all">Tailored</button>
-                                <button onclick="setFitStyle('regular', this)" class="fit-opt px-4 py-4 rounded-2xl border-2 border-indigo-600 bg-indigo-50 text-indigo-700 text-sm font-black shadow-sm transition-all">Regular</button>
-                                <button onclick="setFitStyle('loose', this)" class="fit-opt px-4 py-4 rounded-2xl border border-zinc-200 text-sm font-bold text-zinc-500 hover:border-indigo-300 transition-all">Oversized</button>
-                            </div>
-                        </div>
-
-                        <button onclick="calculateRecommendation()" class="btn-primary w-full py-5 text-white rounded-[1.5rem] font-extrabold text-lg shadow-xl shadow-indigo-200 flex items-center justify-center gap-3 group">
-                            Analyze My Fit
-                            <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
-                        </button>
-                    </div>
+    <!-- REAL SHOPPER MODAL (FOR STOREFRONT) -->
+    <div id="real-widget" class="fixed inset-0 z-[1000] hidden flex items-center justify-center p-6">
+        <div class="absolute inset-0 bg-zinc-900/60 backdrop-blur-md" onclick="closeRealWidget()"></div>
+        <div class="relative w-full max-w-lg glass-panel rounded-[2.5rem] shadow-[0_32px_64px_-15px_rgba(0,0,0,0.5)] p-10 space-y-8 overflow-hidden">
+            <div id="widget-step-1" class="space-y-6">
+                <h2 class="text-3xl font-black tracking-tight">Profile Setup</h2>
+                <div class="grid grid-cols-2 gap-4">
+                    <input type="number" id="h-in" placeholder="Height (cm)" class="p-4 bg-zinc-50 rounded-xl outline-none focus:ring-2 ring-indigo-500 border border-zinc-100 font-bold">
+                    <input type="number" id="w-in" placeholder="Weight (kg)" class="p-4 bg-zinc-50 rounded-xl outline-none focus:ring-2 ring-indigo-500 border border-zinc-100 font-bold">
                 </div>
-
-                <!-- STEP 2: RESULT -->
-                <div id="modal-step-2" class="hidden text-center space-y-10">
-                    <div class="flex justify-center">
-                        <div class="relative">
-                            <div class="absolute -inset-4 bg-indigo-500/20 rounded-full blur-xl animate-pulse"></div>
-                            <div class="relative w-28 h-28 bg-white rounded-full shadow-2xl flex items-center justify-center border border-zinc-100">
-                                <svg class="w-12 h-12 text-indigo-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="space-y-2">
-                        <p class="text-xs font-black text-indigo-600 uppercase tracking-[0.3em]">Perfect Match Found</p>
-                        <h2 id="recommended-size" class="text-7xl font-black text-zinc-900 tracking-tighter">Size XL</h2>
-                        <div class="flex flex-col items-center gap-2 mt-4">
-                            <span id="match-percent" class="text-sm font-bold text-zinc-800">Match Accuracy: 98.4%</span>
-                            <div class="h-1.5 w-48 bg-zinc-100 rounded-full overflow-hidden">
-                                <div id="match-bar" class="h-full btn-primary rounded-full" style="width: 98%"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bg-indigo-50/50 p-6 rounded-3xl border border-indigo-100/50 text-left">
-                        <p id="size-explanation" class="text-zinc-600 text-sm leading-relaxed font-medium">
-                            The <b>XL</b> is the optimal balance for your 185cm frame. It ensures the <b>oversized</b> drape you selected without the sleeves being excessive.
-                        </p>
-                    </div>
-
-                    <div class="space-y-4">
-                        <button onclick="toggleModal(false)" class="btn-primary w-full py-5 text-white rounded-2xl font-bold text-lg">
-                            Add Size <span id="cart-size-text">XL</span> to Cart
-                        </button>
-                        <button onclick="resetModal()" class="text-zinc-400 text-xs font-bold uppercase tracking-widest hover:text-zinc-800 transition-colors">Adjust My Stats</button>
-                    </div>
-                </div>
+                <button onclick="performMatch()" class="w-full py-4 btn-brand preview-brand-bg rounded-xl font-black shadow-lg">Run Fit Analysis</button>
             </div>
-
+            <div id="widget-step-2" class="hidden space-y-6 text-center">
+                <div class="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-3xl">✓</div>
+                <h2 class="text-5xl font-black" id="match-result-size">Size L</h2>
+                <p id="match-explainer" class="text-zinc-500 font-medium"></p>
+                <button onclick="closeRealWidget()" class="w-full py-4 bg-zinc-900 text-white rounded-xl font-bold">Perfect, thanks!</button>
+            </div>
         </div>
     </div>
 
     <script>
-        // State Management
-        let appState = {
-            view: 'admin',
-            fitStyle: 'regular',
-            product: {
-                name: "Signature Heavyweight Hoodie",
-                specs: [
-                    { size: 'S', chest: 38, waist: 34, length: 27 },
-                    { size: 'M', chest: 41, waist: 37, length: 28 },
-                    { size: 'L', chest: 44, waist: 40, length: 29 },
-                    { size: 'XL', chest: 48, waist: 44, length: 30 }
-                ]
-            }
+        // CORE STATE
+        let storeSettings = {
+            brandColor: '#6366f1',
+            showReturnRisk: true,
+            specs: [
+                { size: 'S', chest: 38, waist: 32, length: 26 },
+                { size: 'M', chest: 40, waist: 34, length: 27 },
+                { size: 'L', chest: 42, waist: 36, length: 28 },
+                { size: 'XL', chest: 46, waist: 40, length: 29 }
+            ]
         };
 
-        // Initialize Merchant Table
-        function initAdmin() {
-            const body = document.getElementById('specs-body');
-            body.innerHTML = appState.product.specs.map((s, idx) => `
-                <tr class="group transition-all hover:bg-zinc-50/80">
-                    <td class="py-5">
-                        <span class="w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-zinc-200 font-bold text-xs shadow-sm">${s.size}</span>
-                    </td>
-                    <td class="py-5 text-center">
-                        <input type="number" value="${s.chest}" onchange="updateSpec(${idx}, 'chest', this.value)" class="w-20 px-3 py-2 bg-transparent border-b-2 border-transparent focus:border-indigo-500 text-center font-bold text-zinc-700 outline-none transition-all">
-                    </td>
-                    <td class="py-5 text-center">
-                        <input type="number" value="${s.waist}" onchange="updateSpec(${idx}, 'waist', this.value)" class="w-20 px-3 py-2 bg-transparent border-b-2 border-transparent focus:border-indigo-500 text-center font-bold text-zinc-700 outline-none transition-all">
-                    </td>
-                    <td class="py-5 text-center">
-                        <input type="number" value="${s.length}" onchange="updateSpec(${idx}, 'length', this.value)" class="w-20 px-3 py-2 bg-transparent border-b-2 border-transparent focus:border-indigo-500 text-center font-bold text-zinc-700 outline-none transition-all">
-                    </td>
+        // INITIALIZATION
+        function init() {
+            renderSpecsTable();
+            updateLiveSettings();
+            generateAITip();
+            calculateMetrics();
+        }
+
+        // RENDER TABLE
+        function renderSpecsTable() {
+            const container = document.getElementById('specs-table');
+            container.innerHTML = storeSettings.specs.map((s, idx) => `
+                <tr class="group hover:bg-white/40 transition-all">
+                    <td class="py-4 font-black text-sm">${s.size}</td>
+                    <td class="py-4"><input type="number" onchange="updateSpecValue(${idx}, 'chest', this.value)" value="${s.chest}" class="w-16 bg-transparent border-b border-transparent focus:border-indigo-500 outline-none font-medium text-center"></td>
+                    <td class="py-4"><input type="number" onchange="updateSpecValue(${idx}, 'waist', this.value)" value="${s.waist}" class="w-16 bg-transparent border-b border-transparent focus:border-indigo-500 outline-none font-medium text-center"></td>
+                    <td class="py-4"><input type="number" onchange="updateSpecValue(${idx}, 'length', this.value)" value="${s.length}" class="w-16 bg-transparent border-b border-transparent focus:border-indigo-500 outline-none font-medium text-center"></td>
                 </tr>
             `).join('');
         }
 
-        function updateSpec(index, field, value) {
-            appState.product.specs[index][field] = parseFloat(value);
+        // UPDATE STATE
+        function updateSpecValue(idx, field, val) {
+            storeSettings.specs[idx][field] = parseFloat(val);
+            generateAITip();
+            calculateMetrics();
         }
 
-        function saveSpecs() {
-            appState.product.name = document.getElementById('prod-name').value;
-            document.getElementById('preview-title').innerText = appState.product.name;
-            const btn = event.target;
-            const originalText = btn.innerText;
-            btn.innerText = "Deployment Successful";
-            btn.classList.replace('btn-primary', 'bg-emerald-600');
-            setTimeout(() => {
-                btn.innerText = originalText;
-                btn.classList.add('btn-primary');
-                btn.classList.remove('bg-emerald-600');
-            }, 2000);
+        function updateLiveSettings() {
+            storeSettings.brandColor = document.getElementById('color-picker').value;
+            storeSettings.showReturnRisk = document.getElementById('toggle-risk').checked;
+            
+            // Apply to UI
+            document.getElementById('color-hex').innerText = storeSettings.brandColor;
+            document.documentElement.style.setProperty('--brand-primary', storeSettings.brandColor);
+            
+            // Apply to Preview
+            const previewBgs = document.querySelectorAll('.preview-brand-bg');
+            previewBgs.forEach(el => el.style.backgroundColor = storeSettings.brandColor);
+            
+            const previewBorders = document.querySelectorAll('.preview-brand-border');
+            previewBorders.forEach(el => el.style.borderColor = storeSettings.brandColor);
+
+            document.getElementById('preview-risk-footer').style.display = storeSettings.showReturnRisk ? 'flex' : 'none';
         }
 
-        // View Transition Engine
+        // AI AUDITOR LOGIC
+        function generateAITip() {
+            const tipEl = document.getElementById('ai-tip');
+            const specs = storeSettings.specs;
+            
+            // Check for tiny gaps (common error)
+            let warning = "";
+            for(let i=0; i < specs.length - 1; i++) {
+                const diff = specs[i+1].chest - specs[i].chest;
+                if(diff < 1.5) {
+                    warning = `Critical: The chest gap between ${specs[i].size} and ${specs[i+1].size} is too small (${diff}"). Shoppers will likely struggle to distinguish fits, leading to size-bracket returns.`;
+                    break;
+                }
+            }
+
+            if(!warning) {
+                const avgLength = specs.reduce((acc, s) => acc + s.length, 0) / specs.length;
+                if(avgLength < 25) warning = "Trend Insight: Your garments are shorter than market average. Ensure the widget highlights 'Cropped Fit' to manage expectations.";
+                else warning = "Data look solid! FitGuard AI is currently predicting a 92% accuracy rate with your current specifications.";
+            }
+
+            tipEl.innerText = warning;
+        }
+
+        // PERFORMANCE CALCULATOR (Mock dynamic logic)
+        function calculateMetrics() {
+            const specs = storeSettings.specs;
+            const hasZero = specs.some(s => s.chest === 0 || s.waist === 0);
+            
+            let returns = hasZero ? 12 : 38;
+            let conversion = hasZero ? 5 : 22;
+            let confidence = hasZero ? "Low" : "High";
+
+            // If gaps are consistent, boost performance
+            const consistency = (specs[3].chest - specs[0].chest) > 6;
+            if(consistency) {
+                returns += 7;
+                conversion += 4;
+            }
+
+            document.getElementById('stat-returns').innerText = `-${returns}%`;
+            document.getElementById('stat-conversion').innerText = `+${conversion}%`;
+            document.getElementById('stat-confidence').innerText = confidence;
+            
+            const confEl = document.getElementById('stat-confidence');
+            confEl.className = `text-3xl font-black ${confidence === 'High' ? 'text-emerald-500' : 'text-amber-500'}`;
+        }
+
+        // VIEW TOGGLING
         function switchView(view) {
-            if(appState.view === view) return;
-            appState.view = view;
-
             const admin = document.getElementById('admin-view');
             const shopper = document.getElementById('shopper-view');
-            const adminTab = document.getElementById('adminTab');
-            const shopperTab = document.getElementById('shopperTab');
+            const aTab = document.getElementById('adminTab');
+            const sTab = document.getElementById('shopperTab');
 
-            if (view === 'admin') {
-                shopper.classList.add('opacity-0', 'translate-y-4');
-                setTimeout(() => {
-                    shopper.classList.add('hidden');
-                    admin.classList.remove('hidden');
-                    setTimeout(() => admin.classList.remove('opacity-0', 'translate-y-4'), 10);
-                }, 400);
-                adminTab.className = "px-5 py-2 rounded-lg text-sm font-semibold transition-all tab-active";
-                shopperTab.className = "px-5 py-2 rounded-lg text-sm font-semibold transition-all text-zinc-500 hover:text-zinc-800";
+            if(view === 'admin') {
+                shopper.classList.add('hidden');
+                admin.classList.remove('hidden');
+                aTab.className = "px-5 py-2 rounded-lg text-sm font-bold transition-all bg-white shadow-sm";
+                sTab.className = "px-5 py-2 rounded-lg text-sm font-bold transition-all text-zinc-500";
             } else {
-                admin.classList.add('opacity-0', 'translate-y-4');
-                setTimeout(() => {
-                    admin.classList.add('hidden');
-                    shopper.classList.remove('hidden');
-                    setTimeout(() => shopper.classList.remove('opacity-0', 'translate-y-4'), 10);
-                }, 400);
-                shopperTab.className = "px-5 py-2 rounded-lg text-sm font-semibold transition-all tab-active";
-                adminTab.className = "px-5 py-2 rounded-lg text-sm font-semibold transition-all text-zinc-500 hover:text-zinc-800";
+                admin.classList.add('hidden');
+                shopper.classList.remove('hidden');
+                setTimeout(() => shopper.classList.remove('opacity-0', 'translate-y-8'), 50);
+                sTab.className = "px-5 py-2 rounded-lg text-sm font-bold transition-all bg-white shadow-sm";
+                aTab.className = "px-5 py-2 rounded-lg text-sm font-bold transition-all text-zinc-500";
             }
         }
 
-        // Modal UX
-        function toggleModal(show) {
-            const modal = document.getElementById('size-modal');
-            const content = document.getElementById('modal-content');
-            if (show) {
-                modal.classList.remove('hidden');
-                setTimeout(() => {
-                    content.classList.remove('scale-95', 'opacity-0');
-                    content.classList.add('scale-100', 'opacity-100');
-                }, 10);
-            } else {
-                content.classList.add('scale-95', 'opacity-0');
-                content.classList.remove('scale-100', 'opacity-100');
-                setTimeout(() => {
-                    modal.classList.add('hidden');
-                    resetModal();
-                }, 300);
-            }
+        // SAVE FEEDBACK
+        function saveDashboardChanges() {
+            const toast = document.getElementById('toast');
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
         }
 
-        function setFitStyle(style, el) {
-            appState.fitStyle = style;
-            document.querySelectorAll('.fit-opt').forEach(btn => {
-                btn.className = "fit-opt px-4 py-4 rounded-2xl border border-zinc-200 text-sm font-bold text-zinc-500 hover:border-indigo-300 transition-all";
-            });
-            el.className = "fit-opt px-4 py-4 rounded-2xl border-2 border-indigo-600 bg-indigo-50 text-indigo-700 text-sm font-black shadow-sm transition-all";
+        // REAL WIDGET SIMULATION
+        function openRealWidget() {
+            document.getElementById('real-widget').classList.remove('hidden');
+        }
+        function closeRealWidget() {
+            document.getElementById('real-widget').classList.add('hidden');
+            document.getElementById('widget-step-1').classList.remove('hidden');
+            document.getElementById('widget-step-2').classList.add('hidden');
         }
 
-        function calculateRecommendation() {
-            const h = parseFloat(document.getElementById('user-height').value);
-            const w = parseFloat(document.getElementById('user-weight').value);
-
-            if (!h || !w) {
-                alert("Please provide height and weight to initialize the AI engine.");
-                return;
-            }
-
-            // High-End Heuristic Calculation
-            const estimatedChest = (w * 0.52) + (h * 0.05);
-            let buffer = 2.5; 
-            if (appState.fitStyle === 'tight') buffer = 0.7;
-            if (appState.fitStyle === 'loose') buffer = 4.8;
-
-            const targetChest = estimatedChest + buffer;
-            let bestSize = appState.product.specs[0];
-            let minDiff = 100;
-
-            appState.product.specs.forEach(s => {
-                let diff = s.chest - targetChest;
-                if (diff >= -1 && diff < minDiff) {
-                    minDiff = diff;
-                    bestSize = s;
-                }
-            });
-
-            // Trigger Result UI
-            const step1 = document.getElementById('modal-step-1');
-            const step2 = document.getElementById('modal-step-2');
+        function performMatch() {
+            const w = document.getElementById('w-in').value;
+            if(!w) return alert("Enter weight");
             
-            step1.classList.add('opacity-0');
-            setTimeout(() => {
-                step1.classList.add('hidden');
-                step2.classList.remove('hidden');
-                
-                // Set Values
-                document.getElementById('recommended-size').innerText = `Size ${bestSize.size}`;
-                document.getElementById('cart-size-text').innerText = bestSize.size;
-                const matchVal = (95 + Math.random() * 4.5).toFixed(1);
-                document.getElementById('match-percent').innerText = `Match Accuracy: ${matchVal}%`;
-                document.getElementById('match-bar').style.width = `${matchVal}%`;
-                
-                document.getElementById('size-explanation').innerHTML = `
-                    The <b>${bestSize.size}</b> is the optimal balance for your ${h}cm frame. 
-                    It ensures the <b>${appState.fitStyle}</b> look you desire. 
-                    Calculated return risk for this item: <span class="text-emerald-600 font-bold">Minimal (<1%)</span>.
-                `;
-            }, 300);
+            document.getElementById('widget-step-1').classList.add('hidden');
+            document.getElementById('widget-step-2').classList.remove('hidden');
+            
+            // Pick size based on weight (Simple mock)
+            let size = "S";
+            if(w > 65) size = "M";
+            if(w > 78) size = "L";
+            if(w > 90) size = "XL";
+
+            document.getElementById('match-result-size').innerText = `Size ${size}`;
+            document.getElementById('match-explainer').innerText = `Based on your profile, Size ${size} provides the tailored silhouette you need with enough room in the chest.`;
         }
 
-        function resetModal() {
-            const step1 = document.getElementById('modal-step-1');
-            const step2 = document.getElementById('modal-step-2');
-            step2.classList.add('hidden');
-            step1.classList.remove('hidden', 'opacity-0');
-            document.getElementById('user-height').value = '';
-            document.getElementById('user-weight').value = '';
-        }
-
-        initAdmin();
+        // Launch
+        init();
     </script>
 </body>
 </html>
