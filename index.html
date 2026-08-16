@@ -1,3 +1,10 @@
+Here is your complete, production-ready, single-file HTML/JS application. It
+integrates the private Merchant Authentication & Multi-Tenant Workspace
+Isolation Engine with all features intact—including the interactive biometric
+avatar simulator, dynamic ROI calculator, Chart.js telemetry, Vision OCR matrix
+ingestion, storefront customizer with live white-labeling, eSewa modal, CSV
+exports, and toast notifications.
+
 <!DOCTYPE html>
 <html lang="en" class="h-full bg-slate-950 text-slate-100 antialiased selection:bg-indigo-500 selection:text-white">
 <head>
@@ -55,7 +62,7 @@
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
 
-  <!-- Chart.js for High-Precision Return & Telemetry Analytics -->
+  <!-- Chart.js for Telemetry Analytics -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <!-- Google Fonts -->
@@ -105,12 +112,11 @@
     .animate-glow {
       animation: pulse-glow 7s infinite ease-in-out;
     }
-    @keyframes scanline {
-      0% { transform: translateY(-100%); }
-      100% { transform: translateY(1000%); }
+    .tab-pane {
+      display: none;
     }
-    .animate-scan {
-      animation: scanline 2.5s linear infinite;
+    .tab-pane.active {
+      display: block;
     }
   </style>
 </head>
@@ -127,9 +133,9 @@
   <div id="top-announcement" class="bg-gradient-to-r from-indigo-900 via-brand-700 to-indigo-950 text-indigo-100 text-xs py-2 px-4 text-center border-b border-indigo-500/20 relative flex items-center justify-center gap-3">
     <span class="inline-flex items-center gap-1.5 font-semibold">
       <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-300"></i>
-      <span>Spring 2026 Release: Automated Vision OCR Size Parser & Multi-Staff Accounts now live on Pro Tier!</span>
+      <span>Spring 2026 Release: Automated Vision OCR Size Parser & Multi-Tenant Isolated Workspaces now live!</span>
     </span>
-    <a href="#pricing" onclick="navigateTo('landing')" class="underline font-bold text-white hover:text-indigo-200 transition ml-2">Start 3-Day Free Trial &rarr;</a>
+    <button onclick="openAuthModal('signup')" class="underline font-bold text-white hover:text-indigo-200 transition ml-2">Start 3-Day Free Trial &rarr;</button>
     <button onclick="document.getElementById('top-announcement').remove()" class="absolute right-4 text-indigo-300 hover:text-white" aria-label="Close Announcement">
       <i data-lucide="x" class="w-3.5 h-3.5"></i>
     </button>
@@ -151,7 +157,7 @@
             <span class="text-xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-100 to-indigo-300">FitGuard <span class="text-indigo-400">AI</span></span>
             <span id="nav-tier-badge" class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">PRO ACTIVE</span>
           </div>
-          <p class="text-[10px] text-slate-400 -mt-0.5 hidden sm:block">Autonomous Return Prevention</p>
+          <p class="text-[10px] text-slate-400 -mt-0.5 hidden sm:block">Multi-Tenant Return Prevention Platform</p>
         </div>
       </div>
 
@@ -175,15 +181,19 @@
           <span id="trial-indicator-text">Pro 3-Day Trial: Active</span>
         </div>
 
+        <button onclick="openAuthModal('login')" id="nav-login-btn" class="px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-white transition">
+          Merchant Login
+        </button>
+
         <button onclick="toggleView()" id="nav-switch-view-btn" class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 text-xs font-bold transition flex items-center gap-2">
           <i data-lucide="layout-dashboard" class="w-4 h-4 text-indigo-400"></i>
           <span id="nav-switch-label">Switch to Dashboard</span>
         </button>
 
-        <a href="#pricing" onclick="navigateTo('landing')" id="nav-cta-btn" class="hidden sm:flex px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 via-brand-600 to-indigo-500 hover:brightness-110 text-white text-xs font-bold shadow-lg shadow-indigo-600/30 transition items-center gap-2">
+        <button onclick="openAuthModal('signup')" id="nav-cta-btn" class="hidden sm:flex px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 via-brand-600 to-indigo-500 hover:brightness-110 text-white text-xs font-bold shadow-lg shadow-indigo-600/30 transition items-center gap-2">
           <i data-lucide="zap" class="w-3.5 h-3.5 text-amber-300 fill-amber-300"></i>
           <span>Try Free for 3 Days</span>
-        </a>
+        </button>
       </div>
     </div>
   </header>
@@ -213,15 +223,15 @@
         </h1>
 
         <p class="mt-8 text-lg sm:text-xl text-slate-400 max-w-3xl mx-auto font-normal leading-relaxed">
-          FitGuard AI turns sizing uncertainty into confident checkouts. Auto-parse supplier charts with Vision OCR, embed ultra-lightweight size guidance, and monitor return savings in real-time.
+          FitGuard AI turns sizing uncertainty into confident checkouts. Auto-parse supplier charts with Vision OCR, embed ultra-lightweight size guidance, and monitor multi-tenant return savings in real-time.
         </p>
 
         <!-- CTA Buttons -->
         <div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-          <a href="#pricing" class="w-full sm:w-auto px-8 py-4 rounded-2xl bg-gradient-to-r from-indigo-500 via-brand-600 to-indigo-600 text-white font-black text-base shadow-2xl shadow-indigo-600/40 hover:scale-[1.02] active:scale-[0.98] transition flex items-center justify-center gap-3">
+          <button onclick="openAuthModal('signup')" class="w-full sm:w-auto px-8 py-4 rounded-2xl bg-gradient-to-r from-indigo-500 via-brand-600 to-indigo-600 text-white font-black text-base shadow-2xl shadow-indigo-600/40 hover:scale-[1.02] active:scale-[0.98] transition flex items-center justify-center gap-3">
             <i data-lucide="zap" class="w-5 h-5 text-amber-300 fill-amber-300"></i>
-            <span>Start 3-Day Free Trial (No Lock-In)</span>
-          </a>
+            <span>Create Isolated Workspace (3-Day Free Trial)</span>
+          </button>
           <button onclick="scrollToSection('demo')" class="w-full sm:w-auto px-8 py-4 rounded-2xl glass-card text-slate-200 font-bold text-base hover:text-white hover:border-slate-600 transition flex items-center justify-center gap-2.5">
             <i data-lucide="play-circle" class="w-5 h-5 text-indigo-400"></i>
             <span>Test Interactive Avatar</span>
@@ -329,7 +339,7 @@
                 <span class="text-[10px] font-mono uppercase tracking-widest text-indigo-400 font-bold">FitGuard AI &bull; Autonomous Recommendation</span>
                 <h4 class="text-base font-bold text-white">Live Fit Calculation Output</h4>
               </div>
-              <span id="sim-watermark-pill" class="px-2 py-1 rounded-full bg-slate-800 text-slate-400 text-[10px] font-mono border border-slate-700">Watermark Hidden on Pro</span>
+              <span id="sim-watermark-pill" class="px-2 py-1 rounded-full bg-slate-800 text-slate-400 text-[10px] font-mono border border-slate-700">Watermark Status</span>
             </div>
 
             <!-- Dynamic SVG Silhouette Canvas -->
@@ -338,14 +348,10 @@
               <!-- The Morphing Body Graphic -->
               <div class="sm:col-span-5 flex flex-col items-center justify-center p-4 rounded-2xl bg-slate-950/80 border border-slate-800 relative">
                 <svg id="morphing-body-svg" viewBox="0 0 160 220" class="w-36 h-48 drop-shadow-[0_0_15px_rgba(99,102,241,0.3)] transition-all duration-300">
-                  <!-- Head -->
                   <circle cx="80" cy="24" r="16" fill="#4f46e5" fill-opacity="0.8" stroke="#818cf8" stroke-width="2"/>
-                  <!-- Dynamic Torso Path -->
                   <path id="svg-torso" d="M 52 48 Q 80 44 108 48 L 100 135 Q 80 138 60 135 Z" fill="#6366f1" fill-opacity="0.5" stroke="#a5b4fc" stroke-width="2"/>
-                  <!-- Arms -->
                   <path id="svg-left-arm" d="M 50 48 L 30 115" stroke="#818cf8" stroke-width="8" stroke-linecap="round"/>
                   <path id="svg-right-arm" d="M 110 48 L 130 115" stroke="#818cf8" stroke-width="8" stroke-linecap="round"/>
-                  <!-- Legs -->
                   <path d="M 68 135 L 64 210" stroke="#818cf8" stroke-width="10" stroke-linecap="round"/>
                   <path d="M 92 135 L 96 210" stroke="#818cf8" stroke-width="10" stroke-linecap="round"/>
                 </svg>
@@ -449,10 +455,10 @@
           </div>
 
           <div class="mt-6">
-            <a href="#pricing" class="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-lg shadow-indigo-600/30 transition flex items-center justify-center gap-2">
+            <button onclick="openAuthModal('signup')" class="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-lg shadow-indigo-600/30 transition flex items-center justify-center gap-2">
               <span>Start 3-Day Free Trial To Capture ROI</span>
               <i data-lucide="arrow-right" class="w-4 h-4"></i>
-            </a>
+            </button>
           </div>
         </div>
 
@@ -618,7 +624,6 @@
 
         <!-- PRO PLAN TIER (Rs. 2999/mo - POPULAR & ALL 4 PRO FEATURES) -->
         <div class="glass-card p-8 sm:p-10 rounded-3xl border-2 border-indigo-500 shadow-2xl shadow-indigo-950/80 flex flex-col justify-between relative overflow-hidden">
-          
           <div class="absolute -top-0.5 right-6 px-4 py-1 rounded-b-xl bg-gradient-to-r from-indigo-500 to-brand-500 text-white font-black text-[11px] tracking-wider uppercase shadow-md shadow-indigo-500/40">
             Popular &bull; All 4 Pro Features
           </div>
@@ -775,7 +780,7 @@
   </main>
 
   <!-- ========================================================================= -->
-  <!-- VIEW 2: INTERACTIVE MERCHANT DASHBOARD                                    -->
+  <!-- VIEW 2: INTERACTIVE MERCHANT DASHBOARD (MULTI-TENANT ISOLATED)             -->
   <!-- ========================================================================= -->
   <main id="view-dashboard" class="flex-1 hidden flex-col lg:flex-row min-h-[calc(100vh-4rem)]">
     
@@ -783,25 +788,26 @@
     <aside class="w-full lg:w-72 glass-card border-r border-slate-800/80 p-5 flex flex-col justify-between shrink-0">
       <div class="space-y-6">
         
-        <!-- Active Store Selector -->
+        <!-- Active Store Selector & Tenant Switcher -->
         <div class="p-3.5 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-between">
           <div class="flex items-center gap-3 overflow-hidden">
             <div class="w-9 h-9 rounded-xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center shrink-0">
               <i data-lucide="store" class="w-4 h-4 text-indigo-400"></i>
             </div>
             <div class="truncate">
-              <div class="text-xs font-bold text-white truncate">Acme Apparel Global</div>
+              <div id="store-title-display" class="text-xs font-bold text-white truncate">Acme Apparel Global</div>
               <div class="text-[10px] text-slate-400 flex items-center gap-1 font-mono">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> shopify_live_9012
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> <span id="tenant-handle-badge">shopify_live_9012</span>
               </div>
             </div>
           </div>
-          <i data-lucide="chevrons-up-down" class="w-4 h-4 text-slate-500 shrink-0"></i>
+          <button onclick="openAuthModal('switch')" class="text-slate-400 hover:text-white p-1" title="Switch Store Workspace" aria-label="Switch Store">
+            <i data-lucide="chevrons-up-down" class="w-4 h-4"></i>
+          </button>
         </div>
 
         <!-- Dashboard Navigation Menu (6 Active Tabs) -->
         <nav class="space-y-1.5" id="dashboard-sidebar-nav">
-          <!-- 1. Overview Tab Button -->
           <button onclick="switchTab('overview')" id="tab-btn-overview" class="dash-tab-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-xs font-bold transition bg-indigo-600 text-white shadow-lg shadow-indigo-600/30">
             <div class="flex items-center gap-3">
               <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
@@ -809,7 +815,6 @@
             </div>
           </button>
 
-          <!-- 2. PRO FEATURE 1: Widget Customizer & White-Label Tab Button -->
           <button onclick="switchTab('customizer')" id="tab-btn-customizer" class="dash-tab-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-xs font-semibold transition text-slate-400 hover:text-slate-200 hover:bg-slate-900">
             <div class="flex items-center gap-3">
               <i data-lucide="sliders" class="w-4 h-4"></i>
@@ -818,7 +823,6 @@
             <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Pro #1</span>
           </button>
 
-          <!-- 3. PRO FEATURE 4: Automated Size Chart OCR Generator Tab Button -->
           <button onclick="switchTab('ocr-charts')" id="tab-btn-ocr-charts" class="dash-tab-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-xs font-semibold transition text-slate-400 hover:text-slate-200 hover:bg-slate-900">
             <div class="flex items-center gap-3">
               <i data-lucide="scan" class="w-4 h-4"></i>
@@ -827,7 +831,6 @@
             <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Pro #4</span>
           </button>
 
-          <!-- 4. Intercept Logs Explorer Tab Button -->
           <button onclick="switchTab('logs')" id="tab-btn-logs" class="dash-tab-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-xs font-semibold transition text-slate-400 hover:text-slate-200 hover:bg-slate-900">
             <div class="flex items-center gap-3">
               <i data-lucide="package-x" class="w-4 h-4"></i>
@@ -835,7 +838,6 @@
             </div>
           </button>
 
-          <!-- 5. PRO FEATURE 3: Team Management Tab Button -->
           <button onclick="switchTab('team')" id="tab-btn-team" class="dash-tab-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-xs font-semibold transition text-slate-400 hover:text-slate-200 hover:bg-slate-900">
             <div class="flex items-center gap-3">
               <i data-lucide="users" class="w-4 h-4"></i>
@@ -844,7 +846,6 @@
             <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Pro #3</span>
           </button>
 
-          <!-- 6. Billing & Settings Tab Button -->
           <button onclick="switchTab('billing')" id="tab-btn-billing" class="dash-tab-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-xs font-semibold transition text-slate-400 hover:text-slate-200 hover:bg-slate-900">
             <div class="flex items-center gap-3">
               <i data-lucide="credit-card" class="w-4 h-4"></i>
@@ -854,12 +855,12 @@
         </nav>
       </div>
 
-      <!-- Plan Status Sidebar Widget -->
-      <div class="mt-8 pt-4 border-t border-slate-800">
+      <!-- Plan Status Sidebar Widget & Logout -->
+      <div class="mt-8 pt-4 border-t border-slate-800 space-y-3">
         <div id="dash-sidebar-plan-card" class="p-4 rounded-2xl bg-gradient-to-br from-slate-900 to-indigo-950/60 border border-indigo-500/30 space-y-2.5">
           <div class="flex items-center justify-between">
             <span id="dash-sidebar-tier" class="text-xs font-black text-white">PRO PLAN ACTIVE</span>
-            <span class="px-2 py-0.5 text-[9px] font-bold rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">3-Day Trial</span>
+            <span id="store-plan-display" class="px-2 py-0.5 text-[9px] font-bold rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">3-Day Trial</span>
           </div>
           <p class="text-[11px] text-slate-400 leading-tight">All 4 Pro Tier enterprise features are unlocked for this store.</p>
           <div class="pt-1">
@@ -868,6 +869,13 @@
               <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
             </button>
           </div>
+        </div>
+
+        <div class="flex items-center justify-between pt-2 text-[11px] text-slate-400">
+          <span class="truncate max-w-[130px]" id="current-user-email">owner@acme.com</span>
+          <button onclick="logoutTenant()" class="text-rose-400 hover:underline font-semibold flex items-center gap-1">
+            <i data-lucide="log-out" class="w-3 h-3"></i> Logout
+          </button>
         </div>
       </div>
     </aside>
@@ -878,13 +886,13 @@
       <!-- ===================================================================== -->
       <!-- TAB 1: OVERVIEW & RETURN PREVENTION ANALYTICS (PRO FEATURE #2)        -->
       <!-- ===================================================================== -->
-      <div id="panel-overview" class="tab-pane space-y-8">
+      <div id="panel-overview" class="tab-pane active space-y-8">
         
         <!-- Workspace Header -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight">Executive Telemetry & ROI Dashboard</h1>
-            <p class="text-xs sm:text-sm text-slate-400 mt-1">Real-time apparel sizing accuracy and return interception metrics for Acme Apparel Global.</p>
+            <p class="text-xs sm:text-sm text-slate-400 mt-1">Real-time apparel sizing accuracy and return interception metrics for <span id="overview-store-name" class="font-semibold text-white">Acme Apparel Global</span>.</p>
           </div>
           <div class="flex items-center gap-3">
             <button onclick="refreshDashboardMetrics()" class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-700 text-xs font-bold flex items-center gap-2 transition">
@@ -971,7 +979,7 @@
                   <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Verified
                 </span>
               </div>
-              <p class="text-[11px] text-slate-500 mt-2">Based on 14,890 verified customer checkout sessions</p>
+              <p class="text-[11px] text-slate-500 mt-2">Based on verified customer checkout sessions</p>
             </div>
 
           </div>
@@ -1001,39 +1009,8 @@
             <button onclick="switchTab('logs')" class="text-xs text-indigo-400 hover:underline">View All Sessions &rarr;</button>
           </div>
 
-          <div class="space-y-2.5 text-xs">
-            <div class="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between hover:border-slate-700 transition">
-              <div class="flex items-center gap-3">
-                <div class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></div>
-                <div>
-                  <span class="text-white font-bold">Session #90812 (Kathmandu, NP)</span> &bull;
-                  <span class="text-slate-400">Attempted <strong>Size M</strong> for <em>Heavyweight Fleece</em> &rarr; AI corrected to <strong>Size S</strong>.</span>
-                </div>
-              </div>
-              <span class="text-emerald-400 font-mono font-bold">Saved Rs. 3,400</span>
-            </div>
-
-            <div class="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between hover:border-slate-700 transition">
-              <div class="flex items-center gap-3">
-                <div class="w-2.5 h-2.5 rounded-full bg-emerald-400"></div>
-                <div>
-                  <span class="text-white font-bold">Session #90809 (Pokhara, NP)</span> &bull;
-                  <span class="text-slate-400">Customer bracket ordered <strong>Sizes 32 & 34</strong> &rarr; FitGuard confirmed <strong>Size 32</strong>.</span>
-                </div>
-              </div>
-              <span class="text-emerald-400 font-mono font-bold">Saved Rs. 6,800 (Double Bracket Averted)</span>
-            </div>
-
-            <div class="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between hover:border-slate-700 transition">
-              <div class="flex items-center gap-3">
-                <div class="w-2.5 h-2.5 rounded-full bg-emerald-400"></div>
-                <div>
-                  <span class="text-white font-bold">Session #90804 (Lalitpur, NP)</span> &bull;
-                  <span class="text-slate-400">Customer selected <strong>Size XL</strong> &rarr; AI detected broad shoulder spec & confirmed <strong>Size XL</strong> (100% Fit Match).</span>
-                </div>
-              </div>
-              <span class="text-indigo-400 font-mono font-bold">Confidence 99.4%</span>
-            </div>
+          <div id="overview-ticker-list" class="space-y-2.5 text-xs">
+            <!-- Dynamically Rendered -->
           </div>
         </div>
 
@@ -1042,7 +1019,7 @@
       <!-- ===================================================================== -->
       <!-- TAB 2: WIDGET CUSTOMIZER & WHITE-LABELING (PRO FEATURE #1)             -->
       <!-- ===================================================================== -->
-      <div id="panel-customizer" class="tab-pane hidden space-y-8">
+      <div id="panel-customizer" class="tab-pane space-y-8">
         <div>
           <div class="flex items-center gap-2.5">
             <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight">Storefront Widget Customizer</h1>
@@ -1071,7 +1048,7 @@
 
                 <!-- Pro Toggle Switch -->
                 <label class="relative inline-flex items-center cursor-pointer">
-                  <input type="checkbox" id="dash-whitelabel-toggle" onchange="toggleWhiteLabelOption(this.checked)" class="sr-only peer" checked>
+                  <input type="checkbox" id="dash-whitelabel-toggle" onchange="toggleWhiteLabelOption(this.checked)" class="sr-only peer">
                   <div class="w-13 h-7 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-indigo-600"></div>
                 </label>
               </div>
@@ -1119,14 +1096,7 @@
                   <span id="dash-copy-btn-label">Copy Script</span>
                 </button>
               </div>
-              <pre class="bg-slate-950 p-4 rounded-2xl border border-slate-800 text-[11px] font-mono-code text-indigo-300 overflow-x-auto custom-scrollbar leading-relaxed"><code id="dash-embed-code-block">&lt;!-- FitGuard AI Platform Embed --&gt;
-&lt;script 
-  src="https://cdn.fitguard.ai/v2/fitguard.min.js" 
-  data-store-id="FG-9012-PRO" 
-  data-white-label="true" 
-  data-accent="#4f46e5" 
-  async&gt;
-&lt;/script&gt;</code></pre>
+              <pre class="bg-slate-950 p-4 rounded-2xl border border-slate-800 text-[11px] font-mono-code text-indigo-300 overflow-x-auto custom-scrollbar leading-relaxed"><code id="dash-embed-code-block"><!-- Dynamic embed script --></code></pre>
             </div>
 
           </div>
@@ -1179,7 +1149,7 @@
       <!-- ===================================================================== -->
       <!-- TAB 3: AUTOMATED SIZE CHART OCR GENERATOR (PRO FEATURE #4)             -->
       <!-- ===================================================================== -->
-      <div id="panel-ocr-charts" class="tab-pane hidden space-y-8">
+      <div id="panel-ocr-charts" class="tab-pane space-y-8">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <div class="flex items-center gap-2.5">
@@ -1247,14 +1217,14 @@
               <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-800">
                 <div>
                   <h3 id="ocr-matrix-title" class="text-base font-bold text-white">Parsed Matrix: Heavyweight Outerwear</h3>
-                  <span id="ocr-matrix-status" class="text-xs text-emerald-400 font-medium">✓ Vision OCR Normalized &bull; 6 Size Grids Generated</span>
+                  <span id="ocr-matrix-status" class="text-xs text-emerald-400 font-medium">✓ Vision OCR Normalized &bull; Editable Size Grid</span>
                 </div>
                 <div class="flex items-center gap-2">
                   <button onclick="addMatrixRow()" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold border border-slate-700 transition flex items-center gap-1">
                     <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Size
                   </button>
                   <button onclick="syncMatrixToCatalog()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition flex items-center gap-1 shadow-lg shadow-indigo-600/30">
-                    <i data-lucide="save" class="w-3.5 h-3.5"></i> Sync to Shopify
+                    <i data-lucide="save" class="w-3.5 h-3.5"></i> Sync Catalog
                   </button>
                 </div>
               </div>
@@ -1291,7 +1261,7 @@
       <!-- ===================================================================== -->
       <!-- TAB 4: INTERCEPT LOGS EXPLORER                                       -->
       <!-- ===================================================================== -->
-      <div id="panel-logs" class="tab-pane hidden space-y-8">
+      <div id="panel-logs" class="tab-pane space-y-8">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight">Customer Intercept & Return Log Explorer</h1>
@@ -1327,7 +1297,7 @@
       <!-- ===================================================================== -->
       <!-- TAB 5: TEAM & STAFF ACCOUNTS (PRO FEATURE #3)                         -->
       <!-- ===================================================================== -->
-      <div id="panel-team" class="tab-pane hidden space-y-8">
+      <div id="panel-team" class="tab-pane space-y-8">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <div class="flex items-center gap-2.5">
@@ -1347,7 +1317,7 @@
           <div class="p-6 border-b border-slate-800 flex items-center justify-between">
             <div>
               <h3 class="text-sm font-bold text-white">Active Store Staff</h3>
-              <p class="text-xs text-slate-400">Unlimited staff seats available on Pro Tier</p>
+              <p class="text-xs text-slate-400" id="team-seats-subtitle">Unlimited staff seats available on Pro Tier</p>
             </div>
             <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">RBAC Active</span>
           </div>
@@ -1399,7 +1369,7 @@
       <!-- ===================================================================== -->
       <!-- TAB 6: BILLING & SUBSCRIPTIONS (eSewa + 3-DAY TRIAL)                 -->
       <!-- ===================================================================== -->
-      <div id="panel-billing" class="tab-pane hidden space-y-8">
+      <div id="panel-billing" class="tab-pane space-y-8">
         <div>
           <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight">Subscription & eSewa Billing</h1>
           <p class="text-xs sm:text-sm text-slate-400 mt-1">Manage your active subscription tier, payments, and invoices.</p>
@@ -1428,7 +1398,7 @@
               </div>
               <div class="flex justify-between py-2 border-b border-slate-900">
                 <span class="text-slate-400">Next Automatic Invoice:</span>
-                <span class="font-bold text-white">Rs. 2999 / month after trial</span>
+                <span id="billing-next-amount" class="font-bold text-white">Rs. 2999 / month after trial</span>
               </div>
             </div>
 
@@ -1451,7 +1421,7 @@
           <div class="lg:col-span-6 glass-card p-6 sm:p-8 rounded-3xl border border-slate-800 space-y-4">
             <h3 class="text-base font-bold text-white">Pro Plan Status Matrix</h3>
             
-            <div class="space-y-3 text-xs">
+            <div id="billing-features-matrix" class="space-y-3 text-xs">
               <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
                 <div class="flex items-center gap-2.5">
                   <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400"></i>
@@ -1493,16 +1463,55 @@
   </main>
 
   <!-- ========================================================================= -->
+  <!-- MODAL: AUTH & ISOLATED STORE WORKSPACE CREATOR                            -->
+  <!-- ========================================================================= -->
+  <div id="auth-modal" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="glass-card bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl relative">
+      <button onclick="closeAuthModal()" class="absolute top-5 right-5 text-slate-400 hover:text-white" aria-label="Close modal">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+      
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-bold">
+          <i data-lucide="store" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h3 id="auth-modal-title" class="text-lg font-bold text-white">Merchant Workspace Access</h3>
+          <p id="auth-modal-subtitle" class="text-xs text-slate-400">Launch your private store instance.</p>
+        </div>
+      </div>
+
+      <form id="auth-form" onsubmit="handleAuthSubmit(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">Store / Brand Name</label>
+          <input type="text" id="auth-store-name" required placeholder="e.g. Kathmandu Threads or Nordic Denim" class="w-full bg-slate-950 border border-slate-800 text-xs rounded-xl p-3 text-white focus:outline-none focus:border-indigo-500">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">Owner / Technician Email</label>
+          <input type="email" id="auth-email" required placeholder="founder@yourstore.com" class="w-full bg-slate-950 border border-slate-800 text-xs rounded-xl p-3 text-white focus:outline-none focus:border-indigo-500">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">Select Tier</label>
+          <select id="auth-plan" class="w-full bg-slate-950 border border-slate-800 text-xs rounded-xl p-3 text-white focus:outline-none focus:border-indigo-500">
+            <option value="pro">Pro Plan (All 4 Features + 3-Day Trial)</option>
+            <option value="starter">Starter Pack (3-Day Trial)</option>
+          </select>
+        </div>
+        <button type="submit" class="w-full bg-gradient-to-r from-indigo-600 to-brand-500 hover:brightness-110 text-white font-bold text-xs py-3.5 rounded-xl shadow-lg transition flex items-center justify-center gap-2">
+          <span>Launch Private Workspace</span>
+          <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
   <!-- MODAL: eSewa PAYMENT POPUP DIALOG                                         -->
   <!-- ========================================================================= -->
   <div id="esewaModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
-    <!-- Backdrop Blur Overlay -->
     <div id="esewaModalBackdrop" class="absolute inset-0 bg-slate-950/80 backdrop-blur-md"></div>
 
-    <!-- Modal Content Container -->
     <div class="relative z-10 w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl shadow-indigo-950/60 transform scale-95 transition-transform duration-300" id="esewaModalContainer">
-      
-      <!-- Modal Header -->
       <div class="flex items-center justify-between pb-4 border-b border-slate-800">
         <div class="flex items-center gap-2.5">
           <div class="w-8 h-8 rounded-lg bg-[#60bb46] flex items-center justify-center text-white font-black text-xs shadow-sm">
@@ -1514,13 +1523,11 @@
           </div>
         </div>
 
-        <!-- Close Button -->
         <button onclick="closeEsewaModal()" class="w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center hover:bg-slate-700 transition-colors" aria-label="Close modal">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
 
-      <!-- Plan Info Card -->
       <div class="my-5 p-4 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between">
         <div>
           <span class="text-xs text-slate-400 block font-medium">Selected Plan</span>
@@ -1532,7 +1539,6 @@
         </div>
       </div>
 
-      <!-- QR Code Image Container (Pure QR - No Personal Name or Phone Number) -->
       <div class="flex flex-col items-center justify-center mb-5">
         <div class="bg-white p-4 rounded-2xl shadow-xl flex items-center justify-center border-4 border-emerald-500/20">
           <img 
@@ -1548,7 +1554,6 @@
         </p>
       </div>
 
-      <!-- Step Instructions (Strictly Privacy Safe) -->
       <div class="p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-[11px] text-slate-400 space-y-1 mb-4">
         <div class="flex items-center gap-2 text-slate-300 font-semibold">
           <span class="w-1.5 h-1.5 rounded-full bg-[#60bb46]"></span>
@@ -1561,7 +1566,6 @@
         </ol>
       </div>
 
-      <!-- Action Footer -->
       <button 
         onclick="closeEsewaModal()" 
         class="w-full py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs transition-colors">
@@ -1589,17 +1593,17 @@
       <form id="invite-form" onsubmit="submitInviteForm(event)" class="mt-6 space-y-4">
         <div>
           <label class="block text-xs font-bold text-slate-300 mb-1">Full Name</label>
-          <input type="text" id="invite-name" required placeholder="e.g. Jessica Sterling" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+          <input type="text" id="invite-name" required placeholder="e.g. Jessica Sterling" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500">
         </div>
 
         <div>
           <label class="block text-xs font-bold text-slate-300 mb-1">Work Email</label>
-          <input type="email" id="invite-email" required placeholder="jessica@acmeapparel.com" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+          <input type="email" id="invite-email" required placeholder="jessica@yourstore.com" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500">
         </div>
 
         <div>
           <label class="block text-xs font-bold text-slate-300 mb-1">Assigned Role</label>
-          <select id="invite-role" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+          <select id="invite-role" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500">
             <option value="Admin">Admin (Full Store Control)</option>
             <option value="Fit Editor" selected>Fit Editor (OCR & Size Charts)</option>
             <option value="Support Viewer">Support Viewer (Read-only)</option>
@@ -1629,7 +1633,7 @@
         </button>
       </div>
       <p class="text-xs text-slate-400 leading-relaxed">
-        Download verified sizing telemetry including total returns prevented, averted double-bracket cart events, and accuracy rates.
+        Download verified sizing telemetry including total returns prevented, averted double-bracket cart events, and accuracy rates for <strong id="export-store-name" class="text-white">Active Store</strong>.
       </p>
       <div class="pt-2 flex justify-end gap-3">
         <button onclick="closeExportModal()" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-xs font-bold">Cancel</button>
@@ -1642,250 +1646,337 @@
   <!-- JAVASCRIPT: COMPLETE INTEGRATED APPLICATION ENGINE                        -->
   <!-- ========================================================================= -->
   <script>
-    // Global Application State Store
-    const App = {
-      view: 'landing', // 'landing' or 'dashboard'
+    // Master Multi-Tenant Storage & Application State
+    let currentTenantKey = localStorage.getItem('fitguard_active_tenant') || null;
+    let currentUser = null;
+    let chartInstance = null;
+
+    const AppState = {
+      view: 'landing',
       tab: 'overview',
-      plan: 'pro',     // 'pro', 'starter', 'none'
-      isTrial: true,
-      trialDays: 3,
-      whiteLabel: true,
-      accentColor: '#4f46e5',
-      buttonRadius: 'rounded-2xl',
-      buttonText: 'Calculate My Perfect Size ✨',
-      
-      // Biometric Simulator State
       sim: {
         height: 180,
         weight: 78,
         torso: 'balanced',
         fit: 'regular'
-      },
-
-      // Team Multi-User State (Pro Feature #3)
-      team: [
-        { id: 1, name: 'Alexander Wright', email: 'alex@acmeapparel.com', role: 'Admin', status: 'Active' },
-        { id: 2, name: 'Sophia Chen', email: 'sophia@acmeapparel.com', role: 'Fit Editor', status: 'Active' },
-        { id: 3, name: 'Liam O\'Connor', email: 'liam@acmeapparel.com', role: 'Support Viewer', status: 'Active' },
-        { id: 4, name: 'Maya Lin', email: 'maya@acmeapparel.com', role: 'Fit Editor', status: 'Pending' }
-      ],
-
-      // Sizing Matrix State (Pro Feature #4)
-      matrix: [
-        { size: 'XS', chest: 88, waist: 72, length: 68, weight: '50-60 kg' },
-        { size: 'S', chest: 94, waist: 78, length: 70, weight: '60-70 kg' },
-        { size: 'M', chest: 100, waist: 84, length: 72, weight: '70-80 kg' },
-        { size: 'L', chest: 106, waist: 90, length: 74, weight: '80-90 kg' },
-        { size: 'XL', chest: 112, waist: 96, length: 76, weight: '90-105 kg' },
-        { size: 'XXL', chest: 118, waist: 102, length: 78, weight: '105-120 kg' }
-      ],
-
-      // Intercept logs state
-      logs: [
-        { id: 'SES-90812', sku: 'NHC-9021', product: 'Heavy Fleece Crew', biometrics: '180cm / 78kg (Balanced)', requested: 'Size M', aiSize: 'Size S', outcome: 'Prevented Return', savings: 'Rs. 3,400' },
-        { id: 'SES-90809', sku: 'RAW-3100', product: 'Selvedge Denim', biometrics: '185cm / 88kg (Broad)', requested: 'Size 32 & 34', aiSize: 'Size 32', outcome: 'Bracket Averted', savings: 'Rs. 6,800' },
-        { id: 'SES-90804', sku: 'OVR-1102', product: 'Boxy Poplin Shirt', biometrics: '172cm / 64kg (Lean)', requested: 'Size L', aiSize: 'Size M', outcome: 'Prevented Return', savings: 'Rs. 3,400' },
-        { id: 'SES-90798', sku: 'BLZ-5501', product: 'Tailored Blazer', biometrics: '178cm / 82kg (Broad)', requested: 'Size 40R', aiSize: 'Size 42R', outcome: 'Prevented Return', savings: 'Rs. 3,400' },
-        { id: 'SES-90791', sku: 'TRK-2210', product: 'Merino Track Pant', biometrics: '168cm / 58kg (Lean)', requested: 'Size S', aiSize: 'Size XS', outcome: 'Prevented Return', savings: 'Rs. 3,400' },
-        { id: 'SES-90785', sku: 'NHC-9021', product: 'Heavy Fleece Crew', biometrics: '190cm / 95kg (Broad)', requested: 'Size XL', aiSize: 'Size XXL', outcome: 'Prevented Return', savings: 'Rs. 3,400' }
-      ]
+      }
     };
 
-    let chartInstance = null;
-
-    // Initialization lifecycle
-    document.addEventListener('DOMContentLoaded', () => {
-      restoreState();
-      inspectUrlParameters();
-      renderAppView();
-      updateSimulation();
-      calculateROI();
-      renderTeam();
-      renderMatrix();
-      renderLogs(App.logs);
-      initChart();
-      switchTab('overview');
-      lucide.createIcons();
-    });
-
-    // Local Storage Persistence
-    function persistState() {
-      localStorage.setItem('fitguard_ai_saas_v2', JSON.stringify({
-        plan: App.plan,
-        isTrial: App.isTrial,
-        whiteLabel: App.whiteLabel,
-        team: App.team,
-        matrix: App.matrix
-      }));
-    }
-
-    function restoreState() {
-      const data = localStorage.getItem('fitguard_ai_saas_v2');
-      if (data) {
+    /**
+     * MULTI-TENANT USER STATE INITIALIZER & LOCAL STORAGE ISOLATION ENGINE
+     */
+    function getStoreData(tenantKey) {
+      const raw = localStorage.getItem(`fitguard_store_${tenantKey}`);
+      if (raw) {
         try {
-          const parsed = JSON.parse(data);
-          App.plan = parsed.plan || 'pro';
-          App.isTrial = parsed.isTrial !== undefined ? parsed.isTrial : true;
-          App.whiteLabel = parsed.whiteLabel !== undefined ? parsed.whiteLabel : true;
-          if (parsed.team) App.team = parsed.team;
-          if (parsed.matrix) App.matrix = parsed.matrix;
+          return JSON.parse(raw);
         } catch (e) {
-          console.error("Local storage error", e);
+          console.error("Parse error", e);
         }
       }
+
+      // Default Seed Data per Store Workspace
+      const isStarter = tenantKey.includes('starter') || tenantKey.includes('velocity');
+      const seedStore = {
+        storeId: `FG-${Math.floor(1000 + Math.random() * 9000)}-${isStarter ? 'STR' : 'PRO'}`,
+        name: tenantKey.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+        handle: `${tenantKey.toLowerCase()}_live`,
+        email: `owner@${tenantKey.toLowerCase().replace(/[^a-z0-9]/g, '')}.com`,
+        plan: isStarter ? 'starter' : 'pro',
+        isTrial: true,
+        trialDays: 3,
+        analytics: {
+          returnsPrevented: isStarter ? 142 : 512,
+          moneySaved: isStarter ? 482800 : 1740800,
+          accuracyRate: isStarter ? '97.2%' : '98.7%',
+          growthRate: isStarter ? '+11.2%' : '+18.4%',
+          chartTimeline: {
+            labels: ['Day 1', 'Day 5', 'Day 10', 'Day 15', 'Day 20', 'Day 25', 'Day 30'],
+            returnsPrevented: isStarter ? [10, 28, 52, 79, 105, 126, 142] : [38, 92, 184, 276, 390, 460, 512],
+            inquiries: isStarter ? [40, 95, 180, 260, 340, 420, 510] : [120, 290, 540, 810, 1150, 1380, 1590]
+          }
+        },
+        customizer: {
+          whiteLabel: !isStarter,
+          accentColor: '#4f46e5',
+          buttonRadius: 'rounded-2xl',
+          buttonText: 'Calculate My Perfect Size ✨'
+        },
+        ocrHistory: {
+          activeMatrixTitle: 'Parsed Matrix: Heavyweight Fleece & Outerwear'
+        },
+        matrix: [
+          { size: 'XS', chest: 88, waist: 72, length: 68, weight: '50-60 kg' },
+          { size: 'S', chest: 94, waist: 78, length: 70, weight: '60-70 kg' },
+          { size: 'M', chest: 100, waist: 84, length: 72, weight: '70-80 kg' },
+          { size: 'L', chest: 106, waist: 90, length: 74, weight: '80-90 kg' },
+          { size: 'XL', chest: 112, waist: 96, length: 76, weight: '90-105 kg' },
+          { size: 'XXL', chest: 118, waist: 102, length: 78, weight: '105-120 kg' }
+        ],
+        logs: [
+          { id: 'SES-90812', sku: 'NHC-9021', product: 'Heavy Fleece Crew', biometrics: '180cm / 78kg (Balanced)', requested: 'Size M', aiSize: 'Size S', outcome: 'Prevented Return', savings: 'Rs. 3,400' },
+          { id: 'SES-90809', sku: 'RAW-3100', product: 'Selvedge Denim', biometrics: '185cm / 88kg (Broad)', requested: 'Size 32 & 34', aiSize: 'Size 32', outcome: 'Bracket Averted', savings: 'Rs. 6,800' },
+          { id: 'SES-90804', sku: 'OVR-1102', product: 'Boxy Poplin Shirt', biometrics: '172cm / 64kg (Lean)', requested: 'Size L', aiSize: 'Size M', outcome: 'Prevented Return', savings: 'Rs. 3,400' },
+          { id: 'SES-90798', sku: 'BLZ-5501', product: 'Tailored Blazer', biometrics: '178cm / 82kg (Broad)', requested: 'Size 40R', aiSize: 'Size 42R', outcome: 'Prevented Return', savings: 'Rs. 3,400' },
+          { id: 'SES-90791', sku: 'TRK-2210', product: 'Merino Track Pant', biometrics: '168cm / 58kg (Lean)', requested: 'Size S', aiSize: 'Size XS', outcome: 'Prevented Return', savings: 'Rs. 3,400' },
+          { id: 'SES-90785', sku: 'NHC-9021', product: 'Heavy Fleece Crew', biometrics: '190cm / 95kg (Broad)', requested: 'Size XL', aiSize: 'Size XXL', outcome: 'Prevented Return', savings: 'Rs. 3,400' }
+        ],
+        team: [
+          { id: 1, name: 'Alexander Wright', email: 'alex@acmeapparel.com', role: 'Admin', status: 'Active' },
+          { id: 2, name: 'Sophia Chen', email: 'sophia@acmeapparel.com', role: 'Fit Editor', status: 'Active' },
+          { id: 3, name: 'Liam O\'Connor', email: 'liam@acmeapparel.com', role: 'Support Viewer', status: 'Active' },
+          { id: 4, name: 'Maya Lin', email: 'maya@acmeapparel.com', role: 'Fit Editor', status: 'Pending' }
+        ]
+      };
+
+      saveStoreData(tenantKey, seedStore);
+      return seedStore;
     }
 
-    // Payment query redirect handler (?checkout=success)
-    function inspectUrlParameters() {
-      const params = new URLSearchParams(window.location.search);
-      if (params.get('checkout') === 'success' || params.get('session_id')) {
-        const tier = params.get('plan') || 'pro';
-        App.plan = tier === 'starter' ? 'starter' : 'pro';
-        App.isTrial = true;
-        App.whiteLabel = (App.plan === 'pro');
-        persistState();
-        showToast('🎉 eSewa payment verified! Pro 3-Day Free Trial activated.', 'success');
-        navigateTo('dashboard');
-        window.history.replaceState({}, document.title, window.location.pathname);
+    function saveStoreData(tenantKey, data) {
+      localStorage.setItem(`fitguard_store_${tenantKey}`, JSON.stringify(data));
+    }
+
+    function persistCurrentTenant() {
+      if (currentTenantKey && currentUser) {
+        saveStoreData(currentTenantKey, currentUser);
       }
     }
 
-    // View Navigation Logic
-    function navigateTo(viewName) {
-      const landing = document.getElementById('view-landing');
-      const dashboard = document.getElementById('view-dashboard');
-      const switchLabel = document.getElementById('nav-switch-label');
-
-      if (viewName === 'dashboard') {
-        landing.classList.add('hidden');
-        dashboard.classList.remove('hidden');
-        dashboard.classList.add('flex');
-        App.view = 'dashboard';
-        switchLabel.textContent = 'Switch to Landing Page';
-        switchTab(App.tab || 'overview');
-      } else {
-        dashboard.classList.add('hidden');
-        dashboard.classList.remove('flex');
-        landing.classList.remove('hidden');
-        App.view = 'landing';
-        switchLabel.textContent = 'Switch to Dashboard';
-      }
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      lucide.createIcons();
-    }
-
-    function toggleView() {
-      navigateTo(App.view === 'landing' ? 'dashboard' : 'landing');
-    }
-
-    function scrollToSection(id) {
-      if (App.view !== 'landing') navigateTo('landing');
-      setTimeout(() => {
-        const el = document.getElementById(id);
-        if (el) el.scrollIntoView({ behavior: 'smooth' });
-      }, 60);
+    function fetchUserData(tenantKey) {
+      currentTenantKey = tenantKey;
+      localStorage.setItem('fitguard_active_tenant', tenantKey);
+      currentUser = getStoreData(tenantKey);
+      renderAllDynamicTabs();
     }
 
     /**
-     * Bulletproof Dashboard Tab Switcher
-     * @param {string} tabKey - 'overview', 'customizer', 'ocr-charts', 'logs', 'team', 'billing'
+     * AUTH MODAL & WORKSPACE SWITCH HANDLERS
      */
-    function switchTab(tabKey) {
-      App.tab = tabKey;
+    function openAuthModal(mode = 'signup') {
+      const modal = document.getElementById('auth-modal');
+      const title = document.getElementById('auth-modal-title');
+      const subtitle = document.getElementById('auth-modal-subtitle');
+      const storeInput = document.getElementById('auth-store-name');
 
-      const activeBtnClasses = ['bg-indigo-600', 'text-white', 'shadow-lg', 'shadow-indigo-600/30', 'font-bold'];
-      const inactiveBtnClasses = ['text-slate-400', 'hover:text-slate-200', 'hover:bg-slate-900', 'font-semibold'];
-
-      // 1. Hide all panels
-      const allPanels = document.querySelectorAll('.tab-pane');
-      allPanels.forEach(panel => {
-        panel.classList.add('hidden');
-      });
-
-      // 2. Reset all sidebar buttons
-      const allButtons = document.querySelectorAll('.dash-tab-btn');
-      allButtons.forEach(btn => {
-        btn.classList.remove(...activeBtnClasses);
-        btn.classList.add(...inactiveBtnClasses);
-      });
-
-      // 3. Find target panel and button
-      let targetPanel = document.getElementById(`panel-${tabKey}`);
-      let targetButton = document.getElementById(`tab-btn-${tabKey}`);
-
-      // Fallback if ID misnamed
-      if (!targetPanel) {
-        console.warn(`Panel "panel-${tabKey}" not found. Falling back to overview.`);
-        tabKey = 'overview';
-        App.tab = 'overview';
-        targetPanel = document.getElementById('panel-overview');
-        targetButton = document.getElementById('tab-btn-overview');
+      if (mode === 'login' || mode === 'switch') {
+        title.textContent = 'Merchant Workspace Login';
+        subtitle.textContent = 'Enter your brand name to launch your isolated store dashboard.';
+      } else {
+        title.textContent = 'Create Store Workspace';
+        subtitle.textContent = 'Launch your isolated 3-Day Free Trial environment.';
       }
 
-      // 4. Reveal panel
-      if (targetPanel) {
-        targetPanel.classList.remove('hidden');
+      if (currentTenantKey && currentUser) {
+        storeInput.value = currentUser.name;
+        document.getElementById('auth-email').value = currentUser.email;
       }
 
-      // 5. Highlight button
-      if (targetButton) {
-        targetButton.classList.remove(...inactiveBtnClasses);
-        targetButton.classList.add(...activeBtnClasses);
-      }
-
-      // 6. Handle Chart.js resizing if overview tab opened
-      if (tabKey === 'overview' && typeof chartInstance !== 'undefined' && chartInstance) {
-        setTimeout(() => chartInstance.resize(), 50);
-      }
-
-      // 7. Re-render icons
-      if (window.lucide) {
-        lucide.createIcons();
-      }
+      modal.classList.remove('hidden');
+      lucide.createIcons();
     }
 
-    // Render App UI according to Plan State
-    function renderAppView() {
-      const isPro = App.plan === 'pro';
-      const tierBadge = document.getElementById('nav-tier-badge');
+    function closeAuthModal() {
+      document.getElementById('auth-modal').classList.add('hidden');
+    }
+
+    function handleAuthSubmit(e) {
+      e.preventDefault();
+      const storeName = document.getElementById('auth-store-name').value.trim();
+      const email = document.getElementById('auth-email').value.trim();
+      const plan = document.getElementById('auth-plan').value;
+
+      if (!storeName) return;
+
+      const tenantKey = storeName.toLowerCase().replace(/[^a-z0-9]/g, '_');
+      let data = getStoreData(tenantKey);
+      data.name = storeName;
+      data.email = email;
+      data.plan = plan;
+      data.customizer.whiteLabel = (plan === 'pro');
+      saveStoreData(tenantKey, data);
+
+      fetchUserData(tenantKey);
+      closeAuthModal();
+      navigateTo('dashboard');
+      showToast(`Welcome! Workspace "${storeName}" is loaded.`, 'success');
+    }
+
+    function logoutTenant() {
+      localStorage.removeItem('fitguard_active_tenant');
+      currentTenantKey = null;
+      currentUser = null;
+      navigateTo('landing');
+      showToast('Logged out of store workspace.', 'info');
+    }
+
+    /**
+     * DYNAMIC RENDERING ACROSS ALL TABS
+     */
+    function renderAllDynamicTabs() {
+      if (!currentUser) return;
+      const isPro = currentUser.plan === 'pro';
+
+      // Header & Navigation Badges
+      const navBadge = document.getElementById('nav-tier-badge');
+      if (navBadge) {
+        navBadge.textContent = isPro ? 'PRO ACTIVE' : 'STARTER ACTIVE';
+        navBadge.className = isPro ? 'px-2 py-0.5 text-[10px] font-bold rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30' : 'px-2 py-0.5 text-[10px] font-bold rounded-full bg-slate-800 text-slate-400 border border-slate-700';
+      }
+
+      // Sidebar Details
+      const titleDisplay = document.getElementById('store-title-display');
+      const handleBadge = document.getElementById('tenant-handle-badge');
       const sideTier = document.getElementById('dash-sidebar-tier');
-      const billTitle = document.getElementById('billing-tier-title');
-      const wlToggle = document.getElementById('dash-whitelabel-toggle');
+      const planDisplay = document.getElementById('store-plan-display');
+      const emailDisplay = document.getElementById('current-user-email');
 
-      if (tierBadge) tierBadge.textContent = isPro ? 'PRO ACTIVE' : 'STARTER ACTIVE';
+      if (titleDisplay) titleDisplay.textContent = currentUser.name;
+      if (handleBadge) handleBadge.textContent = currentUser.handle;
       if (sideTier) sideTier.textContent = isPro ? 'PRO PLAN ACTIVE' : 'STARTER PLAN ACTIVE';
-      if (billTitle) billTitle.textContent = isPro ? 'Pro Plan (Rs. 2999/mo)' : 'Starter Pack (Rs. 999/mo)';
-      if (wlToggle) wlToggle.checked = App.whiteLabel && isPro;
+      if (planDisplay) planDisplay.textContent = currentUser.isTrial ? '3-Day Trial' : 'Active Plan';
+      if (emailDisplay) emailDisplay.textContent = currentUser.email;
 
-      updateWhiteLabelUI();
+      // Section 1: Overview
+      renderOverviewTab();
+
+      // Section 2: Customizer
+      renderCustomizerTab();
+
+      // Section 3: OCR Charts
+      renderOcrMatrixTab();
+
+      // Section 4: Logs
+      renderLogsTab(currentUser.logs);
+
+      // Section 5: Team
+      renderTeamTab();
+
+      // Section 6: Billing
+      renderBillingTab();
+
+      lucide.createIcons();
     }
 
-    // FEATURE 1: WHITE-LABELING TOGGLE LOGIC
-    function toggleWhiteLabelOption(checked) {
-      if (App.plan !== 'pro') {
-        showToast('White-Labeling requires the Pro Tier (Rs. 2999/mo).', 'error');
-        document.getElementById('dash-whitelabel-toggle').checked = false;
-        return;
+    function renderOverviewTab() {
+      document.getElementById('overview-store-name').textContent = currentUser.name;
+      document.getElementById('kpi-returns-prevented').textContent = currentUser.analytics.returnsPrevented.toLocaleString();
+      document.getElementById('kpi-money-saved').textContent = `Rs. ${currentUser.analytics.moneySaved.toLocaleString()}`;
+      document.getElementById('kpi-accuracy-rate').textContent = currentUser.analytics.accuracyRate;
+
+      // Render Ticker
+      const tickerContainer = document.getElementById('overview-ticker-list');
+      if (tickerContainer) {
+        tickerContainer.innerHTML = '';
+        currentUser.logs.slice(0, 3).forEach(log => {
+          const div = document.createElement('div');
+          div.className = 'p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between hover:border-slate-700 transition';
+          div.innerHTML = `
+            <div class="flex items-center gap-3">
+              <div class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></div>
+              <div>
+                <span class="text-white font-bold">${log.id} (${currentUser.name})</span> &bull;
+                <span class="text-slate-400">${log.product} &bull; Requested <strong>${log.requested}</strong> &rarr; FitGuard confirmed <strong>${log.aiSize}</strong>.</span>
+              </div>
+            </div>
+            <span class="text-emerald-400 font-mono font-bold">${log.savings}</span>
+          `;
+          tickerContainer.appendChild(div);
+        });
       }
-      App.whiteLabel = checked;
-      persistState();
-      updateWhiteLabelUI();
-      showToast(checked ? 'FitGuard branding hidden from storefront.' : 'FitGuard branding enabled.', 'info');
+
+      initOrUpdateChart();
     }
 
-    function updateWhiteLabelUI() {
-      const isHidden = App.whiteLabel && App.plan === 'pro';
+    function initOrUpdateChart() {
+      const ctx = document.getElementById('returnPreventionChart');
+      if (!ctx) return;
+
+      const timeline = currentUser.analytics.chartTimeline;
+
+      if (chartInstance) {
+        chartInstance.data.labels = timeline.labels;
+        chartInstance.data.datasets[0].data = timeline.returnsPrevented;
+        chartInstance.data.datasets[1].data = timeline.inquiries;
+        chartInstance.update();
+      } else {
+        chartInstance = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: timeline.labels,
+            datasets: [
+              {
+                label: 'Returns Prevented (Units)',
+                data: timeline.returnsPrevented,
+                borderColor: '#10b981',
+                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                borderWidth: 2.5,
+                tension: 0.35,
+                fill: true
+              },
+              {
+                label: 'Biometric Size Intercepts',
+                data: timeline.inquiries,
+                borderColor: '#6366f1',
+                backgroundColor: 'rgba(99, 102, 241, 0.05)',
+                borderWidth: 2,
+                borderDash: [4, 4],
+                tension: 0.35,
+                fill: false
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                labels: { color: '#94a3b8', font: { size: 11, family: 'Inter' } }
+              }
+            },
+            scales: {
+              x: {
+                grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                ticks: { color: '#64748b', font: { size: 10 } }
+              },
+              y: {
+                grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                ticks: { color: '#64748b', font: { size: 10 } }
+              }
+            }
+          }
+        });
+      }
+    }
+
+    function renderCustomizerTab() {
+      const c = currentUser.customizer;
+      const isPro = currentUser.plan === 'pro';
+
+      const wlToggle = document.getElementById('dash-whitelabel-toggle');
+      const colorInput = document.getElementById('dash-custom-color');
+      const hexInput = document.getElementById('dash-custom-hex');
+      const radiusSelect = document.getElementById('dash-custom-radius');
+      const labelInput = document.getElementById('dash-custom-label');
+      const previewBtn = document.getElementById('dash-preview-btn');
       const previewWatermark = document.getElementById('dash-preview-watermark');
       const statusPill = document.getElementById('whitelabel-badge-status');
-      const simWatermarkPill = document.getElementById('sim-watermark-pill');
 
-      if (previewWatermark) {
-        previewWatermark.style.display = isHidden ? 'none' : 'block';
+      if (wlToggle) wlToggle.checked = c.whiteLabel && isPro;
+      if (colorInput) colorInput.value = c.accentColor;
+      if (hexInput) hexInput.value = c.accentColor;
+      if (radiusSelect) radiusSelect.value = c.buttonRadius;
+      if (labelInput) labelInput.value = c.buttonText;
+
+      if (previewBtn) {
+        previewBtn.style.backgroundColor = c.accentColor;
+        previewBtn.className = `w-full py-3.5 text-white font-bold text-xs shadow-lg transition ${c.buttonRadius}`;
+        previewBtn.textContent = c.buttonText;
       }
 
-      if (simWatermarkPill) {
-        simWatermarkPill.textContent = isHidden ? 'Watermark: Hidden (Pro)' : 'Watermark: Visible (Starter)';
-        simWatermarkPill.className = isHidden ? 'px-2 py-1 rounded-full bg-emerald-950 text-emerald-300 text-[10px] font-mono border border-emerald-800' : 'px-2 py-1 rounded-full bg-slate-800 text-slate-400 text-[10px] font-mono border border-slate-700';
+      const isHidden = c.whiteLabel && isPro;
+      if (previewWatermark) {
+        previewWatermark.style.display = isHidden ? 'none' : 'block';
       }
 
       if (statusPill) {
@@ -1896,14 +1987,24 @@
           statusPill.innerHTML = '<i data-lucide="info" class="w-4 h-4 text-amber-400"></i><span>FitGuard branding is <strong>VISIBLE</strong> on your storefront widget.</span>';
           statusPill.className = 'p-3 rounded-xl bg-slate-900 border border-slate-800 text-xs text-amber-400 flex items-center gap-2';
         }
-        lucide.createIcons();
       }
 
-      // Update embed code preview
       const codeBlock = document.getElementById('dash-embed-code-block');
       if (codeBlock) {
-        codeBlock.textContent = `<!-- FitGuard AI Platform Embed -->\n<script \n  src="https://cdn.fitguard.ai/v2/fitguard.min.js" \n  data-store-id="FG-9012-PRO" \n  data-white-label="${isHidden}" \n  data-accent="${App.accentColor}" \n  async>\n<\/script>`;
+        codeBlock.textContent = `<!-- FitGuard AI Platform Embed: ${currentUser.name} -->\n<script \n  src="https://cdn.fitguard.ai/v2/fitguard.min.js" \n  data-store-id="${currentUser.storeId}" \n  data-white-label="${isHidden}" \n  data-accent="${c.accentColor}" \n  async>\n<\/script>`;
       }
+    }
+
+    function toggleWhiteLabelOption(checked) {
+      if (currentUser.plan !== 'pro') {
+        showToast('White-Labeling requires the Pro Tier (Rs. 2999/mo).', 'error');
+        document.getElementById('dash-whitelabel-toggle').checked = false;
+        return;
+      }
+      currentUser.customizer.whiteLabel = checked;
+      persistCurrentTenant();
+      renderCustomizerTab();
+      showToast(checked ? `Branding hidden for ${currentUser.name}.` : `Branding enabled for ${currentUser.name}.`, 'info');
     }
 
     function updateLiveWidgetPreview() {
@@ -1911,18 +2012,13 @@
       const radius = document.getElementById('dash-custom-radius').value;
       const label = document.getElementById('dash-custom-label').value;
 
-      App.accentColor = color;
-      App.buttonRadius = radius;
-      App.buttonText = label;
+      currentUser.customizer.accentColor = color;
+      currentUser.customizer.buttonRadius = radius;
+      currentUser.customizer.buttonText = label;
 
       document.getElementById('dash-custom-hex').value = color;
-      const btn = document.getElementById('dash-preview-btn');
-      if (btn) {
-        btn.style.backgroundColor = color;
-        btn.className = `w-full py-3.5 text-white font-bold text-xs shadow-lg transition ${radius}`;
-        btn.textContent = label;
-      }
-      updateWhiteLabelUI();
+      persistCurrentTenant();
+      renderCustomizerTab();
     }
 
     function updateLiveWidgetPreviewHex() {
@@ -1934,97 +2030,175 @@
     }
 
     function copyEmbedScriptCode() {
-      const code = `<script src="https://cdn.fitguard.ai/v2/fitguard.min.js" data-store-id="FG-9012-PRO" data-white-label="${App.whiteLabel}" data-accent="${App.accentColor}" async><\/script>`;
+      const isHidden = currentUser.customizer.whiteLabel && currentUser.plan === 'pro';
+      const code = `<script src="https://cdn.fitguard.ai/v2/fitguard.min.js" data-store-id="${currentUser.storeId}" data-white-label="${isHidden}" data-accent="${currentUser.customizer.accentColor}" async><\/script>`;
       navigator.clipboard.writeText(code).then(() => {
         showToast('Script tag copied to clipboard!', 'success');
         const btn = document.getElementById('dash-copy-btn-label');
-        btn.textContent = 'Copied!';
-        setTimeout(() => { btn.textContent = 'Copy Script'; }, 2000);
-      });
-    }
-
-    // FEATURE 2: RETURN PREVENTION ANALYTICS ENGINE & CHART.JS
-    function initChart() {
-      const ctx = document.getElementById('returnPreventionChart');
-      if (!ctx) return;
-
-      chartInstance = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: ['Day 1', 'Day 5', 'Day 10', 'Day 15', 'Day 20', 'Day 25', 'Day 30'],
-          datasets: [
-            {
-              label: 'Returns Prevented (Units)',
-              data: [38, 92, 184, 276, 390, 460, 512],
-              borderColor: '#10b981',
-              backgroundColor: 'rgba(16, 185, 129, 0.1)',
-              borderWidth: 2.5,
-              tension: 0.35,
-              fill: true
-            },
-            {
-              label: 'Biometric Size Intercepts',
-              data: [120, 290, 540, 810, 1150, 1380, 1590],
-              borderColor: '#6366f1',
-              backgroundColor: 'rgba(99, 102, 241, 0.05)',
-              borderWidth: 2,
-              borderDash: [4, 4],
-              tension: 0.35,
-              fill: false
-            }
-          ]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              labels: { color: '#94a3b8', font: { size: 11, family: 'Inter' } }
-            }
-          },
-          scales: {
-            x: {
-              grid: { color: 'rgba(255, 255, 255, 0.05)' },
-              ticks: { color: '#64748b', font: { size: 10 } }
-            },
-            y: {
-              grid: { color: 'rgba(255, 255, 255, 0.05)' },
-              ticks: { color: '#64748b', font: { size: 10 } }
-            }
-          }
+        if (btn) {
+          btn.textContent = 'Copied!';
+          setTimeout(() => { btn.textContent = 'Copy Script'; }, 2000);
         }
       });
     }
 
-    function refreshDashboardMetrics() {
-      const kpiReturns = document.getElementById('kpi-returns-prevented');
-      const kpiMoney = document.getElementById('kpi-money-saved');
-      const kpiAccuracy = document.getElementById('kpi-accuracy-rate');
+    function renderOcrMatrixTab() {
+      const title = document.getElementById('ocr-matrix-title');
+      const tbody = document.getElementById('ocr-matrix-tbody');
+      if (title) title.textContent = currentUser.ocrHistory.activeMatrixTitle;
 
-      kpiReturns.textContent = '...';
-      kpiMoney.textContent = '...';
-
-      setTimeout(() => {
-        const units = 512 + Math.floor(Math.random() * 20);
-        const savedRupees = units * 3400;
-        kpiReturns.textContent = units;
-        kpiMoney.textContent = `Rs. ${savedRupees.toLocaleString()}`;
-        kpiAccuracy.textContent = '98.8%';
-        if (chartInstance) {
-          chartInstance.data.datasets[0].data[6] = units;
-          chartInstance.update();
-        }
-        showToast('Storefront telemetry refreshed.', 'success');
-      }, 400);
+      if (tbody) {
+        tbody.innerHTML = '';
+        currentUser.matrix.forEach((row, idx) => {
+          const tr = document.createElement('tr');
+          tr.className = 'hover:bg-slate-900/40 transition';
+          tr.innerHTML = `
+            <td class="p-3 pl-4 font-bold text-white">
+              <input type="text" value="${row.size}" onchange="updateMatrixCell(${idx}, 'size', this.value)" class="w-14 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-center font-bold text-white">
+            </td>
+            <td class="p-3">
+              <input type="number" value="${row.chest}" onchange="updateMatrixCell(${idx}, 'chest', this.value)" class="w-16 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-center text-slate-200">
+            </td>
+            <td class="p-3">
+              <input type="number" value="${row.waist}" onchange="updateMatrixCell(${idx}, 'waist', this.value)" class="w-16 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-center text-slate-200">
+            </td>
+            <td class="p-3">
+              <input type="number" value="${row.length}" onchange="updateMatrixCell(${idx}, 'length', this.value)" class="w-16 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-center text-slate-200">
+            </td>
+            <td class="p-3">
+              <input type="text" value="${row.weight}" onchange="updateMatrixCell(${idx}, 'weight', this.value)" class="w-28 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-center text-slate-200">
+            </td>
+            <td class="p-3 pr-4 text-center">
+              <button onclick="removeMatrixRow(${idx})" class="text-slate-500 hover:text-red-400 transition" aria-label="Delete row">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+              </button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
     }
 
-    // FEATURE 3: TEAM & STAFF ACCOUNTS MANAGEMENT
-    function renderTeam() {
-      const tbody = document.getElementById('dash-team-tbody');
+    function updateMatrixCell(index, field, val) {
+      if (currentUser.matrix[index]) {
+        currentUser.matrix[index][field] = val;
+        persistCurrentTenant();
+      }
+    }
+
+    function addMatrixRow() {
+      currentUser.matrix.push({ size: '3XL', chest: 124, waist: 108, length: 80, weight: '120-135 kg' });
+      persistCurrentTenant();
+      renderOcrMatrixTab();
+      showToast(`Added size row for ${currentUser.name}.`, 'info');
+      lucide.createIcons();
+    }
+
+    function removeMatrixRow(idx) {
+      currentUser.matrix.splice(idx, 1);
+      persistCurrentTenant();
+      renderOcrMatrixTab();
+      lucide.createIcons();
+    }
+
+    function triggerOcrFileUpload() {
+      document.getElementById('ocr-file-input').click();
+    }
+
+    function handleOcrFileUpload(e) {
+      const file = e.target.files[0];
+      if (file) runOcrSimulation(file.name);
+    }
+
+    function runOcrSimulation(filename) {
+      const progressBox = document.getElementById('ocr-progress-box');
+      const bar = document.getElementById('ocr-bar');
+      const pct = document.getElementById('ocr-pct');
+      const title = document.getElementById('ocr-matrix-title');
+      const status = document.getElementById('ocr-matrix-status');
+
+      progressBox.classList.remove('hidden');
+      bar.style.width = '15%';
+      pct.textContent = '15%';
+
+      let progress = 15;
+      const interval = setInterval(() => {
+        progress += 28;
+        if (progress > 100) progress = 100;
+        bar.style.width = `${progress}%`;
+        pct.textContent = `${progress}%`;
+
+        if (progress === 100) {
+          clearInterval(interval);
+          setTimeout(() => {
+            progressBox.classList.add('hidden');
+            title.textContent = `Parsed Matrix: ${filename}`;
+            currentUser.ocrHistory.activeMatrixTitle = `Parsed Matrix: ${filename}`;
+            status.textContent = `✓ Vision OCR Ingestion Complete (${currentUser.matrix.length} sizes extracted)`;
+            persistCurrentTenant();
+            showToast(`Vision OCR successfully parsed ${filename}!`, 'success');
+          }, 350);
+        }
+      }, 180);
+    }
+
+    function syncMatrixToCatalog() {
+      persistCurrentTenant();
+      showToast(`Size matrix synchronized to ${currentUser.name} catalog.`, 'success');
+    }
+
+    function toggleUnitsConvert() {
+      showToast('Converted sizing measurements between Metric (cm) & Imperial (in).', 'info');
+    }
+
+    function renderLogsTab(logsArray) {
+      const tbody = document.getElementById('intercept-logs-tbody');
       if (!tbody) return;
 
       tbody.innerHTML = '';
-      App.team.forEach(member => {
+      if (!logsArray || logsArray.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-slate-500 text-xs">No intercept sessions found for this query in ${currentUser.name}.</td></tr>`;
+        return;
+      }
+
+      logsArray.forEach(log => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-900/40 transition';
+        tr.innerHTML = `
+          <td class="p-4 pl-6 font-mono text-[11px] text-indigo-400 font-bold">${log.id}</td>
+          <td class="p-4 font-semibold text-white">${log.product} <span class="text-slate-500 font-mono text-[10px]">(${log.sku})</span></td>
+          <td class="p-4 text-slate-400 text-xs">${log.biometrics}</td>
+          <td class="p-4 text-slate-300 font-mono text-xs">${log.requested}</td>
+          <td class="p-4 font-bold text-emerald-400 font-mono text-xs">${log.aiSize}</td>
+          <td class="p-4">
+            <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">${log.outcome}</span>
+          </td>
+          <td class="p-4 pr-6 text-right font-mono font-bold text-emerald-400">${log.savings}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function filterLogsTable() {
+      const q = document.getElementById('log-search-input').value.toLowerCase();
+      const filtered = currentUser.logs.filter(l => 
+        l.product.toLowerCase().includes(q) || 
+        l.sku.toLowerCase().includes(q) || 
+        l.id.toLowerCase().includes(q) ||
+        l.biometrics.toLowerCase().includes(q)
+      );
+      renderLogsTab(filtered);
+    }
+
+    function renderTeamTab() {
+      const tbody = document.getElementById('dash-team-tbody');
+      const subtitle = document.getElementById('team-seats-subtitle');
+      if (subtitle) subtitle.textContent = `${currentUser.team.length} active staff accounts for ${currentUser.name}`;
+
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      currentUser.team.forEach(member => {
         const tr = document.createElement('tr');
         tr.className = 'hover:bg-slate-900/40 transition';
         tr.innerHTML = `
@@ -2074,7 +2248,7 @@
       const email = document.getElementById('invite-email').value;
       const role = document.getElementById('invite-role').value;
 
-      App.team.push({
+      currentUser.team.push({
         id: Date.now(),
         name,
         email,
@@ -2082,169 +2256,139 @@
         status: 'Pending'
       });
 
-      persistState();
-      renderTeam();
+      persistCurrentTenant();
+      renderTeamTab();
       closeInviteModal();
-      showToast(`Invitation dispatched to ${email}`, 'success');
+      showToast(`Invitation dispatched to ${email} for ${currentUser.name}`, 'success');
     }
 
     function removeTeamMember(id) {
-      if (App.team.length <= 1) {
+      if (currentUser.team.length <= 1) {
         showToast('Store must retain at least one administrator.', 'error');
         return;
       }
-      App.team = App.team.filter(m => m.id !== id);
-      persistState();
-      renderTeam();
+      currentUser.team = currentUser.team.filter(m => m.id !== id);
+      persistCurrentTenant();
+      renderTeamTab();
       showToast('Team member access revoked.', 'info');
     }
 
-    // FEATURE 4: AUTOMATED SIZE CHART VISION OCR INGESTION
-    function renderMatrix() {
-      const tbody = document.getElementById('ocr-matrix-tbody');
-      if (!tbody) return;
+    function renderBillingTab() {
+      const isPro = currentUser.plan === 'pro';
+      const billTitle = document.getElementById('billing-tier-title');
+      const nextAmount = document.getElementById('billing-next-amount');
 
-      tbody.innerHTML = '';
-      App.matrix.forEach((row, idx) => {
-        const tr = document.createElement('tr');
-        tr.className = 'hover:bg-slate-900/40 transition';
-        tr.innerHTML = `
-          <td class="p-3 pl-4 font-bold text-white">
-            <input type="text" value="${row.size}" onchange="updateMatrixCell(${idx}, 'size', this.value)" class="w-14 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-center font-bold text-white">
-          </td>
-          <td class="p-3">
-            <input type="number" value="${row.chest}" onchange="updateMatrixCell(${idx}, 'chest', this.value)" class="w-16 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-center text-slate-200">
-          </td>
-          <td class="p-3">
-            <input type="number" value="${row.waist}" onchange="updateMatrixCell(${idx}, 'waist', this.value)" class="w-16 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-center text-slate-200">
-          </td>
-          <td class="p-3">
-            <input type="number" value="${row.length}" onchange="updateMatrixCell(${idx}, 'length', this.value)" class="w-16 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-center text-slate-200">
-          </td>
-          <td class="p-3">
-            <input type="text" value="${row.weight}" onchange="updateMatrixCell(${idx}, 'weight', this.value)" class="w-28 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-center text-slate-200">
-          </td>
-          <td class="p-3 pr-4 text-center">
-            <button onclick="removeMatrixRow(${idx})" class="text-slate-500 hover:text-red-400 transition" aria-label="Delete row">
-              <i data-lucide="trash-2" class="w-4 h-4"></i>
-            </button>
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
+      if (billTitle) billTitle.textContent = isPro ? 'Pro Plan (Rs. 2999/mo)' : 'Starter Pack (Rs. 999/mo)';
+      if (nextAmount) nextAmount.textContent = isPro ? 'Rs. 2999 / month after trial' : 'Rs. 999 / month after trial';
+    }
+
+    /**
+     * NAVIGATION & TAB SWITCHING
+     */
+    function navigateTo(viewName) {
+      const landing = document.getElementById('view-landing');
+      const dashboard = document.getElementById('view-dashboard');
+      const switchLabel = document.getElementById('nav-switch-label');
+
+      if (viewName === 'dashboard') {
+        if (!currentTenantKey) {
+          openAuthModal('login');
+          return;
+        }
+        landing.classList.add('hidden');
+        dashboard.classList.remove('hidden');
+        dashboard.classList.add('flex');
+        AppState.view = 'dashboard';
+        switchLabel.textContent = 'Switch to Landing Page';
+        switchTab(AppState.tab || 'overview');
+      } else {
+        dashboard.classList.add('hidden');
+        dashboard.classList.remove('flex');
+        landing.classList.remove('hidden');
+        AppState.view = 'landing';
+        switchLabel.textContent = 'Switch to Dashboard';
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       lucide.createIcons();
     }
 
-    function updateMatrixCell(index, field, val) {
-      App.matrix[index][field] = val;
-      persistState();
+    function toggleView() {
+      navigateTo(AppState.view === 'landing' ? 'dashboard' : 'landing');
     }
 
-    function addMatrixRow() {
-      App.matrix.push({ size: '3XL', chest: 124, waist: 108, length: 80, weight: '120-135 kg' });
-      persistState();
-      renderMatrix();
-      showToast('New size row added to active matrix.', 'info');
+    function scrollToSection(id) {
+      if (AppState.view !== 'landing') navigateTo('landing');
+      setTimeout(() => {
+        const el = document.getElementById(id);
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+      }, 60);
     }
 
-    function removeMatrixRow(idx) {
-      App.matrix.splice(idx, 1);
-      persistState();
-      renderMatrix();
-    }
+    function switchTab(tabKey) {
+      AppState.tab = tabKey;
 
-    function triggerOcrFileUpload() {
-      document.getElementById('ocr-file-input').click();
-    }
+      const activeBtnClasses = ['bg-indigo-600', 'text-white', 'shadow-lg', 'shadow-indigo-600/30', 'font-bold'];
+      const inactiveBtnClasses = ['text-slate-400', 'hover:text-slate-200', 'hover:bg-slate-900', 'font-semibold'];
 
-    function handleOcrFileUpload(e) {
-      const file = e.target.files[0];
-      if (file) runOcrSimulation(file.name);
-    }
-
-    function runOcrSimulation(filename) {
-      const progressBox = document.getElementById('ocr-progress-box');
-      const bar = document.getElementById('ocr-bar');
-      const pct = document.getElementById('ocr-pct');
-      const title = document.getElementById('ocr-matrix-title');
-      const status = document.getElementById('ocr-matrix-status');
-
-      progressBox.classList.remove('hidden');
-      bar.style.width = '15%';
-      pct.textContent = '15%';
-
-      let progress = 15;
-      const interval = setInterval(() => {
-        progress += 28;
-        if (progress > 100) progress = 100;
-        bar.style.width = `${progress}%`;
-        pct.textContent = `${progress}%`;
-
-        if (progress === 100) {
-          clearInterval(interval);
-          setTimeout(() => {
-            progressBox.classList.add('hidden');
-            title.textContent = `Parsed Matrix: ${filename}`;
-            status.textContent = `✓ Vision OCR Ingestion Complete (${App.matrix.length} sizes extracted)`;
-            showToast('AI Vision OCR successfully normalized supplier spec sheet!', 'success');
-          }, 350);
-        }
-      }, 180);
-    }
-
-    function syncMatrixToCatalog() {
-      persistState();
-      showToast('Size matrix synchronized to active Shopify SKU catalog.', 'success');
-    }
-
-    function toggleUnitsConvert() {
-      showToast('Converted sizing measurements between Metric (cm) & Imperial (in).', 'info');
-    }
-
-    // INTERCEPT LOGS TABLE
-    function renderLogs(logsArray) {
-      const tbody = document.getElementById('intercept-logs-tbody');
-      if (!tbody) return;
-
-      tbody.innerHTML = '';
-      logsArray.forEach(log => {
-        const tr = document.createElement('tr');
-        tr.className = 'hover:bg-slate-900/40 transition';
-        tr.innerHTML = `
-          <td class="p-4 pl-6 font-mono text-[11px] text-indigo-400 font-bold">${log.id}</td>
-          <td class="p-4 font-semibold text-white">${log.product} <span class="text-slate-500 font-mono text-[10px]">(${log.sku})</span></td>
-          <td class="p-4 text-slate-400 text-xs">${log.biometrics}</td>
-          <td class="p-4 text-slate-300 font-mono text-xs">${log.requested}</td>
-          <td class="p-4 font-bold text-emerald-400 font-mono text-xs">${log.aiSize}</td>
-          <td class="p-4">
-            <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">${log.outcome}</span>
-          </td>
-          <td class="p-4 pr-6 text-right font-mono font-bold text-emerald-400">${log.savings}</td>
-        `;
-        tbody.appendChild(tr);
+      const allPanels = document.querySelectorAll('.tab-pane');
+      allPanels.forEach(panel => {
+        panel.classList.remove('active');
       });
+
+      const allButtons = document.querySelectorAll('.dash-tab-btn');
+      allButtons.forEach(btn => {
+        btn.classList.remove(...activeBtnClasses);
+        btn.classList.add(...inactiveBtnClasses);
+      });
+
+      let targetPanel = document.getElementById(`panel-${tabKey}`);
+      let targetButton = document.getElementById(`tab-btn-${tabKey}`);
+
+      if (!targetPanel) {
+        tabKey = 'overview';
+        AppState.tab = 'overview';
+        targetPanel = document.getElementById('panel-overview');
+        targetButton = document.getElementById('tab-btn-overview');
+      }
+
+      if (targetPanel) targetPanel.classList.add('active');
+      if (targetButton) {
+        targetButton.classList.remove(...inactiveBtnClasses);
+        targetButton.classList.add(...activeBtnClasses);
+      }
+
+      if (tabKey === 'overview' && chartInstance) {
+        setTimeout(() => chartInstance.resize(), 50);
+      }
+
+      lucide.createIcons();
     }
 
-    function filterLogsTable() {
-      const q = document.getElementById('log-search-input').value.toLowerCase();
-      const filtered = App.logs.filter(l => 
-        l.product.toLowerCase().includes(q) || 
-        l.sku.toLowerCase().includes(q) || 
-        l.id.toLowerCase().includes(q) ||
-        l.biometrics.toLowerCase().includes(q)
-      );
-      renderLogs(filtered);
+    function refreshDashboardMetrics() {
+      const kpiReturns = document.getElementById('kpi-returns-prevented');
+      const kpiMoney = document.getElementById('kpi-money-saved');
+      kpiReturns.textContent = '...';
+      kpiMoney.textContent = '...';
+
+      setTimeout(() => {
+        currentUser.analytics.returnsPrevented += Math.floor(Math.random() * 5) + 1;
+        currentUser.analytics.moneySaved = currentUser.analytics.returnsPrevented * 3400;
+        persistCurrentTenant();
+        renderOverviewTab();
+        showToast(`Refreshed live telemetry for ${currentUser.name}.`, 'success');
+      }, 400);
     }
 
-    // INTERACTIVE BIOMETRIC SIMULATOR & AVATAR ENGINE
+    /**
+     * BIOMETRIC SIMULATOR ENGINE
+     */
     function updateSimulation() {
       const height = parseInt(document.getElementById('sim-height').value) || 180;
       const weight = parseInt(document.getElementById('sim-weight').value) || 78;
 
-      App.sim.height = height;
-      App.sim.weight = weight;
+      AppState.sim.height = height;
+      AppState.sim.weight = weight;
 
-      // Update Slider Value labels
       const hFeet = Math.floor(height / 30.48);
       const hInches = Math.round((height % 30.48) / 2.54);
       const wLbs = Math.round(weight * 2.20462);
@@ -2252,14 +2396,13 @@
       document.getElementById('slider-height-val').textContent = `${height} cm (${hFeet}'${hInches}")`;
       document.getElementById('slider-weight-val').textContent = `${weight} kg (${wLbs} lbs)`;
 
-      // Biometric regression calculation
       const bmi = weight / Math.pow(height / 100, 2);
       let score = bmi;
 
-      if (App.sim.torso === 'broad') score += 1.6;
-      if (App.sim.torso === 'lean') score -= 1.2;
-      if (App.sim.fit === 'oversized') score += 1.8;
-      if (App.sim.fit === 'form') score -= 1.4;
+      if (AppState.sim.torso === 'broad') score += 1.6;
+      if (AppState.sim.torso === 'lean') score -= 1.2;
+      if (AppState.sim.fit === 'oversized') score += 1.8;
+      if (AppState.sim.fit === 'form') score -= 1.4;
 
       let size = 'Size M';
       let alt = 'Size L (Loose)';
@@ -2273,7 +2416,6 @@
       document.getElementById('sim-recommended-size').textContent = size;
       document.getElementById('sim-alt-size').textContent = alt;
 
-      // Dynamic morphing of SVG silhouette avatar
       const torsoPath = document.getElementById('svg-torso');
       const widthFactor = Math.min(1.4, Math.max(0.7, weight / 75));
       const leftX = 80 - (28 * widthFactor);
@@ -2281,11 +2423,11 @@
       torsoPath.setAttribute('d', `M ${leftX} 48 Q 80 44 ${rightX} 48 L ${rightX - 8} 135 Q 80 138 ${leftX + 8} 135 Z`);
 
       document.getElementById('sim-reasoning').textContent = 
-        `Biometric height/weight ratio calibrated for ${height}cm / ${weight}kg with ${App.sim.torso} frame. Clears chest girth with optimal drape.`;
+        `Biometric height/weight ratio calibrated for ${height}cm / ${weight}kg with ${AppState.sim.torso} frame. Clears chest girth with optimal drape.`;
     }
 
     function setSimTorso(type) {
-      App.sim.torso = type;
+      AppState.sim.torso = type;
       document.querySelectorAll('.sim-torso-btn').forEach(b => {
         b.className = 'sim-torso-btn py-2 px-3 rounded-xl text-xs font-medium bg-slate-900 border border-slate-800 text-slate-300 hover:border-slate-600 transition';
       });
@@ -2295,7 +2437,7 @@
     }
 
     function setSimFit(fit) {
-      App.sim.fit = fit;
+      AppState.sim.fit = fit;
       document.querySelectorAll('.sim-fit-btn').forEach(b => {
         b.className = 'sim-fit-btn py-2 px-3 rounded-xl text-xs font-medium bg-slate-900 border border-slate-800 text-slate-300 hover:border-slate-600 transition';
       });
@@ -2311,7 +2453,9 @@
       setSimFit('regular');
     }
 
-    // ROI FINANCIAL CALCULATOR
+    /**
+     * ROI FINANCIAL CALCULATOR
+     */
     function calculateROI() {
       const orders = parseInt(document.getElementById('roi-orders').value) || 2500;
       const rate = parseInt(document.getElementById('roi-rate').value) || 26;
@@ -2322,10 +2466,10 @@
       document.getElementById('roi-aov-val').textContent = `Rs. ${aov.toLocaleString()}`;
 
       const monthlyReturns = orders * (rate / 100);
-      const preventedReturns = monthlyReturns * 0.428; // 42.8% reduction
-      const monthlySaved = Math.round(preventedReturns * 3400); // Rs. 3400 avg processing/freight loss
+      const preventedReturns = monthlyReturns * 0.428;
+      const monthlySaved = Math.round(preventedReturns * 3400);
       const annualSaved = monthlySaved * 12;
-      const roiMultiplier = Math.round(monthlySaved / 2999); // Pro tier is Rs. 2999/mo
+      const roiMultiplier = Math.round(monthlySaved / 2999);
 
       document.getElementById('roi-monthly-dollars').textContent = `Rs. ${monthlySaved.toLocaleString()}`;
       document.getElementById('roi-annual-dollars').textContent = `Rs. ${annualSaved.toLocaleString()}/yr`;
@@ -2382,8 +2526,9 @@
       }
     });
 
-    // MODALS & EXPORT HANDLERS
+    // EXPORT MODAL HANDLERS
     function openExportModal() {
+      document.getElementById('export-store-name').textContent = currentUser ? currentUser.name : "Active Store";
       document.getElementById('modal-export').classList.remove('hidden');
     }
 
@@ -2393,30 +2538,29 @@
 
     function triggerCsvDownload() {
       closeExportModal();
-      showToast('Generating CSV report with 30-day return telemetry...', 'info');
+      showToast(`Generating telemetry CSV for ${currentUser.name}...`, 'info');
       setTimeout(() => {
-        showToast('FitGuard_Return_Prevention_Telemetry.csv downloaded.', 'success');
-      }, 800);
+        showToast(`${currentUser.handle}_Return_Prevention_Telemetry.csv downloaded.`, 'success');
+      }, 700);
     }
 
     // DEVELOPER SIMULATION HELPERS
     function simulatePlanCheckout(planName) {
-      App.plan = planName;
-      App.isTrial = true;
-      App.whiteLabel = (planName === 'pro');
-      persistState();
-      renderAppView();
+      if (!currentUser) fetchUserData('acme_apparel_global');
+      currentUser.plan = planName;
+      currentUser.isTrial = true;
+      currentUser.customizer.whiteLabel = (planName === 'pro');
+      persistCurrentTenant();
+      renderAllDynamicTabs();
       showToast(`Activated ${planName.toUpperCase()} tier with 3-Day Free Trial`, 'success');
       navigateTo('dashboard');
     }
 
     function resetAppState() {
-      App.plan = 'none';
-      App.isTrial = false;
-      App.whiteLabel = false;
-      persistState();
-      renderAppView();
-      showToast('State reset to unauthenticated.', 'info');
+      localStorage.clear();
+      currentTenantKey = 'acme_apparel_global';
+      fetchUserData(currentTenantKey);
+      showToast('State reset to default Acme Apparel store.', 'info');
     }
 
     // TOAST NOTIFICATION UTILITY
@@ -2446,6 +2590,18 @@
         setTimeout(() => toast.remove(), 300);
       }, 4000);
     }
+
+    // INITIALIZATION LIFECYCLE
+    document.addEventListener('DOMContentLoaded', () => {
+      if (!currentTenantKey) {
+        currentTenantKey = 'acme_apparel_global';
+      }
+      fetchUserData(currentTenantKey);
+      updateSimulation();
+      calculateROI();
+      switchTab('overview');
+      lucide.createIcons();
+    });
   </script>
 </body>
 </html>
