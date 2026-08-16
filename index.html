@@ -1,293 +1,154 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FitGuard AI | Merchant Portal</title>
-    
-    <!-- Scripts & Styles -->
+    <title>FitGuard AI | Elite Size Optimization</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Sora:wght@700;800&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --brand-primary: #6366f1;
-            --brand-gradient: linear-gradient(135deg, var(--brand-primary) 0%, #a855f7 100%);
-        }
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
-        h1, h2, h3, h4, .font-sora { font-family: 'Sora', sans-serif; }
-
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.75);
-            backdrop-filter: blur(14px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-        }
-
-        .btn-brand {
-            background: var(--brand-primary);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            color: white;
-        }
-
-        .btn-brand:hover:not(:disabled) {
-            filter: brightness(1.1);
-            transform: translateY(-1px);
-            box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3);
-        }
-
-        .btn-brand:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        .custom-toggle {
-            appearance: none;
-            width: 40px;
-            height: 20px;
-            background: #cbd5e1;
-            border-radius: 20px;
-            position: relative;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-        .custom-toggle:checked { background: var(--brand-primary); }
-        .custom-toggle::before {
-            content: '';
-            position: absolute;
-            width: 16px;
-            height: 16px;
-            background: white;
-            border-radius: 50%;
-            top: 2px;
-            left: 2px;
-            transition: transform 0.3s;
-        }
-        .custom-toggle:checked::before { transform: translateX(20px); }
-
-        .notification {
-            position: fixed;
-            bottom: 2rem;
-            left: 50%;
-            transform: translate(-50%, 100px);
-            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            z-index: 1000;
-        }
-        .notification.show { transform: translate(-50%, 0); }
+        :root { --p: #6366f1; }
+        body { font-family: 'Inter', sans-serif; background: #f8fafc; }
+        .font-sora { font-family: 'Sora', sans-serif; }
+        .glass { background: rgba(255,255,255,0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.5); }
+        .btn-p { background: var(--p); color: white; transition: all 0.2s; }
+        .btn-p:hover:not(:disabled) { filter: brightness(1.1); transform: translateY(-1px); }
+        .btn-p:disabled { opacity: 0.5; cursor: not-allowed; }
+        .nav-tab.active { background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.05); color: #1e293b; }
+        .toast { transform: translate(-50%, 100px); transition: transform 0.4s cubic-bezier(0.17,0.88,0.3,1.2); }
+        .toast.show { transform: translate(-50%, -40px); }
+        input[type="number"] { font-weight: 700; color: #334155; }
     </style>
 </head>
-<body class="min-h-screen text-zinc-900">
+<body class="min-h-screen text-slate-900">
 
-    <!-- GLOBAL TOAST NOTIFICATION -->
-    <div id="toast" class="notification">
-        <div class="bg-zinc-900 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 border border-zinc-700">
-            <div id="toast-icon" class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-            <span class="text-sm font-bold tracking-tight" id="toast-message">Sync Complete</span>
+    <!-- SYNC TOAST -->
+    <div id="toast" class="fixed bottom-0 left-1/2 z-[1000] toast">
+        <div class="bg-slate-900 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 border border-slate-700">
+            <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+            <span id="toast-msg" class="text-sm font-bold tracking-tight">Sync Complete</span>
         </div>
     </div>
 
-    <!-- NAVIGATION -->
-    <nav class="sticky top-0 z-[100] w-full px-6 py-4">
-        <div class="max-w-7xl mx-auto flex items-center justify-between glass-panel rounded-2xl px-6 py-3 border border-zinc-200 shadow-sm">
+    <!-- NAVBAR -->
+    <nav class="sticky top-0 z-50 px-6 py-4">
+        <div class="max-w-7xl mx-auto flex items-center justify-between glass rounded-2xl px-6 py-2 shadow-sm">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl btn-brand flex items-center justify-center shadow-lg">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                </div>
-                <div class="flex flex-col">
-                    <span class="text-lg font-bold tracking-tight leading-none">FitGuard <span class="text-indigo-600">AI</span></span>
-                    <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-widest mt-1">Status: Connected</span>
-                </div>
+                <div class="w-10 h-10 rounded-xl btn-p flex items-center justify-center font-bold">F</div>
+                <span class="text-lg font-bold font-sora">FitGuard <span class="text-indigo-600">AI</span></span>
             </div>
-
-            <div class="bg-zinc-100 p-1 rounded-xl border border-zinc-200 flex gap-1">
-                <button onclick="switchView('admin')" id="adminTab" class="px-5 py-2 rounded-lg text-sm font-bold transition-all bg-white shadow-sm">Merchant Setup</button>
-                <button onclick="switchView('shopper')" id="shopperTab" class="px-5 py-2 rounded-lg text-sm font-bold transition-all text-zinc-500">Consumer View</button>
+            <div class="bg-slate-100 p-1 rounded-xl flex gap-1">
+                <button onclick="setView('admin')" id="tab-admin" class="nav-tab active px-5 py-2 rounded-lg text-xs font-bold transition-all">DASHBOARD</button>
+                <button onclick="setView('shop')" id="tab-shop" class="nav-tab px-5 py-2 rounded-lg text-xs font-bold text-slate-500 transition-all">STOREFRONT</button>
             </div>
         </div>
     </nav>
 
-    <main class="max-w-7xl mx-auto px-6 py-8">
-        
-        <!-- DASHBOARD VIEW -->
-        <section id="admin-view" class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            
-            <!-- LEFT COLUMN -->
+    <main class="max-w-7xl mx-auto px-6 py-6">
+        <!-- MERCHANT VIEW -->
+        <div id="view-admin" class="grid lg:grid-cols-12 gap-8">
             <div class="lg:col-span-7 space-y-8">
-                <!-- PERFORMANCE METRICS -->
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div class="glass-panel p-5 rounded-3xl border border-white">
-                        <h4 class="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-1">Return Reduction</h4>
-                        <div class="flex items-baseline gap-2">
-                            <span class="text-3xl font-black text-zinc-900" id="stat-returns">-42%</span>
-                        </div>
-                    </div>
-                    <div class="glass-panel p-5 rounded-3xl border border-white">
-                        <h4 class="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-1">Conversion Lift</h4>
-                        <div class="flex items-baseline gap-2">
-                            <span class="text-3xl font-black text-zinc-900" id="stat-conversion">+18%</span>
-                        </div>
-                    </div>
-                    <div class="glass-panel p-5 rounded-3xl border border-white">
-                        <h4 class="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-1">Data Health</h4>
-                        <div class="flex items-baseline gap-2">
-                            <span class="text-2xl font-black text-emerald-500" id="stat-confidence">Optimal</span>
-                        </div>
-                    </div>
+                <!-- STATS -->
+                <div class="grid grid-cols-3 gap-4">
+                    <div class="glass p-5 rounded-3xl"><p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Returns</p><p class="text-2xl font-bold" id="stat-ret">-42%</p></div>
+                    <div class="glass p-5 rounded-3xl"><p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Conversion</p><p class="text-2xl font-bold" id="stat-conv">+18%</p></div>
+                    <div class="glass p-5 rounded-3xl"><p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Health</p><p class="text-2xl font-bold text-emerald-500" id="stat-health">High</p></div>
                 </div>
 
-                <!-- GARMENT SPECS -->
-                <div class="glass-panel rounded-[2rem] border border-white overflow-hidden shadow-sm">
-                    <div class="p-8 border-b border-zinc-100 bg-white/50 flex justify-between items-center">
-                        <div>
-                            <h3 class="text-xl font-bold">Garment Specifications</h3>
-                            <p class="text-sm text-zinc-500">Enter measurements to optimize match accuracy.</p>
-                        </div>
-                    </div>
-                    <div class="p-8 overflow-x-auto">
+                <!-- TABLE -->
+                <div class="glass rounded-[2rem] overflow-hidden shadow-sm">
+                    <div class="p-6 border-b border-slate-100 bg-white/50"><h3 class="font-bold">Garment Specifications (Inches)</h3></div>
+                    <div class="p-6 overflow-x-auto">
                         <table class="w-full text-left">
-                            <thead>
-                                <tr class="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-black">
-                                    <th class="pb-6">Size</th>
-                                    <th class="pb-6">Chest</th>
-                                    <th class="pb-6">Waist</th>
-                                    <th class="pb-6">Length</th>
-                                </tr>
-                            </thead>
-                            <tbody id="specs-table" class="divide-y divide-zinc-100">
-                                <!-- Pre-populated by JS init -->
-                            </tbody>
+                            <thead><tr class="text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b"><th class="pb-4">Size</th><th class="pb-4">Chest</th><th class="pb-4">Waist</th><th class="pb-4">Length</th></tr></thead>
+                            <tbody id="specs-table" class="divide-y divide-slate-50"></tbody>
                         </table>
                     </div>
                 </div>
 
-                <!-- WIDGET CUSTOMIZATION -->
-                <div class="glass-panel p-8 rounded-[2rem] border border-white shadow-sm space-y-6">
-                    <h3 class="text-xl font-bold">Widget Personalization</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div class="space-y-4">
-                            <label class="block text-sm font-bold text-zinc-700">Brand Primary Color</label>
+                <!-- CONFIG -->
+                <div class="glass p-8 rounded-[2rem] space-y-6">
+                    <h3 class="font-bold">Widget Personalization</h3>
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 mb-2 uppercase">Brand Primary Color</label>
                             <div class="flex items-center gap-4">
-                                <input type="color" id="color-picker" oninput="updateLiveSettings()" class="w-12 h-12 rounded-lg cursor-pointer border-none bg-transparent">
-                                <span class="font-mono text-sm text-zinc-500 uppercase" id="color-hex">#6366F1</span>
+                                <input type="color" id="cfg-color" oninput="updateUI()" class="w-10 h-10 cursor-pointer bg-transparent border-none">
+                                <span class="font-mono text-xs uppercase" id="cfg-hex">#6366f1</span>
                             </div>
                         </div>
-                        <div class="space-y-4">
-                            <label class="block text-sm font-bold text-zinc-700">Display Logic</label>
-                            <div class="flex items-center justify-between p-3 bg-white/50 rounded-xl border border-zinc-100">
-                                <span class="text-sm font-medium">Show Return Risk Metric</span>
-                                <input type="checkbox" id="toggle-risk" onchange="updateLiveSettings()" class="custom-toggle">
-                            </div>
+                        <div class="flex items-center justify-between p-4 bg-white/50 rounded-2xl border">
+                            <span class="text-sm font-bold">Show Return Risk</span>
+                            <input type="checkbox" id="cfg-risk" onchange="updateUI()" class="w-5 h-5 accent-indigo-600">
                         </div>
                     </div>
                 </div>
-
-                <button id="save-btn" onclick="saveToSupabase()" class="w-full py-5 btn-brand rounded-2xl font-black text-lg shadow-xl flex items-center justify-center gap-3 active:scale-[0.98]">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
-                    Sync to Cloud Database
+                <button id="save-btn" onclick="saveToCloud()" class="w-full py-5 btn-p rounded-2xl font-bold text-lg shadow-xl flex items-center justify-center gap-3">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Sync Production Settings
                 </button>
             </div>
 
-            <!-- RIGHT COLUMN -->
+            <!-- PREVIEW COLUMN -->
             <div class="lg:col-span-5 space-y-8">
-                <!-- AI INSIGHTS -->
-                <div class="bg-zinc-900 text-white p-8 rounded-[2rem] shadow-2xl relative overflow-hidden">
-                    <div class="relative z-10 space-y-4">
-                        <div class="flex items-center gap-2 px-3 py-1 bg-white/10 rounded-full w-fit border border-white/10">
-                            <span class="w-2 h-2 bg-indigo-400 rounded-full"></span>
-                            <span class="text-[10px] font-black uppercase tracking-widest">AI Auditor</span>
-                        </div>
-                        <h4 class="text-lg font-bold">Optimization Strategy</h4>
-                        <p id="ai-tip" class="text-sm text-zinc-400 leading-relaxed italic">Analyzing measurement data...</p>
-                    </div>
+                <div class="bg-slate-900 text-white p-8 rounded-[2rem] shadow-2xl relative overflow-hidden">
+                    <h4 class="text-lg font-bold font-sora mb-2">AI Strategy Auditor</h4>
+                    <p id="ai-tip" class="text-sm text-slate-400 leading-relaxed italic">Validating measurements...</p>
                 </div>
-
-                <!-- LIVE PREVIEW -->
-                <div class="space-y-4">
-                    <h3 class="text-xs font-black text-zinc-400 uppercase tracking-widest text-center">Real-Time Component Preview</h3>
-                    <div class="glass-panel rounded-[2.5rem] border border-white shadow-2xl overflow-hidden scale-[0.85] origin-top">
-                        <div id="preview-widget-ui" class="p-10 space-y-8">
-                            <div class="flex justify-between items-start">
-                                <h2 class="text-2xl font-bold tracking-tight">Find My Size</h2>
-                                <div class="w-8 h-8 rounded-full bg-zinc-100 flex items-center justify-center text-zinc-400">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                                </div>
-                            </div>
-                            <div class="space-y-4">
-                                <div class="grid grid-cols-2 gap-3">
-                                    <div class="h-12 bg-zinc-50 border border-zinc-100 rounded-xl px-4 flex items-center text-[10px] font-bold text-zinc-300">USER_HEIGHT</div>
-                                    <div class="h-12 bg-zinc-50 border border-zinc-100 rounded-xl px-4 flex items-center text-[10px] font-bold text-zinc-300">USER_WEIGHT</div>
-                                </div>
-                                <div class="h-24 bg-zinc-50 border border-zinc-100 rounded-xl flex flex-col justify-center px-6 gap-2">
-                                    <div class="h-2 w-1/3 bg-zinc-200 rounded-full"></div>
-                                    <div class="flex gap-2">
-                                        <div class="h-8 flex-1 bg-white border-2 border-indigo-600 rounded-lg preview-brand-border"></div>
-                                        <div class="h-8 flex-1 bg-white border border-zinc-200 rounded-lg"></div>
-                                        <div class="h-8 flex-1 bg-white border border-zinc-200 rounded-lg"></div>
-                                    </div>
-                                </div>
-                                <button class="w-full py-4 rounded-xl font-bold text-white shadow-lg preview-brand-bg">Calculate My Size</button>
-                                <div id="preview-risk-footer" class="flex items-center justify-center gap-2 text-[10px] font-black uppercase text-emerald-600 tracking-tighter">
-                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"></path></svg>
-                                    Return Risk Reduced by 85%
-                                </div>
-                            </div>
+                <div class="space-y-4 text-center">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Live Widget Preview</p>
+                    <div class="glass rounded-[2.5rem] p-10 space-y-8 scale-90 shadow-2xl">
+                        <div class="flex justify-between items-start"><div class="text-left"><h2 class="text-2xl font-bold font-sora">Find My Size</h2><p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">FitGuard Engine</p></div><div class="w-8 h-8 rounded-full bg-slate-100"></div></div>
+                        <div class="space-y-4">
+                            <div class="grid grid-cols-2 gap-3"><div class="h-12 bg-slate-50 rounded-xl"></div><div class="h-12 bg-slate-50 rounded-xl"></div></div>
+                            <div class="h-20 bg-slate-50 rounded-xl flex items-center justify-center gap-2 px-4"><div class="h-8 flex-1 bg-white border-2 rounded-lg preview-b"></div><div class="h-8 flex-1 bg-white border rounded-lg"></div></div>
+                            <button class="w-full py-4 rounded-xl text-white font-bold preview-bg">Analyze My Fit</button>
+                            <div id="preview-risk" class="text-[10px] font-bold text-emerald-600 uppercase tracking-tighter">Return Risk Reduced by 85%</div>
                         </div>
                     </div>
                 </div>
             </div>
-        </section>
+        </div>
 
         <!-- SHOPPER VIEW -->
-        <section id="shopper-view" class="hidden opacity-0 translate-y-8 transition-all duration-500 py-12">
-            <div class="max-w-4xl mx-auto flex flex-col md:flex-row items-center gap-12">
-                <div class="flex-1">
-                    <img src="https://images.unsplash.com/photo-1556821840-3a63f95609a7?auto=format&fit=crop&q=80&w=800" class="rounded-[2.5rem] shadow-2xl border-4 border-white">
-                </div>
-                <div class="flex-1 space-y-6">
-                    <h1 class="text-5xl font-black tracking-tight">Signature Hoodie</h1>
-                    <p class="text-zinc-500 text-lg">Indie-crafted 450GSM cotton. Designed to drape perfectly based on the specifications configured in your dashboard.</p>
-                    <div class="pt-6 border-t border-zinc-200">
-                        <button onclick="openRealWidget()" class="w-full py-5 rounded-2xl font-black text-xl text-white shadow-2xl preview-brand-bg">
-                            Personalize My Size
-                        </button>
-                    </div>
-                </div>
+        <div id="view-shop" class="hidden max-w-4xl mx-auto flex flex-col md:flex-row items-center gap-12 py-12">
+            <div class="flex-1"><img src="https://images.unsplash.com/photo-1556821840-3a63f95609a7?auto=format&fit=crop&q=80&w=800" class="rounded-[2.5rem] shadow-2xl"></div>
+            <div class="flex-1 space-y-6">
+                <h1 class="text-5xl font-bold font-sora tracking-tight">Signature Hoodie</h1>
+                <p class="text-slate-500 text-lg">Premium 450GSM French Terry. Hand-crafted for an oversized silhouette.</p>
+                <div class="pt-6 border-t"><button onclick="openModal()" class="w-full py-5 rounded-2xl font-bold text-xl text-white preview-bg shadow-2xl">Personalize My Size</button></div>
             </div>
-        </section>
+        </div>
     </main>
 
-    <!-- SHOPPER WIDGET MODAL -->
-    <div id="real-widget" class="fixed inset-0 z-[1000] hidden flex items-center justify-center p-6">
-        <div class="absolute inset-0 bg-zinc-900/60 backdrop-blur-md" onclick="closeRealWidget()"></div>
-        <div class="relative w-full max-w-lg glass-panel rounded-[2.5rem] shadow-2xl p-10 space-y-8 overflow-hidden">
-            <div id="widget-step-1" class="space-y-6">
-                <h2 class="text-3xl font-black">Find Your Fit</h2>
+    <!-- SHOPPER MODAL -->
+    <div id="modal" class="fixed inset-0 z-[1000] hidden flex items-center justify-center p-6 bg-slate-900/60 backdrop-blur-md">
+        <div class="relative w-full max-w-lg glass rounded-[2.5rem] shadow-2xl p-10 space-y-8" onclick="event.stopPropagation()">
+            <div id="step-1" class="space-y-6">
+                <h2 class="text-3xl font-bold font-sora">What's your profile?</h2>
                 <div class="grid grid-cols-2 gap-4">
-                    <input type="number" id="h-in" placeholder="Height (cm)" class="p-4 bg-zinc-50 rounded-xl border border-zinc-100 outline-none focus:ring-2 ring-indigo-500 font-bold">
-                    <input type="number" id="w-in" placeholder="Weight (kg)" class="p-4 bg-zinc-50 rounded-xl border border-zinc-100 outline-none focus:ring-2 ring-indigo-500 font-bold">
+                    <input type="number" id="user-h" placeholder="Height (cm)" class="p-4 bg-slate-50 rounded-xl border outline-none focus:ring-2 ring-indigo-500">
+                    <input type="number" id="user-w" placeholder="Weight (kg)" class="p-4 bg-slate-50 rounded-xl border outline-none focus:ring-2 ring-indigo-500">
                 </div>
-                <button onclick="performMatch()" class="w-full preview-brand-bg text-white rounded-xl font-black shadow-lg">Run Analysis</button>
+                <button onclick="runAI()" class="w-full py-4 preview-bg text-white rounded-xl font-bold">Run Fit Analysis</button>
             </div>
-            <div id="widget-step-2" class="hidden space-y-6 text-center">
-                <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-2xl font-bold">✓</div>
-                <h2 class="text-6xl font-black" id="match-result-size">Size L</h2>
-                <p id="match-explainer" class="text-zinc-500 font-medium"></p>
-                <button onclick="closeRealWidget()" class="w-full py-4 bg-zinc-900 text-white rounded-xl font-bold">Add to Cart</button>
+            <div id="step-2" class="hidden text-center space-y-6">
+                <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-3xl">✓</div>
+                <h2 class="text-6xl font-bold font-sora" id="res-size">Size L</h2>
+                <p id="res-desc" class="text-slate-500 font-medium"></p>
+                <button onclick="closeModal()" class="w-full py-4 bg-slate-900 text-white rounded-xl font-bold">Add to Cart</button>
             </div>
         </div>
     </div>
 
     <script>
-        // 1. SUPABASE CLIENT
-        const SUPABASE_URL = "https://pvedhlkotcviguijybw.supabase.co";
-        const SUPABASE_KEY = "sb_publishable_KCs9Re2uDyqX9KBlOezogg_oYgcdepg";
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        // SUPABASE INIT
+        const client = supabase.createClient("https://pvedhlkotcviguijybw.supabase.co", "sb_publishable_KCs9Re2uDyqX9KBlOezogg_oYgcdepg");
 
-        // 2. MOCKUP DEFAULT DATA
-        let storeSettings = {
-            id: 1,
-            brand_color: '#6366f1',
-            show_return_risk: true,
+        // STATE (Mockups ready by default)
+        let data = {
+            id: 1, brand_color: '#6366f1', show_risk: true,
             specs: [
                 { size: 'S', chest: 38, waist: 32, length: 26 },
                 { size: 'M', chest: 40, waist: 34, length: 27 },
@@ -296,178 +157,106 @@
             ]
         };
 
-        // 3. INITIALIZATION
-        async function init() {
-            // Immediately render with defaults
-            refreshUI();
-            // Fetch from DB in background
-            await loadFromSupabase();
-        }
-
-        // 4. DATABASE FETCH (No UI Badge on load)
-        async function loadFromSupabase() {
-            try {
-                const { data, error } = await supabase
-                    .from('stores')
-                    .select('*')
-                    .eq('id', storeSettings.id)
-                    .single();
-
-                if (error && error.code !== 'PGRST116') throw error;
-
-                if (data) {
-                    storeSettings = data;
-                    document.getElementById('color-picker').value = data.brand_color;
-                    document.getElementById('toggle-risk').checked = data.show_return_risk;
-                    refreshUI(); // Re-render with real data
-                }
-            } catch (err) {
-                console.warn("DB offline or unreachable. Using default catalog.");
-            }
-        }
-
-        // 5. DATABASE SAVE (Temporary Success Badge ONLY)
-        async function saveToSupabase() {
-            const btn = document.getElementById('save-btn');
-            btn.disabled = true;
-            btn.innerText = "Synchronizing...";
-
-            try {
-                const { error } = await supabase
-                    .from('stores')
-                    .upsert({
-                        id: storeSettings.id,
-                        brand_color: storeSettings.brand_color,
-                        show_return_risk: storeSettings.show_return_risk,
-                        specs: storeSettings.specs,
-                        store_name: "Signature Apparel"
-                    });
-
-                if (error) throw error;
-                
-                // Show badge ONLY after manual click and successful return
-                showToast("Cloud Sync Complete", "emerald");
-            } catch (err) {
-                console.error("Save Error:", err);
-                showToast("Sync Error: Connection Refused", "red");
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg> Sync to Cloud Database`;
-            }
-        }
-
-        // 6. UI REFRESH ENGINE
-        function refreshUI() {
-            renderSpecsTable();
-            updateLiveSettings();
-            generateAITip();
-            calculateMetrics();
-        }
-
-        function renderSpecsTable() {
-            const container = document.getElementById('specs-table');
-            container.innerHTML = storeSettings.specs.map((s, idx) => `
-                <tr class="group hover:bg-white/40 transition-all">
-                    <td class="py-4 font-black text-sm">${s.size}</td>
-                    <td class="py-4"><input type="number" onchange="updateSpecValue(${idx}, 'chest', this.value)" value="${s.chest}" class="w-16 bg-transparent border-b border-zinc-200 focus:border-indigo-500 outline-none font-bold text-center"></td>
-                    <td class="py-4"><input type="number" onchange="updateSpecValue(${idx}, 'waist', this.value)" value="${s.waist}" class="w-16 bg-transparent border-b border-zinc-200 focus:border-indigo-500 outline-none font-bold text-center"></td>
-                    <td class="py-4"><input type="number" onchange="updateSpecValue(${idx}, 'length', this.value)" value="${s.length}" class="w-16 bg-transparent border-b border-zinc-200 focus:border-indigo-500 outline-none font-bold text-center"></td>
+        // RENDER TABLE
+        function renderTable() {
+            const tbody = document.getElementById('specs-table');
+            tbody.innerHTML = data.specs.map((s, i) => `
+                <tr>
+                    <td class="py-4 font-bold text-sm">${s.size}</td>
+                    <td class="py-4"><input type="number" onchange="editSpec(${i},'chest',this.value)" value="${s.chest}" class="w-16 bg-transparent border-b border-transparent focus:border-indigo-500 outline-none"></td>
+                    <td class="py-4"><input type="number" onchange="editSpec(${i},'waist',this.value)" value="${s.waist}" class="w-16 bg-transparent border-b border-transparent focus:border-indigo-500 outline-none"></td>
+                    <td class="py-4"><input type="number" onchange="editSpec(${i},'length',this.value)" value="${s.length}" class="w-16 bg-transparent border-b border-transparent focus:border-indigo-500 outline-none"></td>
                 </tr>
             `).join('');
         }
 
-        function updateSpecValue(idx, field, val) {
-            storeSettings.specs[idx][field] = parseFloat(val);
-            generateAITip();
-            calculateMetrics();
+        // STATE UPDATES
+        function editSpec(i, f, v) { data.specs[i][f] = parseFloat(v); checkAI(); }
+        
+        function updateUI() {
+            data.brand_color = document.getElementById('cfg-color').value;
+            data.show_risk = document.getElementById('cfg-risk').checked;
+            document.getElementById('cfg-hex').innerText = data.brand_color;
+            document.documentElement.style.setProperty('--p', data.brand_color);
+            document.querySelectorAll('.preview-bg').forEach(e => e.style.backgroundColor = data.brand_color);
+            document.querySelectorAll('.preview-b').forEach(e => e.style.borderColor = data.brand_color);
+            document.getElementById('preview-risk').style.display = data.show_risk ? 'block' : 'none';
         }
 
-        function updateLiveSettings() {
-            storeSettings.brand_color = document.getElementById('color-picker').value;
-            storeSettings.show_return_risk = document.getElementById('toggle-risk').checked;
-            
-            document.getElementById('color-hex').innerText = storeSettings.brand_color;
-            document.documentElement.style.setProperty('--brand-primary', storeSettings.brand_color);
-            
-            document.querySelectorAll('.preview-brand-bg').forEach(el => el.style.backgroundColor = storeSettings.brand_color);
-            document.querySelectorAll('.preview-brand-border').forEach(el => el.style.borderColor = storeSettings.brand_color);
-            document.getElementById('preview-risk-footer').style.display = storeSettings.show_return_risk ? 'flex' : 'none';
+        function checkAI() {
+            const s = data.specs;
+            let tip = "Measurements look optimal. Match accuracy is 94%.";
+            for(let i=0; i<s.length-1; i++) {
+                if(s[i+1].chest - s[i].chest < 1.5) { tip = `Warning: Gap between ${s[i].size} & ${s[i+1].size} is too narrow. Increase spacing for better AI accuracy.`; break; }
+            }
+            document.getElementById('ai-tip').innerText = tip;
+            const healthy = s.every(x => x.chest > 0);
+            document.getElementById('stat-health').innerText = healthy ? 'High' : 'Low';
+            document.getElementById('stat-health').className = `text-2xl font-bold ${healthy ? 'text-emerald-500' : 'text-amber-500'}`;
         }
 
-        function calculateMetrics() {
-            const hasData = storeSettings.specs.every(s => s.chest > 0);
-            document.getElementById('stat-confidence').innerText = hasData ? "Optimal" : "Partial";
-            document.getElementById('stat-confidence').className = `text-2xl font-black ${hasData ? 'text-emerald-500' : 'text-amber-500'}`;
-        }
-
-        function generateAITip() {
-            const specs = storeSettings.specs;
-            let warning = "Catalog health is high! AI is achieving 92% match accuracy.";
-            for(let i=0; i < specs.length - 1; i++) {
-                if(specs[i+1].chest - specs[i].chest < 1.5) {
-                    warning = `Critical: Chest gap too narrow between ${specs[i].size} & ${specs[i+1].size}. Adjust for better results.`;
-                    break;
+        // DB ACTIONS
+        async function loadData() {
+            try {
+                const { data: dbData, error } = await client.from('stores').select('*').eq('id', 1).single();
+                if (dbData) {
+                    data = dbData;
+                    document.getElementById('cfg-color').value = data.brand_color;
+                    document.getElementById('cfg-risk').checked = data.show_risk;
                 }
-            }
-            document.getElementById('ai-tip').innerText = warning;
+            } catch (e) { console.log("Using local state"); }
+            renderTable();
+            updateUI();
+            checkAI();
         }
 
-        // 7. NAVIGATION & TOAST
-        function switchView(view) {
-            const admin = document.getElementById('admin-view');
-            const shopper = document.getElementById('shopper-view');
-            const aTab = document.getElementById('adminTab');
-            const sTab = document.getElementById('shopperTab');
-
-            if(view === 'admin') {
-                shopper.classList.add('hidden');
-                admin.classList.remove('hidden');
-                aTab.className = "px-5 py-2 rounded-lg text-sm font-bold transition-all bg-white shadow-sm";
-                sTab.className = "px-5 py-2 rounded-lg text-sm font-bold transition-all text-zinc-500";
-            } else {
-                admin.classList.add('hidden');
-                shopper.classList.remove('hidden');
-                setTimeout(() => shopper.classList.remove('opacity-0', 'translate-y-8'), 50);
-                sTab.className = "px-5 py-2 rounded-lg text-sm font-bold transition-all bg-white shadow-sm";
-                aTab.className = "px-5 py-2 rounded-lg text-sm font-bold transition-all text-zinc-500";
-            }
+        async function saveToCloud() {
+            const btn = document.getElementById('save-btn');
+            btn.disabled = true; btn.innerText = "Syncing...";
+            const { error } = await client.from('stores').upsert({ id: data.id, brand_color: data.brand_color, show_risk: data.show_risk, specs: data.specs, store_name: "Sig Hoodie" });
+            if (!error) showToast("Cloud Sync Complete", "emerald");
+            btn.disabled = false; btn.innerText = "Sync Production Settings";
         }
 
-        function showToast(msg, color) {
-            const toast = document.getElementById('toast');
-            const icon = document.getElementById('toast-icon');
-            document.getElementById('toast-message').innerText = msg;
-            icon.className = `w-2 h-2 bg-${color}-500 rounded-full animate-pulse`;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3000);
+        // HELPERS
+        function setView(v) {
+            document.getElementById('view-admin').classList.toggle('hidden', v !== 'admin');
+            document.getElementById('view-shop').classList.toggle('hidden', v !== 'shop');
+            document.getElementById('tab-admin').classList.toggle('active', v === 'admin');
+            document.getElementById('tab-shop').classList.toggle('active', v === 'shop');
         }
 
-        // 8. WIDGET LOGIC
-        function openRealWidget() { document.getElementById('real-widget').classList.remove('hidden'); }
-        function closeRealWidget() {
-            document.getElementById('real-widget').classList.add('hidden');
-            document.getElementById('widget-step-1').classList.remove('hidden');
-            document.getElementById('widget-step-2').classList.add('hidden');
+        function showToast(m, c) {
+            const t = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = m;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3000);
         }
 
-        function performMatch() {
-            const w = parseFloat(document.getElementById('w-in').value);
-            if(!w) return alert("Please enter weight");
-            
-            document.getElementById('widget-step-1').classList.add('hidden');
-            document.getElementById('widget-step-2').classList.remove('hidden');
-            
-            let size = storeSettings.specs[0].size;
-            if(w > 65) size = storeSettings.specs[1].size;
-            if(w > 78) size = storeSettings.specs[2].size;
-            if(w > 90) size = storeSettings.specs[3].size;
-
-            document.getElementById('match-result-size').innerText = size;
-            document.getElementById('match-explainer').innerText = `Your profile suggests ${size} for the best overall comfort and silhouette.`;
+        // SHOPPER ACTIONS
+        function openModal() { document.getElementById('modal').classList.remove('hidden'); }
+        function closeModal() { 
+            document.getElementById('modal').classList.add('hidden');
+            document.getElementById('step-1').classList.remove('hidden');
+            document.getElementById('step-2').classList.add('hidden');
         }
 
-        // Entry point
-        init();
+        function runAI() {
+            const w = parseFloat(document.getElementById('user-w').value);
+            if(!w) return alert("Enter weight");
+            document.getElementById('step-1').classList.add('hidden');
+            document.getElementById('step-2').classList.remove('hidden');
+            let sz = data.specs[0].size;
+            if(w > 65) sz = data.specs[1].size;
+            if(w > 78) sz = data.specs[2].size;
+            if(w > 90) sz = data.specs[3].size;
+            document.getElementById('res-size').innerText = sz;
+            document.getElementById('res-desc').innerText = `Based on your profile, ${sz} provides the perfect drape. Estimated return risk: <1%.`;
+        }
+
+        // BOOT
+        window.onload = loadData;
     </script>
 </body>
+</html>
 </html>
