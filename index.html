@@ -2625,5 +2625,22 @@
         }
     }
 </script>
+  <script>
+    function switchDashboardTab(tabId) {
+        // Hide all dashboard panels
+        const panels = document.querySelectorAll('.dashboard-panel');
+        panels.forEach(panel => panel.classList.add('hidden'));
+
+        // Show the selected panel
+        const targetPanel = document.getElementById('panel-' + tabId);
+        if (targetPanel) {
+            targetPanel.classList.remove('hidden');
+        }
+
+        // Update active state on sidebar buttons if needed
+        const buttons = document.querySelectorAll('.sidebar-btn');
+        buttons.forEach(btn => btn.classList.remove('bg-indigo-600/20', 'border-indigo-500'));
+    }
+</script>
 </body>
 </html>
