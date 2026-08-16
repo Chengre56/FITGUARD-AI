@@ -49,7 +49,7 @@
   </script>
 
   <style>
-    /* Custom Scrollbar Styling */
+    /* Custom Scrollbar */
     ::-webkit-scrollbar {
       width: 6px;
       height: 6px;
@@ -82,6 +82,18 @@
     .pulse-glow {
       animation: pulse-subtle 4s infinite ease-in-out;
     }
+
+    /* Range slider custom styling */
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      height: 20px;
+      width: 20px;
+      border-radius: 50%;
+      background: #6366f1;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(99, 102, 241, 0.6);
+      border: 2px solid #ffffff;
+    }
   </style>
 </head>
 <body class="bg-[#070a13] text-slate-100 font-sans min-h-screen antialiased selection:bg-indigo-500 selection:text-white flex flex-col justify-between">
@@ -90,47 +102,57 @@
   <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-3 pointer-events-none"></div>
 
   <!-- ========================================================================= -->
-  <!-- MODAL: STRIPE-STYLE CHECKOUT & TRIAL ONBOARDING -->
+  <!-- MODAL: REALISTIC STRIPE-STYLE CHECKOUT & 3-DAY TRIAL ONBOARDING -->
   <!-- ========================================================================= -->
-  <div id="checkout-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/80 backdrop-blur-md p-4 transition-all duration-300">
-    <div class="bg-slate-900 border border-slate-700/80 rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative overflow-hidden transform transition-all scale-100">
+  <div id="checkout-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/80 backdrop-blur-md p-4 transition-all duration-300 overflow-y-auto">
+    <div class="bg-slate-900 border border-slate-700/80 rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative overflow-hidden my-8 transform transition-all scale-100">
       
       <!-- Top Decor Glow -->
       <div class="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-32 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none"></div>
 
       <!-- Modal Close Button -->
-      <button onclick="closeCheckoutModal()" class="absolute top-5 right-5 text-slate-400 hover:text-white p-1 rounded-lg bg-slate-800/80 hover:bg-slate-700 transition">
+      <button onclick="closeCheckoutModal()" class="absolute top-5 right-5 text-slate-400 hover:text-white p-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 transition cursor-pointer">
         <i data-lucide="x" class="w-5 h-5"></i>
       </button>
 
-      <!-- Header & Tier Details -->
+      <!-- Header & 3-Day Trial Details -->
       <div class="space-y-3 mb-6 relative">
         <div class="flex items-center gap-2">
-          <span class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white">
+          <span class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white shadow-lg shadow-indigo-600/30">
             <i data-lucide="shield-check" class="w-4 h-4"></i>
           </span>
           <span class="text-xs font-bold uppercase tracking-widest text-indigo-400">FitGuard AI Provisioning</span>
         </div>
-        <h3 class="text-2xl font-extrabold text-white">Start Your 14-Day Free Trial</h3>
-        <p class="text-xs text-slate-400">Zero charges today. Full unlimited access to biometric machine learning sizing.</p>
+        <h3 class="text-2xl font-extrabold text-white">Start Your 3-Day Free Trial</h3>
+        <p class="text-xs text-slate-300">Zero charges today. Full unlimited access to biometric machine learning sizing for 3 days.</p>
 
         <!-- Selected Tier Summary Pill -->
-        <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between mt-3">
+        <div class="p-3.5 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between mt-3">
           <div>
-            <span id="modal-plan-name" class="text-xs font-bold text-white uppercase tracking-wider">Pro Tier Plan</span>
-            <div class="text-[11px] text-slate-400">Includes live Supabase Cloud sync & full API</div>
+            <div class="flex items-center gap-2">
+              <span id="modal-plan-name" class="text-xs font-bold text-white uppercase tracking-wider">Pro Scale Plan</span>
+              <span class="text-[10px] font-semibold text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-800/60">3-Day Free Trial</span>
+            </div>
+            <div class="text-[11px] text-slate-400 mt-0.5">Includes live Supabase sync, predictive mesh & full API</div>
           </div>
           <div class="text-right">
-            <span id="modal-plan-price" class="text-lg font-extrabold text-indigo-400">$25</span>
-            <span class="text-[10px] text-slate-400">/mo after trial</span>
+            <span id="modal-plan-price" class="text-xl font-extrabold text-indigo-400">$25</span>
+            <span class="text-[10px] text-slate-400 block">/mo after trial</span>
           </div>
         </div>
       </div>
 
-      <!-- Checkout Form -->
-      <form id="checkout-form" onsubmit="handleCheckoutSubmit(event)" class="space-y-4 relative">
+      <!-- Checkout Form with REAL Typable Card Inputs & Validation -->
+      <form id="checkout-form" onsubmit="handleCheckoutSubmit(event)" class="space-y-4 relative" novalidate>
+        
+        <!-- Validation Error Message Banner -->
+        <div id="checkout-error-banner" class="hidden p-3 rounded-xl bg-rose-950/60 border border-rose-500/50 text-rose-300 text-xs flex items-center gap-2">
+          <i data-lucide="alert-circle" class="w-4 h-4 flex-shrink-0 text-rose-400"></i>
+          <span id="checkout-error-text">Please complete all fields with valid information.</span>
+        </div>
+
         <div>
-          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Store Brand Name</label>
+          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Store Brand Name *</label>
           <div class="relative">
             <i data-lucide="store" class="w-4 h-4 text-slate-500 absolute left-3.5 top-3"></i>
             <input 
@@ -145,7 +167,7 @@
         </div>
 
         <div>
-          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Merchant Email Address</label>
+          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Merchant Email Address *</label>
           <div class="relative">
             <i data-lucide="mail" class="w-4 h-4 text-slate-500 absolute left-3.5 top-3"></i>
             <input 
@@ -159,19 +181,77 @@
           </div>
         </div>
 
-        <!-- Stripe Mockup Card Element -->
-        <div>
-          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Payment Method (Trial Verification)</label>
-          <div class="bg-slate-950 border border-slate-700 rounded-xl p-3 space-y-2">
-            <div class="flex items-center justify-between text-xs text-slate-400">
-              <span class="flex items-center gap-1.5 font-mono text-slate-300">
-                <i data-lucide="credit-card" class="w-4 h-4 text-indigo-400"></i> &bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; 4242
-              </span>
-              <span class="text-[11px] font-semibold text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-800/60">Stripe Encrypted</span>
+        <!-- REAL Typable Credit Card Fields -->
+        <div class="space-y-3 pt-1">
+          <div class="flex items-center justify-between">
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider">Payment Information (3-Day Trial Verification)</label>
+            <span class="text-[10px] font-semibold text-slate-400 flex items-center gap-1 font-mono">
+              <i data-lucide="lock" class="w-3 h-3 text-emerald-400"></i> SSL Encrypted
+            </span>
+          </div>
+
+          <div class="bg-slate-950 border border-slate-700 rounded-xl p-3.5 space-y-3">
+            <!-- Cardholder Name -->
+            <div>
+              <label class="text-[10px] uppercase font-semibold text-slate-400 block mb-1">Cardholder Name</label>
+              <input 
+                type="text" 
+                id="checkout-card-name" 
+                placeholder="Alex Morgan" 
+                value="Alex Morgan"
+                required
+                class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-indigo-500 font-mono"
+              />
             </div>
-            <div class="grid grid-cols-2 gap-2 pt-1 border-t border-slate-800 text-[11px] text-slate-400 font-mono">
-              <span>Exp: 12/28</span>
-              <span class="text-right">CVC: &bull;&bull;&bull;</span>
+
+            <!-- Card Number -->
+            <div>
+              <label class="text-[10px] uppercase font-semibold text-slate-400 block mb-1">Card Number (16 Digits)</label>
+              <div class="relative">
+                <input 
+                  type="text" 
+                  id="checkout-card-number" 
+                  placeholder="4242 4242 4242 4242" 
+                  value="4242 4242 4242 4242"
+                  maxlength="19"
+                  required
+                  oninput="formatCardNumber(this)"
+                  class="w-full bg-slate-900 border border-slate-700 rounded-lg pl-3 pr-10 py-2 text-xs text-white placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-indigo-500 font-mono tracking-wider"
+                />
+                <div class="absolute right-3 top-2.5 text-slate-400">
+                  <i data-lucide="credit-card" class="w-4 h-4 text-indigo-400"></i>
+                </div>
+              </div>
+            </div>
+
+            <!-- Expiry & CVC -->
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="text-[10px] uppercase font-semibold text-slate-400 block mb-1">Expiry (MM/YY)</label>
+                <input 
+                  type="text" 
+                  id="checkout-card-exp" 
+                  placeholder="12/28" 
+                  value="12/28"
+                  maxlength="5"
+                  required
+                  oninput="formatCardExpiry(this)"
+                  class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-indigo-500 font-mono"
+                />
+              </div>
+              <div>
+                <label class="text-[10px] uppercase font-semibold text-slate-400 block mb-1">CVC / CVV</label>
+                <input 
+                  type="password" 
+                  id="checkout-card-cvc" 
+                  placeholder="123" 
+                  value="882"
+                  maxlength="4"
+                  required
+                  oninput="formatCardCVC(this)"
+                  class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-indigo-500 font-mono tracking-widest"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -183,12 +263,12 @@
           class="w-full py-3.5 text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 active:scale-[0.99] rounded-xl shadow-xl shadow-indigo-600/30 border border-indigo-400/40 flex items-center justify-center gap-2 transition cursor-pointer"
         >
           <i data-lucide="sparkles" class="w-4 h-4"></i>
-          <span id="checkout-btn-text">Provision Account & Launch Dashboard</span>
+          <span id="checkout-btn-text">Start 3-Day Free Trial & Launch Dashboard</span>
         </button>
 
         <div class="flex items-center justify-center gap-2 text-[11px] text-slate-400 text-center">
-          <i data-lucide="lock" class="w-3.5 h-3.5 text-emerald-400"></i>
-          <span>Encrypted with 256-bit SSL. Cancel anytime with 1 click.</span>
+          <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-400"></i>
+          <span>Zero charges today. 3-day free trial. Cancel anytime with 1 click.</span>
         </div>
       </form>
 
@@ -197,13 +277,13 @@
 
 
   <!-- ========================================================================= -->
-  <!-- TOP NAVIGATION HEADER -->
+  <!-- TOP NAVIGATION HEADER WITH FUNCTIONAL ANCHOR LINKS -->
   <!-- ========================================================================= -->
   <header class="border-b border-slate-800/80 bg-slate-950/85 backdrop-blur-xl sticky top-0 z-40">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 py-3 flex items-center justify-between">
       
-      <!-- Brand Logo -->
-      <button onclick="switchView('landing')" class="flex items-center gap-3 group text-left focus:outline-none cursor-pointer">
+      <!-- Brand Logo & Home Switcher -->
+      <button onclick="handleNavAnchor('landing')" class="flex items-center gap-3 group text-left focus:outline-none cursor-pointer">
         <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-cyan-400 p-0.5 shadow-lg shadow-indigo-500/20 group-hover:shadow-indigo-500/40 transition">
           <div class="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
             <i data-lucide="shield-check" class="w-5 h-5 text-indigo-400"></i>
@@ -218,14 +298,15 @@
         </div>
       </button>
 
-      <!-- Center Nav Links (Landing View) -->
-      <nav id="landing-nav-links" class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
-        <a href="#features" class="hover:text-white transition">Features</a>
-        <a href="#interactive-demo" class="hover:text-white transition flex items-center gap-1.5 text-indigo-400 font-semibold">
+      <!-- Center Nav Anchor Links (Fully Functional) -->
+      <nav id="landing-nav-links" class="hidden md:flex items-center gap-7 text-sm font-medium text-slate-300">
+        <button onclick="handleNavAnchor('features')" class="hover:text-white transition cursor-pointer">Features</button>
+        <button onclick="handleNavAnchor('interactive-demo')" class="hover:text-white transition flex items-center gap-1.5 text-indigo-400 font-semibold cursor-pointer">
           <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Live Demo
-        </a>
-        <a href="#roi-impact" class="hover:text-white transition">ROI Impact</a>
-        <a href="#pricing" class="hover:text-white transition">Pricing</a>
+        </button>
+        <button onclick="handleNavAnchor('roi-calculator')" class="hover:text-white transition cursor-pointer">ROI Calculator</button>
+        <button onclick="handleNavAnchor('pricing')" class="hover:text-white transition cursor-pointer">Pricing</button>
+        <button onclick="handleNavAnchor('faq-guide')" class="hover:text-white transition cursor-pointer">FAQ & Guide</button>
       </nav>
 
       <!-- View Switcher & Action Cluster -->
@@ -276,7 +357,7 @@
         <!-- Trust Pill -->
         <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-950/80 border border-indigo-700/60 text-indigo-300 text-xs font-semibold shadow-inner">
           <span class="flex h-2 w-2 rounded-full bg-emerald-400"></span>
-          <span>Proven Return Shield for Shopify & WooCommerce Brands</span>
+          <span>Proven Return Shield for Shopify, WooCommerce & Custom Stores</span>
           <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-indigo-400"></i>
         </div>
 
@@ -290,20 +371,20 @@
           </p>
         </div>
 
-        <!-- Hero CTAs -->
+        <!-- Hero CTAs with 3-Day Free Trial Action -->
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
           <button onclick="openCheckoutModal('pro', 25)" class="w-full sm:w-auto px-8 py-4 text-base font-bold text-white bg-indigo-600 hover:bg-indigo-500 active:scale-[0.98] rounded-xl shadow-xl shadow-indigo-600/30 border border-indigo-400/40 flex items-center justify-center gap-2.5 transition cursor-pointer">
             <i data-lucide="rocket" class="w-5 h-5 text-indigo-200"></i>
-            <span>Start 14-Day Free Trial</span>
+            <span>Start 3-Day Free Trial</span>
           </button>
-          <a href="#interactive-demo" class="w-full sm:w-auto px-8 py-4 text-base font-semibold text-slate-200 bg-slate-900/90 hover:bg-slate-800 hover:text-white rounded-xl border border-slate-700 flex items-center justify-center gap-2 transition">
+          <button onclick="handleNavAnchor('interactive-demo')" class="w-full sm:w-auto px-8 py-4 text-base font-semibold text-slate-200 bg-slate-900/90 hover:bg-slate-800 hover:text-white rounded-xl border border-slate-700 flex items-center justify-center gap-2 transition cursor-pointer">
             <i data-lucide="play-circle" class="w-5 h-5 text-cyan-400"></i>
             <span>Try Interactive Demo</span>
-          </a>
+          </button>
         </div>
 
         <!-- Social Proof Stats Row -->
-        <div id="roi-impact" class="pt-12 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto border-t border-slate-800/80">
+        <div class="pt-12 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto border-t border-slate-800/80">
           <div class="p-3">
             <div class="text-3xl font-extrabold text-white">-42.4%</div>
             <div class="text-xs text-slate-400 mt-1 font-medium">Return Rate Reduction</div>
@@ -423,9 +504,9 @@
               <div>
                 <label class="text-[11px] font-semibold text-slate-400 block mb-1">Fit Preference</label>
                 <div class="grid grid-cols-3 gap-2 bg-slate-950 p-1 rounded-lg border border-slate-800 text-xs">
-                  <button type="button" onclick="setLandingPref('Fitted')" id="lnd-pref-fitted" class="py-1.5 font-medium rounded text-slate-400 hover:text-white transition">Fitted</button>
-                  <button type="button" onclick="setLandingPref('Regular')" id="lnd-pref-regular" class="py-1.5 font-semibold rounded bg-slate-800 text-white transition">Regular</button>
-                  <button type="button" onclick="setLandingPref('Relaxed')" id="lnd-pref-relaxed" class="py-1.5 font-medium rounded text-slate-400 hover:text-white transition">Relaxed</button>
+                  <button type="button" onclick="setLandingPref('Fitted')" id="lnd-pref-fitted" class="py-1.5 font-medium rounded text-slate-400 hover:text-white transition cursor-pointer">Fitted</button>
+                  <button type="button" onclick="setLandingPref('Regular')" id="lnd-pref-regular" class="py-1.5 font-semibold rounded bg-slate-800 text-white transition cursor-pointer">Regular</button>
+                  <button type="button" onclick="setLandingPref('Relaxed')" id="lnd-pref-relaxed" class="py-1.5 font-medium rounded text-slate-400 hover:text-white transition cursor-pointer">Relaxed</button>
                 </div>
               </div>
 
@@ -444,7 +525,7 @@
                   </div>
                 </div>
                 <button onclick="openCheckoutModal('pro', 25)" class="px-3.5 py-2 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg transition shadow cursor-pointer">
-                  Deploy to Store
+                  Start 3-Day Trial
                 </button>
               </div>
             </div>
@@ -461,6 +542,142 @@
             </div>
           </div>
         </div>
+      </div>
+    </section>
+
+    <!-- INTERACTIVE ROI CALCULATOR SECTION -->
+    <section id="roi-calculator" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="bg-gradient-to-br from-slate-900 via-indigo-950/30 to-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-10 shadow-2xl space-y-8">
+        
+        <div class="text-center max-w-2xl mx-auto space-y-3">
+          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-950/80 border border-emerald-800 text-emerald-300 text-xs font-semibold">
+            <i data-lucide="calculator" class="w-3.5 h-3.5"></i> Real-Time Profit Simulator
+          </div>
+          <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">Calculate Your Store's Return Savings</h2>
+          <p class="text-sm text-slate-300">Adjust the sliders below to see how much revenue FitGuard AI recaptures for your apparel brand every month.</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          
+          <!-- Sliders & Store Parameters (6 Cols) -->
+          <div class="lg:col-span-6 space-y-6 bg-slate-950/80 p-6 rounded-2xl border border-slate-800">
+            
+            <!-- Slider 1: Monthly Orders -->
+            <div class="space-y-2">
+              <div class="flex justify-between items-center text-xs">
+                <span class="font-semibold text-slate-300 uppercase tracking-wider">Monthly Apparel Orders</span>
+                <span class="text-base font-bold text-indigo-400 font-mono" id="roi-val-orders">1,500 orders</span>
+              </div>
+              <input 
+                type="range" 
+                id="roi-input-orders" 
+                min="200" 
+                max="15000" 
+                step="100" 
+                value="1500" 
+                oninput="calculateROISavings()"
+                class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500"
+              />
+              <div class="flex justify-between text-[10px] text-slate-500 font-mono">
+                <span>200 orders</span>
+                <span>7,500 orders</span>
+                <span>15,000+ orders</span>
+              </div>
+            </div>
+
+            <!-- Slider 2: Average Order Value (AOV) -->
+            <div class="space-y-2">
+              <div class="flex justify-between items-center text-xs">
+                <span class="font-semibold text-slate-300 uppercase tracking-wider">Average Order Value (AOV)</span>
+                <span class="text-base font-bold text-indigo-400 font-mono" id="roi-val-aov">$65.00</span>
+              </div>
+              <input 
+                type="range" 
+                id="roi-input-aov" 
+                min="25" 
+                max="250" 
+                step="5" 
+                value="65" 
+                oninput="calculateROISavings()"
+                class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500"
+              />
+              <div class="flex justify-between text-[10px] text-slate-500 font-mono">
+                <span>$25</span>
+                <span>$135</span>
+                <span>$250</span>
+              </div>
+            </div>
+
+            <!-- Slider 3: Current Return Rate -->
+            <div class="space-y-2">
+              <div class="flex justify-between items-center text-xs">
+                <span class="font-semibold text-slate-300 uppercase tracking-wider">Current Sizing Return Rate</span>
+                <span class="text-base font-bold text-rose-400 font-mono" id="roi-val-return-rate">28%</span>
+              </div>
+              <input 
+                type="range" 
+                id="roi-input-return-rate" 
+                min="10" 
+                max="45" 
+                step="1" 
+                value="28" 
+                oninput="calculateROISavings()"
+                class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500"
+              />
+              <div class="flex justify-between text-[10px] text-slate-500 font-mono">
+                <span>10% (Low)</span>
+                <span>28% (Avg Fashion)</span>
+                <span>45% (High)</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Real-Time ROI Output Cards (6 Cols) -->
+          <div class="lg:col-span-6 space-y-4">
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <!-- Result 1 -->
+              <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800 space-y-1">
+                <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Returns Prevented / Mo</span>
+                <div class="text-3xl font-extrabold text-white" id="roi-out-prevented">178 packages</div>
+                <p class="text-[10px] text-slate-500">Based on 42.4% verified reduction rate</p>
+              </div>
+
+              <!-- Result 2 -->
+              <div class="bg-slate-950 p-5 rounded-2xl border border-emerald-500/30 space-y-1 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-emerald-500/10 rounded-full blur-xl pointer-events-none"></div>
+                <span class="text-[11px] font-semibold text-emerald-400 uppercase tracking-wider">Monthly Profit Recaptured</span>
+                <div class="text-3xl font-extrabold text-emerald-400" id="roi-out-monthly">$4,984</div>
+                <p class="text-[10px] text-emerald-500/80">Shipping fees, handling & margin saved</p>
+              </div>
+            </div>
+
+            <!-- Big Annual Net Benefit Card -->
+            <div class="bg-gradient-to-r from-indigo-950 via-slate-900 to-indigo-950 p-6 rounded-2xl border border-indigo-500/50 space-y-4 shadow-xl">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div>
+                  <span class="text-xs font-bold uppercase tracking-wider text-indigo-300">Projected Annual Bottom-Line Boost</span>
+                  <div class="text-4xl sm:text-5xl font-black text-white mt-1" id="roi-out-annual">$59,808<span class="text-sm font-normal text-slate-400"> / year</span></div>
+                </div>
+                <div class="text-left sm:text-right">
+                  <span class="text-xs text-slate-400 block font-mono">Software Cost: $25/mo</span>
+                  <span class="text-xs font-bold text-emerald-400 px-2.5 py-1 rounded bg-emerald-950/80 border border-emerald-800" id="roi-out-multiple">199x ROI</span>
+                </div>
+              </div>
+
+              <div class="pt-3 border-t border-indigo-900/60 flex flex-col sm:flex-row items-center justify-between gap-3">
+                <span class="text-xs text-slate-300">Ready to unlock these savings for your storefront?</span>
+                <button onclick="openCheckoutModal('pro', 25)" class="w-full sm:w-auto px-5 py-2.5 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl shadow-lg shadow-indigo-600/30 transition cursor-pointer">
+                  Start 3-Day Free Trial
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
       </div>
     </section>
 
@@ -486,7 +703,7 @@
           <div class="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 flex items-center justify-center">
             <i data-lucide="sliders" class="w-6 h-6"></i>
           </div>
-          <h3 class="text-lg font-bold text-white">Garment Matrix Matrixing</h3>
+          <h3 class="text-lg font-bold text-white">Garment Matrix Precision</h3>
           <p class="text-xs sm:text-sm text-slate-400 leading-relaxed">
             Specify unique chest, waist, and length tolerances for oversized tees, hoodies, denim, or tailored jackets with instant real-time sync.
           </p>
@@ -504,11 +721,11 @@
       </div>
     </section>
 
-    <!-- Pricing Section (Starter $10 / mo & Pro $25 / mo) -->
+    <!-- Pricing Section (Starter $10 / mo & Pro $25 / mo with 3-Day Free Trial) -->
     <section id="pricing" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center max-w-2xl mx-auto mb-12 space-y-3">
         <div class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-950/80 border border-emerald-800 text-emerald-300 text-xs font-semibold">
-          <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> 14-Day Free Trial On All Plans
+          <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> 3-Day Free Trial On All Plans
         </div>
         <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">Transparent, High-ROI Pricing</h2>
         <p class="text-slate-400 text-base">Simple pricing that pays for itself on your very first prevented return.</p>
@@ -531,13 +748,16 @@
             
             <div class="pt-4 border-t border-slate-800 space-y-3 text-xs text-slate-300">
               <div class="flex items-center gap-2.5">
+                <i data-lucide="check" class="w-4 h-4 text-emerald-400"></i> Full 3-Day Unlimited Free Trial
+              </div>
+              <div class="flex items-center gap-2.5">
                 <i data-lucide="check" class="w-4 h-4 text-emerald-400"></i> Up to 2,500 monthly sizing recommendations
               </div>
               <div class="flex items-center gap-2.5">
                 <i data-lucide="check" class="w-4 h-4 text-emerald-400"></i> Full Garment Specification Matrix
               </div>
               <div class="flex items-center gap-2.5">
-                <i data-lucide="check" class="w-4 h-4 text-emerald-400"></i> Standard Brand Primary Color Customizer
+                <i data-lucide="check" class="w-4 h-4 text-emerald-400"></i> Brand Primary Color Customizer
               </div>
               <div class="flex items-center gap-2.5">
                 <i data-lucide="check" class="w-4 h-4 text-emerald-400"></i> Shopify & WooCommerce 1-Line Embed
@@ -546,7 +766,7 @@
           </div>
 
           <button onclick="openCheckoutModal('starter', 10)" class="w-full py-3.5 text-sm font-bold text-white bg-slate-800 hover:bg-slate-700 rounded-xl border border-slate-700 transition cursor-pointer">
-            Choose Starter Plan ($10/mo)
+            Start 3-Day Trial ($10/mo)
           </button>
         </div>
 
@@ -569,6 +789,9 @@
             
             <div class="pt-4 border-t border-slate-800 space-y-3 text-xs text-slate-200">
               <div class="flex items-center gap-2.5">
+                <i data-lucide="check-check" class="w-4 h-4 text-indigo-400"></i> Full 3-Day Unlimited Free Trial
+              </div>
+              <div class="flex items-center gap-2.5">
                 <i data-lucide="check-check" class="w-4 h-4 text-indigo-400"></i> <strong class="text-white">Unlimited</strong> fit calculations
               </div>
               <div class="flex items-center gap-2.5">
@@ -587,11 +810,120 @@
           </div>
 
           <button onclick="openCheckoutModal('pro', 25)" class="w-full py-3.5 text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl shadow-lg shadow-indigo-600/30 transition cursor-pointer">
-            Start 14-Day Free Trial ($25/mo)
+            Start 3-Day Trial ($25/mo)
           </button>
         </div>
 
       </div>
+    </section>
+
+    <!-- HUMAN-WRITTEN FAQ & STEP-BY-STEP QUICKSTART GUIDE SECTION -->
+    <section id="faq-guide" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
+      
+      <!-- Part A: 4-Step Quickstart Guide -->
+      <div class="bg-slate-900/60 border border-slate-800 rounded-3xl p-6 sm:p-10 space-y-8">
+        <div class="text-center max-w-2xl mx-auto space-y-3">
+          <span class="text-xs font-bold uppercase tracking-wider text-indigo-400 bg-indigo-950/80 px-3 py-1 rounded-full border border-indigo-800">Seamless Setup</span>
+          <h2 class="text-3xl font-extrabold text-white">How Store Owners Integrate in 4 Simple Steps</h2>
+          <p class="text-sm text-slate-300">You don't need a software engineering team. You can be up, running, and preventing returns in less than 3 minutes.</p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <!-- Step 1 -->
+          <div class="bg-slate-950 p-6 rounded-2xl border border-slate-800 space-y-3 relative">
+            <div class="w-8 h-8 rounded-full bg-indigo-600 text-white font-extrabold text-xs flex items-center justify-center">1</div>
+            <h4 class="text-base font-bold text-white">Enter Your Sizing Matrix</h4>
+            <p class="text-xs text-slate-400 leading-relaxed">
+              Input your garment's physical dimensions (chest, waist, length in inches or cm) right into your dashboard table.
+            </p>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="bg-slate-950 p-6 rounded-2xl border border-slate-800 space-y-3 relative">
+            <div class="w-8 h-8 rounded-full bg-indigo-600 text-white font-extrabold text-xs flex items-center justify-center">2</div>
+            <h4 class="text-base font-bold text-white">Match Your Store Colors</h4>
+            <p class="text-xs text-slate-400 leading-relaxed">
+              Pick your primary brand hex color. The sizing assistant will automatically match your storefront typography and button palettes.
+            </p>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="bg-slate-950 p-6 rounded-2xl border border-slate-800 space-y-3 relative">
+            <div class="w-8 h-8 rounded-full bg-indigo-600 text-white font-extrabold text-xs flex items-center justify-center">3</div>
+            <h4 class="text-base font-bold text-white">Paste 1 Line of HTML</h4>
+            <p class="text-xs text-slate-400 leading-relaxed">
+              Copy your generated merchant snippet and paste it before the closing &lt;/body&gt; tag in Shopify, WooCommerce, or Webflow.
+            </p>
+          </div>
+
+          <!-- Step 4 -->
+          <div class="bg-slate-950 p-6 rounded-2xl border border-slate-800 space-y-3 relative">
+            <div class="w-8 h-8 rounded-full bg-emerald-600 text-white font-extrabold text-xs flex items-center justify-center">4</div>
+            <h4 class="text-base font-bold text-white">Watch Returns Drop 42%</h4>
+            <p class="text-xs text-slate-400 leading-relaxed">
+              Shoppers immediately get instant fit confidence at checkout, eliminating multi-size bracket purchases forever.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Part B: Warm, Human-Written FAQ -->
+      <div class="max-w-4xl mx-auto space-y-8">
+        <div class="text-center space-y-3">
+          <span class="text-xs font-bold uppercase tracking-wider text-cyan-400 bg-cyan-950/80 px-3 py-1 rounded-full border border-cyan-800">Clear Answers</span>
+          <h2 class="text-3xl font-extrabold text-white">Frequently Asked Questions</h2>
+          <p class="text-sm text-slate-400">Everything you need to know about how FitGuard AI works with your clothing brand.</p>
+        </div>
+
+        <div class="space-y-4">
+          
+          <!-- Q1 -->
+          <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 space-y-2">
+            <h3 class="text-base font-bold text-white flex items-center gap-2">
+              <i data-lucide="help-circle" class="w-4 h-4 text-indigo-400 flex-shrink-0"></i>
+              Why do apparel stores get so many sizing returns in the first place?
+            </h3>
+            <p class="text-xs sm:text-sm text-slate-300 leading-relaxed pl-6">
+              Online shoppers cannot try garments on in person, and static size charts with generic inches or centimeters are confusing and tedious. Because of this hesitation, shoppers often do what the industry calls "wardrobing" or "bracketing"—ordering both a Medium and a Large with the deliberate intention of shipping one back. FitGuard AI eliminates this hesitation right on the product page.
+            </p>
+          </div>
+
+          <!-- Q2 -->
+          <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 space-y-2">
+            <h3 class="text-base font-bold text-white flex items-center gap-2">
+              <i data-lucide="help-circle" class="w-4 h-4 text-indigo-400 flex-shrink-0"></i>
+              How does the 3-day free trial work?
+            </h3>
+            <p class="text-xs sm:text-sm text-slate-300 leading-relaxed pl-6">
+              When you start your 3-day trial, you receive 100% full access to all features, unlimited sizing calculations, and the Supabase cloud-synced merchant dashboard. You will not be charged a single cent during your 3-day trial period, and you can cancel anytime with a single click inside your dashboard.
+            </p>
+          </div>
+
+          <!-- Q3 -->
+          <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 space-y-2">
+            <h3 class="text-base font-bold text-white flex items-center gap-2">
+              <i data-lucide="help-circle" class="w-4 h-4 text-indigo-400 flex-shrink-0"></i>
+              Will the FitGuard script slow down my Shopify or WooCommerce store?
+            </h3>
+            <p class="text-xs sm:text-sm text-slate-300 leading-relaxed pl-6">
+              Not at all! Our client-side script is under 9KB gzipped and loads asynchronously from a global edge CDN. It performs all biometric interpolation calculations in under 10 milliseconds directly on the shopper's device with zero cumulative layout shift (CLS 0.00).
+            </p>
+          </div>
+
+          <!-- Q4 -->
+          <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 space-y-2">
+            <h3 class="text-base font-bold text-white flex items-center gap-2">
+              <i data-lucide="help-circle" class="w-4 h-4 text-indigo-400 flex-shrink-0"></i>
+              Can I have different sizing tables for different clothing types?
+            </h3>
+            <p class="text-xs sm:text-sm text-slate-300 leading-relaxed pl-6">
+              Yes! You can configure specific matrices for Boxy Tees, Slim-fit Hoodies, Denim Jeans, or Heavy Outerwear. The engine dynamically accounts for the distinct drape and fit profile of each garment category.
+            </p>
+          </div>
+
+        </div>
+      </div>
+
     </section>
 
   </div>
@@ -612,7 +944,7 @@
         <div>
           <div class="flex items-center gap-2">
             <h2 class="text-sm font-bold text-white" id="dashboard-header-title">Aura Apparel Co.</h2>
-            <span id="dashboard-tier-badge" class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-800">Pro Plan</span>
+            <span id="dashboard-tier-badge" class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-800">Pro 3-Day Trial</span>
           </div>
           <p class="text-[11px] text-slate-400 font-mono">Store ID: <span id="header-store-slug-badge" class="text-slate-200 font-bold">aura-apparel-co</span></p>
         </div>
@@ -788,8 +1120,8 @@
                   <i data-lucide="ruler" class="w-3.5 h-3.5 text-indigo-400"></i> Measurement System
                 </label>
                 <div class="grid grid-cols-2 gap-2 bg-slate-950 p-1 rounded-lg border border-slate-700">
-                  <button type="button" id="unit-in-btn" onclick="setUnit('in')" class="py-1.5 text-xs font-semibold rounded bg-indigo-600 text-white transition">Inches (in)</button>
-                  <button type="button" id="unit-cm-btn" onclick="setUnit('cm')" class="py-1.5 text-xs font-semibold rounded text-slate-400 hover:text-white transition">Centimeters (cm)</button>
+                  <button type="button" id="unit-in-btn" onclick="setUnit('in')" class="py-1.5 text-xs font-semibold rounded bg-indigo-600 text-white transition cursor-pointer">Inches (in)</button>
+                  <button type="button" id="unit-cm-btn" onclick="setUnit('cm')" class="py-1.5 text-xs font-semibold rounded text-slate-400 hover:text-white transition cursor-pointer">Centimeters (cm)</button>
                 </div>
               </div>
             </div>
@@ -846,7 +1178,7 @@
             </div>
           </div>
 
-          <!-- Merchant Integration Snippet Card -->
+          <!-- Merchant Integration Snippet Card with GREEN CHECKMARK FEEDBACK -->
           <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 shadow-xl relative overflow-hidden">
             <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-4">
               <div class="flex items-center gap-3">
@@ -858,12 +1190,14 @@
                   <p class="text-xs text-slate-400">Paste before the closing <code class="text-indigo-400 font-mono">&lt;/body&gt;</code> on Shopify, WooCommerce, or Custom Headless themes</p>
                 </div>
               </div>
+              
+              <!-- Satisfying Copy Button with Morphing State -->
               <button 
                 id="copy-snippet-btn" 
                 onclick="copyIntegrationSnippet()" 
-                class="px-3.5 py-1.5 text-xs font-semibold text-white bg-slate-800 hover:bg-slate-700 active:scale-95 border border-slate-600 rounded-lg flex items-center gap-1.5 transition cursor-pointer"
+                class="px-4 py-2 text-xs font-bold text-white bg-slate-800 hover:bg-slate-700 active:scale-95 border border-slate-600 rounded-xl flex items-center gap-2 transition-all duration-200 cursor-pointer shadow"
               >
-                <i data-lucide="copy" class="w-3.5 h-3.5" id="copy-icon"></i>
+                <i data-lucide="copy" class="w-4 h-4" id="copy-icon"></i>
                 <span id="copy-text">Copy HTML Snippet</span>
               </button>
             </div>
@@ -1032,7 +1366,7 @@
 
 
     <!-- ----------------------------------------------------------------------- -->
-    <!-- DASHBOARD SUB-TAB 2: ANALYTICS & INSIGHTS (NEW TAB) -->
+    <!-- DASHBOARD SUB-TAB 2: ANALYTICS & INSIGHTS -->
     <!-- ----------------------------------------------------------------------- -->
     <div id="subtab-analytics" class="hidden space-y-8">
       
@@ -1043,7 +1377,7 @@
             <span class="flex h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
             <h3 class="text-base font-bold text-white">Live Storefront Telemetry & Event Stream</h3>
           </div>
-          <p class="text-xs text-slate-400 mt-1">Real-time fit calculation requests, conversions, and estimated return dollars saved.</p>
+          <p class="text-xs text-slate-400 mt-1">Real-time fit calculation requests, conversions, and return dollars saved synced to Supabase.</p>
         </div>
 
         <!-- Live Traffic Simulators -->
@@ -1131,7 +1465,7 @@
       <!-- Chart & Live Feed Grid -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
         
-        <!-- Left: Interactive Fit Recommendation Traffic Chart (7 Cols) -->
+        <!-- Left: Interactive Recommendation Traffic Chart (7 Cols) -->
         <div class="lg:col-span-7 bg-slate-900/90 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
           <div class="flex items-center justify-between border-b border-slate-800 pb-3">
             <div>
@@ -1191,10 +1525,11 @@
         <span class="text-slate-400 font-medium">&copy; FitGuard AI Technologies Inc. All rights reserved.</span>
       </div>
       <div class="flex items-center gap-6 text-slate-400">
-        <button onclick="switchView('landing')" class="hover:text-white transition cursor-pointer">Home</button>
+        <button onclick="handleNavAnchor('landing')" class="hover:text-white transition cursor-pointer">Home</button>
         <button onclick="switchView('dashboard')" class="hover:text-white transition cursor-pointer">Merchant Console</button>
-        <a href="#features" class="hover:text-white transition">Engine Specs</a>
-        <a href="#pricing" class="hover:text-white transition">Pricing</a>
+        <button onclick="handleNavAnchor('features')" class="hover:text-white transition cursor-pointer">Engine Specs</button>
+        <button onclick="handleNavAnchor('pricing')" class="hover:text-white transition cursor-pointer">Pricing</button>
+        <button onclick="handleNavAnchor('faq-guide')" class="hover:text-white transition cursor-pointer">FAQ & Guide</button>
       </div>
     </div>
   </footer>
@@ -1218,7 +1553,7 @@
       console.warn("Supabase client initialization note:", e);
     }
 
-    // Default Mockup State (Requirement 1 & 2)
+    // Default Mockup State
     const defaultData = {
       storeName: "Aura Apparel Co.",
       brandColor: "#6366f1",
@@ -1259,7 +1594,7 @@
 
     let chartInstance = null;
 
-    // Slug Generator Function
+    // Helper: Slug Generator
     function generateSlug(text) {
       return (text || '')
         .toString()
@@ -1272,24 +1607,42 @@
         .replace(/-+$/, '') || 'aura-apparel-co';
     }
 
-    // Initialize Dashboard On Load
+    // App Startup Initialization
     window.addEventListener('DOMContentLoaded', async () => {
-      // 1. Immediately render default data to prevent blank states
       renderFullUI();
       computeLandingSim();
+      calculateROISavings();
       initDefaultEventStream();
       initAnalyticsChart();
 
-      // 2. Fetch Supabase stores table asynchronously
+      // Fetch Supabase data asynchronously
       await loadFromSupabase();
 
-      // Initialize icons
       if (window.lucide) {
         lucide.createIcons();
       }
     });
 
-    // View Switching System
+    // Anchor Link Navigation Handler (Smooth Scroll & View Transition)
+    function handleNavAnchor(targetId) {
+      if (appState.currentView !== 'landing') {
+        switchView('landing');
+      }
+
+      if (targetId === 'landing') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+
+      setTimeout(() => {
+        const el = document.getElementById(targetId);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 50);
+    }
+
+    // Main View Switching System
     function toggleMainView() {
       if (appState.currentView === 'landing') {
         switchView('dashboard');
@@ -1337,7 +1690,7 @@
       if (window.lucide) lucide.createIcons();
     }
 
-    // Dashboard Internal Tab Switcher (Config vs Analytics)
+    // Dashboard Sub-Tab Switcher
     function switchDashboardTab(tab) {
       appState.activeDashboardTab = tab;
       const subtabConfig = document.getElementById('subtab-config');
@@ -1358,7 +1711,6 @@
         tabBtnAnalytics.className = "px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 bg-indigo-600 text-white shadow cursor-pointer";
         tabBtnConfig.className = "px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center gap-2 text-slate-400 hover:text-white cursor-pointer";
 
-        // Resize Chart.js when entering view
         if (chartInstance) {
           setTimeout(() => chartInstance.resize(), 50);
         }
@@ -1367,7 +1719,9 @@
       if (window.lucide) lucide.createIcons();
     }
 
-    // Modal Handlers: Stripe Checkout & Trial Provisioning
+    // -------------------------------------------------------------------------
+    // REALISTIC CHECKOUT & 3-DAY TRIAL MODAL LOGIC WITH CARD VALIDATION
+    // -------------------------------------------------------------------------
     let pendingTier = 'pro';
     let pendingPrice = 25;
 
@@ -1379,8 +1733,10 @@
       const modalPlanName = document.getElementById('modal-plan-name');
       const modalPlanPrice = document.getElementById('modal-plan-price');
       const storeInput = document.getElementById('checkout-store-name');
+      const errBanner = document.getElementById('checkout-error-banner');
 
-      if (modalPlanName) modalPlanName.textContent = tier === 'starter' ? 'Starter Tier Plan' : 'Pro Scale Plan';
+      if (errBanner) errBanner.classList.add('hidden');
+      if (modalPlanName) modalPlanName.textContent = tier === 'starter' ? 'Starter Tier Plan (3-Day Trial)' : 'Pro Scale Plan (3-Day Trial)';
       if (modalPlanPrice) modalPlanPrice.textContent = `$${price}`;
       if (storeInput) storeInput.value = appState.storeName;
 
@@ -1393,20 +1749,77 @@
       modal.classList.add('hidden');
     }
 
+    // Credit Card Input Masking & Formatters
+    function formatCardNumber(input) {
+      let val = input.value.replace(/\D/g, '').substring(0, 16);
+      let formatted = val.match(/.{1,4}/g)?.join(' ') || val;
+      input.value = formatted;
+    }
+
+    function formatCardExpiry(input) {
+      let val = input.value.replace(/\D/g, '').substring(0, 4);
+      if (val.length >= 2) {
+        input.value = val.substring(0, 2) + '/' + val.substring(2);
+      } else {
+        input.value = val;
+      }
+    }
+
+    function formatCardCVC(input) {
+      input.value = input.value.replace(/\D/g, '').substring(0, 4);
+    }
+
     async function handleCheckoutSubmit(e) {
       e.preventDefault();
+      
+      const storeNameVal = document.getElementById('checkout-store-name')?.value.trim();
+      const emailVal = document.getElementById('checkout-email')?.value.trim();
+      const cardNameVal = document.getElementById('checkout-card-name')?.value.trim();
+      const cardNumVal = document.getElementById('checkout-card-number')?.value.replace(/\s/g, '');
+      const cardExpVal = document.getElementById('checkout-card-exp')?.value.trim();
+      const cardCvcVal = document.getElementById('checkout-card-cvc')?.value.trim();
+      
+      const errBanner = document.getElementById('checkout-error-banner');
+      const errText = document.getElementById('checkout-error-text');
+
+      // Validation Checks
+      if (!storeNameVal) {
+        showCheckoutError("Please enter your Store Brand Name.");
+        return;
+      }
+      if (!emailVal || !emailVal.includes('@') || !emailVal.includes('.')) {
+        showCheckoutError("Please enter a valid email address.");
+        return;
+      }
+      if (!cardNameVal) {
+        showCheckoutError("Please enter the name on the card.");
+        return;
+      }
+      if (!cardNumVal || cardNumVal.length < 15) {
+        showCheckoutError("Please enter a valid 16-digit credit card number.");
+        return;
+      }
+      if (!cardExpVal || !cardExpVal.includes('/') || cardExpVal.length < 5) {
+        showCheckoutError("Please enter a valid expiration date (MM/YY).");
+        return;
+      }
+      if (!cardCvcVal || cardCvcVal.length < 3) {
+        showCheckoutError("Please enter a valid 3 or 4-digit CVC code.");
+        return;
+      }
+
+      if (errBanner) errBanner.classList.add('hidden');
+
       const submitBtn = document.getElementById('checkout-submit-btn');
       const submitText = document.getElementById('checkout-btn-text');
-      const storeNameVal = document.getElementById('checkout-store-name').value.trim();
 
       submitBtn.disabled = true;
-      submitText.textContent = "Provisioning Secure Workspace...";
+      submitText.textContent = "Provisioning 3-Day Free Trial...";
 
-      // Update state with checkout details
-      appState.storeName = storeNameVal || "Aura Apparel Co.";
+      appState.storeName = storeNameVal;
       appState.subscriptionTier = pendingTier;
 
-      // Upsert new provisioned store into Supabase
+      // Upsert to Supabase
       if (supabaseClient) {
         try {
           const { data, error } = await supabaseClient
@@ -1423,22 +1836,65 @@
             appState.storeId = data[0].id;
           }
         } catch (err) {
-          console.warn("Supabase provision note:", err);
+          console.warn("Supabase provision log:", err);
         }
       }
 
-      // Render UI and transition directly to Dashboard
       renderFullUI();
       closeCheckoutModal();
       switchView('dashboard');
-      
-      showToast("Account Provisioned!", `Welcome to FitGuard AI! 14-day trial started for ${appState.storeName}.`, "success");
+
+      showToast("3-Day Trial Activated!", `Welcome to FitGuard AI! 3-Day unlimited free trial started for ${appState.storeName}.`, "success");
 
       submitBtn.disabled = false;
-      submitText.textContent = "Provision Account & Launch Dashboard";
+      submitText.textContent = "Start 3-Day Free Trial & Launch Dashboard";
     }
 
-    // Fetch store from Supabase without persistent loading lock (Requirement 1 & 3)
+    function showCheckoutError(msg) {
+      const errBanner = document.getElementById('checkout-error-banner');
+      const errText = document.getElementById('checkout-error-text');
+      if (errBanner && errText) {
+        errText.textContent = msg;
+        errBanner.classList.remove('hidden');
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // ROI CALCULATOR ENGINE
+    // -------------------------------------------------------------------------
+    function calculateROISavings() {
+      const orders = parseFloat(document.getElementById('roi-input-orders')?.value) || 1500;
+      const aov = parseFloat(document.getElementById('roi-input-aov')?.value) || 65;
+      const returnRate = parseFloat(document.getElementById('roi-input-return-rate')?.value) || 28;
+
+      // Update Slider Label Displays
+      document.getElementById('roi-val-orders').textContent = `${orders.toLocaleString()} orders`;
+      document.getElementById('roi-val-aov').textContent = `$${aov.toFixed(2)}`;
+      document.getElementById('roi-val-return-rate').textContent = `${returnRate}%`;
+
+      // Return Calculations:
+      // FitGuard reduces returns by 42.4% on average
+      const currentMonthlyReturns = orders * (returnRate / 100);
+      const preventedReturnsMonthly = Math.round(currentMonthlyReturns * 0.424);
+      
+      // Est cost per return (shipping $8.50 + repackaging/wear $4.00 + recaptured margin 35% of AOV)
+      const costSavedPerReturn = 12.50 + (aov * 0.35);
+      const monthlySavings = Math.round(preventedReturnsMonthly * costSavedPerReturn);
+      const annualSavings = monthlySavings * 12;
+      
+      const proPlanCostAnnual = 25 * 12; // $300/yr
+      const roiMultiple = Math.round(annualSavings / Math.max(1, proPlanCostAnnual));
+
+      // Update Output DOM
+      document.getElementById('roi-out-prevented').textContent = `${preventedReturnsMonthly.toLocaleString()} packages`;
+      document.getElementById('roi-out-monthly').textContent = `$${monthlySavings.toLocaleString()}`;
+      document.getElementById('roi-out-annual').innerHTML = `$${annualSavings.toLocaleString()}<span class="text-sm font-normal text-slate-400"> / year</span>`;
+      document.getElementById('roi-out-multiple').textContent = `${roiMultiple}x ROI`;
+    }
+
+    // -------------------------------------------------------------------------
+    // SUPABASE DATA FETCH & SYNC
+    // -------------------------------------------------------------------------
     async function loadFromSupabase() {
       const statusBadgeText = document.getElementById('status-badge-text');
       
@@ -1455,7 +1911,6 @@
           .limit(1);
 
         if (error) {
-          console.warn("Supabase fetch note:", error.message);
           if (statusBadgeText) statusBadgeText.textContent = "Connected";
           return;
         }
@@ -1479,16 +1934,13 @@
           renderFullUI();
         }
         
-        // Status remains neutral "Connected" on initial load
         if (statusBadgeText) statusBadgeText.textContent = "Connected";
 
       } catch (err) {
-        console.error("Initialization error:", err);
         if (statusBadgeText) statusBadgeText.textContent = "Connected";
       }
     }
 
-    // Save and Upsert Settings to Supabase
     async function saveStoreSettings() {
       const saveBtn = document.getElementById('save-sync-btn');
       const saveBtnText = document.getElementById('save-btn-text');
@@ -1496,12 +1948,10 @@
       const statusBadge = document.getElementById('status-badge');
       const statusBadgeText = document.getElementById('status-badge-text');
 
-      // Loading state on button
       saveBtn.disabled = true;
       saveBtnText.textContent = "Syncing...";
       saveIcon.classList.add("animate-spin");
 
-      // Collect active table data
       collectTableData();
 
       const payload = {
@@ -1530,7 +1980,6 @@
           }
         }
 
-        // Show temporary "Cloud Sync Complete" status (Requirement 3)
         if (statusBadge && statusBadgeText) {
           statusBadge.classList.remove('bg-slate-900', 'border-slate-700', 'text-slate-300');
           statusBadge.classList.add('bg-emerald-950', 'border-emerald-700', 'text-emerald-300');
@@ -1546,7 +1995,6 @@
         }
 
       } catch (err) {
-        console.error("Save error:", err);
         showToast("Sync Notice", "Local configuration stored. Cloud sync retained.", "info");
       } finally {
         saveBtn.disabled = false;
@@ -1556,9 +2004,10 @@
       }
     }
 
-    // Render All UI Components
+    // -------------------------------------------------------------------------
+    // DASHBOARD RENDERING & MATRIX CONTROLS
+    // -------------------------------------------------------------------------
     function renderFullUI() {
-      // 1. Form Inputs
       const storeInput = document.getElementById('input-store-name');
       const colorPicker = document.getElementById('input-brand-color-picker');
       const colorHex = document.getElementById('input-brand-color-hex');
@@ -1571,19 +2020,13 @@
       if (colorHex) colorHex.value = appState.brandColor;
       if (selectCategory) selectCategory.value = appState.category;
       if (headerTitle) headerTitle.textContent = appState.storeName;
-      if (tierBadge) tierBadge.textContent = appState.subscriptionTier === 'starter' ? 'Starter Plan' : 'Pro Scale Plan';
+      if (tierBadge) tierBadge.textContent = appState.subscriptionTier === 'starter' ? 'Starter (3-Day Trial)' : 'Pro Scale (3-Day Trial)';
 
-      // 2. Garment Table Matrix
       renderMatrixTable();
-
-      // 3. Dynamic Snippet
       updateSnippetDisplay();
-
-      // 4. Live Storefront Preview
       updateLivePreview();
     }
 
-    // Render Matrix Table Rows (Requirement 2)
     function renderMatrixTable() {
       const tbody = document.getElementById('matrix-tbody');
       if (!tbody) return;
@@ -1664,7 +2107,6 @@
       if (window.lucide) lucide.createIcons();
     }
 
-    // Row Edit Handlers
     function handleRowChange(index, key, val) {
       if (!appState.garmentData[index]) return;
       if (key === 'chest' || key === 'waist' || key === 'length') {
@@ -1714,7 +2156,6 @@
       return appState.garmentData;
     }
 
-    // Real-Time Store Brand Name Change (Requirement 4)
     function handleStoreNameChange(name) {
       appState.storeName = name || "Aura Apparel Co.";
       updateSnippetDisplay();
@@ -1725,7 +2166,6 @@
       if (headerTitle) headerTitle.textContent = appState.storeName;
     }
 
-    // Real-Time Brand Color Change
     function handleBrandColorChange(color) {
       if (!color) return;
       if (!color.startsWith('#')) color = '#' + color;
@@ -1741,32 +2181,29 @@
       updateDynamicColorStyles();
     }
 
-    // Category Selector
     function updateCategory(cat) {
       appState.category = cat;
       const previewCatTag = document.getElementById('preview-category-tag');
       if (previewCatTag) previewCatTag.textContent = cat;
     }
 
-    // Unit Preference Selector
     function setUnit(unit) {
       appState.unit = unit;
       const inBtn = document.getElementById('unit-in-btn');
       const cmBtn = document.getElementById('unit-cm-btn');
 
       if (unit === 'in') {
-        inBtn.className = 'py-1.5 text-xs font-semibold rounded bg-indigo-600 text-white transition';
-        cmBtn.className = 'py-1.5 text-xs font-semibold rounded text-slate-400 hover:text-white transition';
+        inBtn.className = 'py-1.5 text-xs font-semibold rounded bg-indigo-600 text-white transition cursor-pointer';
+        cmBtn.className = 'py-1.5 text-xs font-semibold rounded text-slate-400 hover:text-white transition cursor-pointer';
       } else {
-        cmBtn.className = 'py-1.5 text-xs font-semibold rounded bg-indigo-600 text-white transition';
-        inBtn.className = 'py-1.5 text-xs font-semibold rounded text-slate-400 hover:text-white transition';
+        cmBtn.className = 'py-1.5 text-xs font-semibold rounded bg-indigo-600 text-white transition cursor-pointer';
+        inBtn.className = 'py-1.5 text-xs font-semibold rounded text-slate-400 hover:text-white transition cursor-pointer';
       }
 
       renderMatrixTable();
       updateSnippetDisplay();
     }
 
-    // Dynamic Integration Snippet Updater (Requirement 4)
     function updateSnippetDisplay() {
       const slug = generateSlug(appState.storeName);
       const slugEl = document.getElementById('snippet-store-slug');
@@ -1780,7 +2217,7 @@
       if (badgeSlug) badgeSlug.textContent = slug;
     }
 
-    // Copy Integration Snippet to Clipboard
+    // WORKING COPY BUTTON WITH 2-SECOND SATISFYING GREEN CHECKMARK STATE
     async function copyIntegrationSnippet() {
       const slug = generateSlug(appState.storeName);
       const snippetCode = `<script\n  src="https://cdn.fitguard.ai/v2/widget.js"\n  data-store-id="${slug}"\n  data-brand-color="${appState.brandColor}"\n  data-unit="${appState.unit}"\n  async\n><\/script>`;
@@ -1789,26 +2226,33 @@
         await navigator.clipboard.writeText(snippetCode);
         const copyBtn = document.getElementById('copy-snippet-btn');
         const copyText = document.getElementById('copy-text');
+        const copyIcon = document.getElementById('copy-icon');
 
-        copyText.textContent = "Copied to Clipboard!";
-        copyBtn.classList.remove('bg-slate-800');
-        copyBtn.classList.add('bg-emerald-600');
-        
-        showToast("Snippet Copied", `Integration script tag for '${slug}' copied to clipboard!`, "success");
+        // Transform into satisfying green checkmark state
+        copyBtn.className = "px-4 py-2 text-xs font-bold text-white bg-emerald-600 border border-emerald-500 rounded-xl flex items-center gap-2 transition-all duration-200 cursor-pointer shadow-lg shadow-emerald-600/30";
+        copyText.textContent = "Copied to clipboard!";
+        copyIcon.setAttribute('data-lucide', 'check');
 
+        if (window.lucide) lucide.createIcons();
+
+        showToast("Snippet Copied!", `Integration code for ${slug} copied to clipboard.`, "success");
+
+        // Revert back after exactly 2 seconds
         setTimeout(() => {
+          copyBtn.className = "px-4 py-2 text-xs font-bold text-white bg-slate-800 hover:bg-slate-700 active:scale-95 border border-slate-600 rounded-xl flex items-center gap-2 transition-all duration-200 cursor-pointer shadow";
           copyText.textContent = "Copy HTML Snippet";
-          copyBtn.classList.remove('bg-emerald-600');
-          copyBtn.classList.add('bg-slate-800');
+          copyIcon.setAttribute('data-lucide', 'copy');
           if (window.lucide) lucide.createIcons();
-        }, 2500);
+        }, 2000);
 
       } catch (err) {
-        console.error("Clipboard copy error:", err);
+        console.error("Clipboard copy note:", err);
       }
     }
 
-    // Live Storefront Preview Update Logic
+    // -------------------------------------------------------------------------
+    // LIVE STORE SIMULATOR & PREDICTOR
+    // -------------------------------------------------------------------------
     function updateLivePreview() {
       const pillsContainer = document.getElementById('preview-size-pills');
       if (pillsContainer) {
@@ -1876,9 +2320,9 @@
         const el = document.getElementById(`sim-pref-${p}`);
         if (el) {
           if (p.toLowerCase() === pref.toLowerCase()) {
-            el.className = 'py-1 text-[11px] font-semibold rounded bg-slate-800 text-white transition';
+            el.className = 'py-1 text-[11px] font-semibold rounded bg-slate-800 text-white transition cursor-pointer';
           } else {
-            el.className = 'py-1 text-[11px] font-medium rounded text-slate-400 hover:text-white transition';
+            el.className = 'py-1 text-[11px] font-medium rounded text-slate-400 hover:text-white transition cursor-pointer';
           }
         }
       });
@@ -1886,7 +2330,6 @@
       computeSimulatedRecommendation();
     }
 
-    // Biometric Sizing Inference Engine Simulation for Dashboard
     function computeSimulatedRecommendation() {
       const height = parseFloat(document.getElementById('sim-height')?.value) || 70;
       const weight = parseFloat(document.getElementById('sim-weight')?.value) || 175;
@@ -1934,16 +2377,16 @@
       showToast("Added to Cart!", `Added Heavyweight Tee (${appState.simulatedSelectedSize}) to shopper cart.`, "success");
     }
 
-    // Landing Page Sandbox Simulation
+    // Landing Page Sizing Simulator
     function setLandingPref(pref) {
       appState.landingPref = pref;
       ['fitted', 'regular', 'relaxed'].forEach(p => {
         const el = document.getElementById(`lnd-pref-${p}`);
         if (el) {
           if (p.toLowerCase() === pref.toLowerCase()) {
-            el.className = 'py-1.5 font-semibold rounded bg-slate-800 text-white transition';
+            el.className = 'py-1.5 font-semibold rounded bg-slate-800 text-white transition cursor-pointer';
           } else {
-            el.className = 'py-1.5 font-medium rounded text-slate-400 hover:text-white transition';
+            el.className = 'py-1.5 font-medium rounded text-slate-400 hover:text-white transition cursor-pointer';
           }
         }
       });
@@ -1972,10 +2415,9 @@
       if (activePill) activePill.textContent = size;
     }
 
-
-    // =========================================================================
-    // ANALYTICS & TELEMETRY SYSTEM WITH SUPABASE LOGGING
-    // =========================================================================
+    // -------------------------------------------------------------------------
+    // ANALYTICS & TELEMETRY WITH SUPABASE LOGGING
+    // -------------------------------------------------------------------------
     function initDefaultEventStream() {
       const container = document.getElementById('event-stream-container');
       if (!container) return;
@@ -1992,7 +2434,6 @@
     }
 
     async function simulateTrafficEvent(type) {
-      // 1. Update State Counters
       if (type === 'widget_view') {
         appState.analytics.totalViews += 1;
       } else if (type === 'size_computed') {
@@ -2003,16 +2444,13 @@
         appState.analytics.dollarsSaved += 48;
       }
 
-      // Update Conversion Metric
       const convRate = ((appState.analytics.cartAdds / Math.max(1, appState.analytics.totalMatches)) * 100).toFixed(1);
       
-      // Update DOM Tiles
       document.getElementById('stat-total-views').textContent = appState.analytics.totalViews.toLocaleString();
       document.getElementById('stat-total-matches').textContent = appState.analytics.totalMatches.toLocaleString();
       document.getElementById('stat-conversion-rate').textContent = `${convRate}%`;
       document.getElementById('stat-dollars-saved').textContent = `$${appState.analytics.dollarsSaved.toLocaleString()}`;
 
-      // 2. Prepend to Event Stream UI
       const labels = {
         widget_view: 'Product page PDP impression recorded',
         size_computed: `Biometric calculation completed (${appState.simulatedSelectedSize})`,
@@ -2021,7 +2459,6 @@
       };
       prependEventToUI(type, labels[type] || 'Event recorded', 'Just now');
 
-      // 3. Increment Chart.js real-time data
       if (chartInstance) {
         const lastIdx = chartInstance.data.datasets[0].data.length - 1;
         if (type === 'widget_view' || type === 'size_computed') {
@@ -2032,7 +2469,6 @@
         chartInstance.update('none');
       }
 
-      // 4. Log to Supabase analytics_events table
       if (supabaseClient) {
         try {
           await supabaseClient
@@ -2042,7 +2478,7 @@
               event_type: type
             }]);
         } catch (err) {
-          // Silent catch for resilience
+          // resilient catch
         }
       }
     }
@@ -2068,7 +2504,7 @@
       if (!container) return;
 
       const item = document.createElement('div');
-      item.className = "flex items-center justify-between p-2.5 rounded-xl bg-slate-950/80 border border-slate-800/80 text-xs transition animate-fade-in";
+      item.className = "flex items-center justify-between p-2.5 rounded-xl bg-slate-950/80 border border-slate-800/80 text-xs transition";
 
       let icon = 'eye';
       let color = 'text-cyan-400 bg-cyan-950/60 border-cyan-800/60';
@@ -2105,7 +2541,6 @@
       if (container) container.innerHTML = '';
     }
 
-    // Chart.js Initialization
     function initAnalyticsChart() {
       const ctx = document.getElementById('analyticsChart')?.getContext('2d');
       if (!ctx) return;
@@ -2160,7 +2595,9 @@
       });
     }
 
-    // Toast Notification Utility
+    // -------------------------------------------------------------------------
+    // NOTIFICATION TOAST UTILITY
+    // -------------------------------------------------------------------------
     function showToast(title, message, type = 'info') {
       const container = document.getElementById('toast-container');
       if (!container) return;
