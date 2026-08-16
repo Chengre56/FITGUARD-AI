@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FitGuard AI — Predictive Sizing Engine & Return Prevention</title>
+  <title>FitGuard AI — Predictive Sizing Engine & Return Prevention SaaS</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -11,6 +11,9 @@
   <!-- Supabase JS Client CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   
+  <!-- Chart.js CDN for Analytics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
   <!-- Google Fonts: Inter & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -46,7 +49,7 @@
   </script>
 
   <style>
-    /* Custom scrollbars */
+    /* Custom Scrollbar Styling */
     ::-webkit-scrollbar {
       width: 6px;
       height: 6px;
@@ -62,12 +65,14 @@
       background: #334155;
     }
 
-    .glow-effect {
-      background: radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.18) 0%, rgba(15, 23, 42, 0) 70%);
+    .glow-bg {
+      background: radial-gradient(circle at 50% -10%, rgba(99, 102, 241, 0.22) 0%, rgba(15, 23, 42, 0) 70%);
     }
 
-    .card-gradient {
-      background: linear-gradient(180deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.8) 100%);
+    .card-glass {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
     }
 
     @keyframes pulse-subtle {
@@ -84,11 +89,121 @@
   <!-- Toast Notification Container -->
   <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-3 pointer-events-none"></div>
 
-  <!-- Global Sticky Navigation Header -->
+  <!-- ========================================================================= -->
+  <!-- MODAL: STRIPE-STYLE CHECKOUT & TRIAL ONBOARDING -->
+  <!-- ========================================================================= -->
+  <div id="checkout-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/80 backdrop-blur-md p-4 transition-all duration-300">
+    <div class="bg-slate-900 border border-slate-700/80 rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative overflow-hidden transform transition-all scale-100">
+      
+      <!-- Top Decor Glow -->
+      <div class="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-32 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none"></div>
+
+      <!-- Modal Close Button -->
+      <button onclick="closeCheckoutModal()" class="absolute top-5 right-5 text-slate-400 hover:text-white p-1 rounded-lg bg-slate-800/80 hover:bg-slate-700 transition">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <!-- Header & Tier Details -->
+      <div class="space-y-3 mb-6 relative">
+        <div class="flex items-center gap-2">
+          <span class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white">
+            <i data-lucide="shield-check" class="w-4 h-4"></i>
+          </span>
+          <span class="text-xs font-bold uppercase tracking-widest text-indigo-400">FitGuard AI Provisioning</span>
+        </div>
+        <h3 class="text-2xl font-extrabold text-white">Start Your 14-Day Free Trial</h3>
+        <p class="text-xs text-slate-400">Zero charges today. Full unlimited access to biometric machine learning sizing.</p>
+
+        <!-- Selected Tier Summary Pill -->
+        <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between mt-3">
+          <div>
+            <span id="modal-plan-name" class="text-xs font-bold text-white uppercase tracking-wider">Pro Tier Plan</span>
+            <div class="text-[11px] text-slate-400">Includes live Supabase Cloud sync & full API</div>
+          </div>
+          <div class="text-right">
+            <span id="modal-plan-price" class="text-lg font-extrabold text-indigo-400">$25</span>
+            <span class="text-[10px] text-slate-400">/mo after trial</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Checkout Form -->
+      <form id="checkout-form" onsubmit="handleCheckoutSubmit(event)" class="space-y-4 relative">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Store Brand Name</label>
+          <div class="relative">
+            <i data-lucide="store" class="w-4 h-4 text-slate-500 absolute left-3.5 top-3"></i>
+            <input 
+              type="text" 
+              id="checkout-store-name" 
+              required 
+              placeholder="e.g. Aura Apparel Co." 
+              value="Aura Apparel Co."
+              class="w-full bg-slate-950 border border-slate-700 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Merchant Email Address</label>
+          <div class="relative">
+            <i data-lucide="mail" class="w-4 h-4 text-slate-500 absolute left-3.5 top-3"></i>
+            <input 
+              type="email" 
+              id="checkout-email" 
+              required 
+              placeholder="founder@brand.com" 
+              value="founder@auraapparel.com"
+              class="w-full bg-slate-950 border border-slate-700 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+            />
+          </div>
+        </div>
+
+        <!-- Stripe Mockup Card Element -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Payment Method (Trial Verification)</label>
+          <div class="bg-slate-950 border border-slate-700 rounded-xl p-3 space-y-2">
+            <div class="flex items-center justify-between text-xs text-slate-400">
+              <span class="flex items-center gap-1.5 font-mono text-slate-300">
+                <i data-lucide="credit-card" class="w-4 h-4 text-indigo-400"></i> &bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; 4242
+              </span>
+              <span class="text-[11px] font-semibold text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-800/60">Stripe Encrypted</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2 pt-1 border-t border-slate-800 text-[11px] text-slate-400 font-mono">
+              <span>Exp: 12/28</span>
+              <span class="text-right">CVC: &bull;&bull;&bull;</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Submit CTA -->
+        <button 
+          type="submit" 
+          id="checkout-submit-btn" 
+          class="w-full py-3.5 text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 active:scale-[0.99] rounded-xl shadow-xl shadow-indigo-600/30 border border-indigo-400/40 flex items-center justify-center gap-2 transition cursor-pointer"
+        >
+          <i data-lucide="sparkles" class="w-4 h-4"></i>
+          <span id="checkout-btn-text">Provision Account & Launch Dashboard</span>
+        </button>
+
+        <div class="flex items-center justify-center gap-2 text-[11px] text-slate-400 text-center">
+          <i data-lucide="lock" class="w-3.5 h-3.5 text-emerald-400"></i>
+          <span>Encrypted with 256-bit SSL. Cancel anytime with 1 click.</span>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+
+  <!-- ========================================================================= -->
+  <!-- TOP NAVIGATION HEADER -->
+  <!-- ========================================================================= -->
   <header class="border-b border-slate-800/80 bg-slate-950/85 backdrop-blur-xl sticky top-0 z-40">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 py-3 flex items-center justify-between">
+      
       <!-- Brand Logo -->
-      <button onclick="switchView('landing')" class="flex items-center gap-3 group text-left focus:outline-none">
+      <button onclick="switchView('landing')" class="flex items-center gap-3 group text-left focus:outline-none cursor-pointer">
         <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-cyan-400 p-0.5 shadow-lg shadow-indigo-500/20 group-hover:shadow-indigo-500/40 transition">
           <div class="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
             <i data-lucide="shield-check" class="w-5 h-5 text-indigo-400"></i>
@@ -97,13 +212,13 @@
         <div>
           <div class="flex items-center gap-2">
             <span class="font-extrabold tracking-tight text-lg text-white group-hover:text-indigo-200 transition">FitGuard AI</span>
-            <span id="nav-view-pill" class="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-950 text-indigo-300 border border-indigo-800/80">E-Commerce AI</span>
+            <span id="nav-view-pill" class="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-950 text-indigo-300 border border-indigo-800/80">E-Commerce Engine</span>
           </div>
-          <p class="text-[11px] text-slate-400 hidden sm:block">Intelligent Clothing Sizing & Return Shield</p>
+          <p class="text-[11px] text-slate-400 hidden sm:block">Biometric Sizing & Return Shield SaaS</p>
         </div>
       </button>
 
-      <!-- Center Nav Links (Visible in Landing View) -->
+      <!-- Center Nav Links (Landing View) -->
       <nav id="landing-nav-links" class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
         <a href="#features" class="hover:text-white transition">Features</a>
         <a href="#interactive-demo" class="hover:text-white transition flex items-center gap-1.5 text-indigo-400 font-semibold">
@@ -115,8 +230,10 @@
 
       <!-- View Switcher & Action Cluster -->
       <div class="flex items-center gap-3">
-        <!-- Dashboard Specific Status Badge (Only shown in dashboard view) -->
+        
+        <!-- Dashboard Specific Header Cluster -->
         <div id="dashboard-status-cluster" class="hidden items-center gap-3">
+          <!-- Live Supabase Status Badge -->
           <div id="status-badge" class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900 border border-slate-700 text-xs font-medium text-slate-300 transition-all duration-300">
             <span class="relative flex h-2 w-2">
               <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -125,13 +242,14 @@
             <span id="status-badge-text">Connected</span>
           </div>
 
+          <!-- Save Settings & Sync Button -->
           <button id="save-sync-btn" onclick="saveStoreSettings()" class="inline-flex items-center gap-2 px-3.5 py-1.5 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 active:scale-95 rounded-lg shadow-md shadow-indigo-600/30 border border-indigo-400/30 transition cursor-pointer">
             <i data-lucide="cloud-upload" class="w-3.5 h-3.5" id="save-icon"></i>
-            <span id="save-btn-text">Save & Sync</span>
+            <span id="save-btn-text">Save Settings & Sync</span>
           </button>
         </div>
 
-        <!-- Primary View Toggle Button -->
+        <!-- Primary View Switcher Button -->
         <button 
           id="view-toggle-btn" 
           onclick="toggleMainView()" 
@@ -141,40 +259,42 @@
           <span id="view-toggle-label">Merchant Login / Dashboard</span>
         </button>
       </div>
+
     </div>
   </header>
 
+
   <!-- ========================================================================= -->
-  <!-- VIEW 1: HIGH-CONVERTING PUBLIC LANDING PAGE (DEFAULT) -->
+  <!-- VIEW 1: PUBLIC MARKETING LANDING PAGE -->
   <!-- ========================================================================= -->
   <div id="landing-view" class="w-full space-y-24 pb-20 overflow-hidden">
     
-    <!-- Hero Section with Ambient Glow -->
-    <section class="relative pt-16 pb-20 md:pt-24 md:pb-28 glow-effect">
+    <!-- Hero Section -->
+    <section class="relative pt-16 pb-20 md:pt-24 md:pb-28 glow-bg">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10 space-y-8">
         
         <!-- Trust Pill -->
         <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-950/80 border border-indigo-700/60 text-indigo-300 text-xs font-semibold shadow-inner">
           <span class="flex h-2 w-2 rounded-full bg-emerald-400"></span>
-          <span>Trusted by 850+ Fashion Brands on Shopify & WooCommerce</span>
+          <span>Proven Return Shield for Shopify & WooCommerce Brands</span>
           <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-indigo-400"></i>
         </div>
 
-        <!-- Main Value Proposition Headline -->
+        <!-- Headline -->
         <div class="max-w-4xl mx-auto space-y-4">
           <h1 class="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white leading-[1.1]">
             Reduce Clothing Returns by <span class="bg-gradient-to-r from-indigo-400 via-cyan-300 to-emerald-400 bg-clip-text text-transparent">42%</span> with AI Sizing
           </h1>
           <p class="text-lg sm:text-xl text-slate-300 max-w-2xl mx-auto font-normal leading-relaxed">
-            Eliminate size anxiety. FitGuard AI computes real-time biometric body fits directly on your product pages to boost checkout conversions and protect margins.
+            Eliminate shopper sizing hesitation. FitGuard AI computes real-time biometric body fits directly on your product pages to boost checkout conversions and protect margins.
           </p>
         </div>
 
         <!-- Hero CTAs -->
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
-          <button onclick="switchView('dashboard')" class="w-full sm:w-auto px-8 py-4 text-base font-bold text-white bg-indigo-600 hover:bg-indigo-500 active:scale-[0.98] rounded-xl shadow-xl shadow-indigo-600/30 border border-indigo-400/40 flex items-center justify-center gap-2.5 transition cursor-pointer">
+          <button onclick="openCheckoutModal('pro', 25)" class="w-full sm:w-auto px-8 py-4 text-base font-bold text-white bg-indigo-600 hover:bg-indigo-500 active:scale-[0.98] rounded-xl shadow-xl shadow-indigo-600/30 border border-indigo-400/40 flex items-center justify-center gap-2.5 transition cursor-pointer">
             <i data-lucide="rocket" class="w-5 h-5 text-indigo-200"></i>
-            <span>Launch 14-Day Free Trial</span>
+            <span>Start 14-Day Free Trial</span>
           </button>
           <a href="#interactive-demo" class="w-full sm:w-auto px-8 py-4 text-base font-semibold text-slate-200 bg-slate-900/90 hover:bg-slate-800 hover:text-white rounded-xl border border-slate-700 flex items-center justify-center gap-2 transition">
             <i data-lucide="play-circle" class="w-5 h-5 text-cyan-400"></i>
@@ -183,7 +303,7 @@
         </div>
 
         <!-- Social Proof Stats Row -->
-        <div class="pt-12 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto border-t border-slate-800/80">
+        <div id="roi-impact" class="pt-12 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto border-t border-slate-800/80">
           <div class="p-3">
             <div class="text-3xl font-extrabold text-white">-42.4%</div>
             <div class="text-xs text-slate-400 mt-1 font-medium">Return Rate Reduction</div>
@@ -198,7 +318,7 @@
           </div>
           <div class="p-3">
             <div class="text-3xl font-extrabold text-emerald-400">&lt; 3 Mins</div>
-            <div class="text-xs text-slate-400 mt-1 font-medium">No-Code Storefront Setup</div>
+            <div class="text-xs text-slate-400 mt-1 font-medium">1-Line Script Setup</div>
           </div>
         </div>
 
@@ -213,11 +333,12 @@
             <i data-lucide="zap" class="w-3.5 h-3.5"></i> Interactive Widget Sandbox
           </div>
           <h2 class="text-3xl sm:text-4xl font-bold text-white tracking-tight">Test the Shopper Experience Live</h2>
-          <p class="text-sm text-slate-300">See how easy it is for your shoppers to find their exact fit in seconds without manual tape measure confusion.</p>
+          <p class="text-sm text-slate-300">See how your shoppers receive instant, highly accurate size recommendations in seconds.</p>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-          <!-- Left: Value Explainer -->
+          
+          <!-- Left Value Column -->
           <div class="lg:col-span-5 space-y-6">
             <div class="space-y-4">
               <div class="flex items-start gap-3.5">
@@ -226,7 +347,7 @@
                 </div>
                 <div>
                   <h4 class="text-base font-bold text-white">Biometric Machine Learning</h4>
-                  <p class="text-xs text-slate-400 leading-relaxed mt-1">Cross-references shopper height, weight, and silhouette against exact garment stitch matrixes.</p>
+                  <p class="text-xs text-slate-400 leading-relaxed mt-1">Cross-references shopper height, weight, and silhouette against exact garment stitch matrices.</p>
                 </div>
               </div>
 
@@ -236,7 +357,7 @@
                 </div>
                 <div>
                   <h4 class="text-base font-bold text-white">Stop "Wardrobing" & Multi-Size Orders</h4>
-                  <p class="text-xs text-slate-400 leading-relaxed mt-1">Prevent customers from buying both Medium and Large just to return one. Deliver instant certainty.</p>
+                  <p class="text-xs text-slate-400 leading-relaxed mt-1">Eliminate buyers ordering both Medium and Large just to return one. Deliver instant certainty.</p>
                 </div>
               </div>
 
@@ -246,20 +367,20 @@
                 </div>
                 <div>
                   <h4 class="text-base font-bold text-white">100% On-Brand Styling</h4>
-                  <p class="text-xs text-slate-400 leading-relaxed mt-1">Injects seamlessly into Shopify, BigCommerce, and custom headless themes matching your hex codes.</p>
+                  <p class="text-xs text-slate-400 leading-relaxed mt-1">Injects seamlessly into Shopify, BigCommerce, and custom headless storefronts matching your exact hex codes.</p>
                 </div>
               </div>
             </div>
 
             <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between">
-              <span class="text-xs text-slate-300 font-medium">Want to customize this for your brand?</span>
-              <button onclick="switchView('dashboard')" class="text-xs font-bold text-indigo-400 hover:text-indigo-300 flex items-center gap-1">
+              <span class="text-xs text-slate-300 font-medium">Ready to tailor this for your clothing line?</span>
+              <button onclick="switchView('dashboard')" class="text-xs font-bold text-indigo-400 hover:text-indigo-300 flex items-center gap-1 cursor-pointer">
                 Open Dashboard <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
               </button>
             </div>
           </div>
 
-          <!-- Right: Interactive Live Simulation Box -->
+          <!-- Right Interactive Simulation Box -->
           <div class="lg:col-span-7 bg-slate-950 rounded-2xl border border-slate-800 p-6 shadow-2xl space-y-5">
             <!-- Mock Product Header -->
             <div class="flex items-center justify-between pb-4 border-b border-slate-800">
@@ -268,12 +389,12 @@
                   <i data-lucide="shirt" class="w-6 h-6"></i>
                 </div>
                 <div>
-                  <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-400">Demo Product</span>
-                  <h4 class="text-sm font-bold text-white">Relaxed Heavyweight Luxury Crewneck</h4>
+                  <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-400">Live Demo Garment</span>
+                  <h4 class="text-sm font-bold text-white">Heavyweight Boxy Drop-Shoulder Tee</h4>
                 </div>
               </div>
               <div class="text-right">
-                <div class="text-sm font-extrabold text-white">$68.00</div>
+                <div class="text-sm font-extrabold text-white">$48.00</div>
                 <div class="text-[10px] text-emerald-400 font-semibold">In Stock</div>
               </div>
             </div>
@@ -282,7 +403,7 @@
             <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-4">
               <div class="flex items-center justify-between">
                 <span class="text-xs font-bold text-white flex items-center gap-2">
-                  <i data-lucide="sparkles" class="w-4 h-4 text-indigo-400"></i> FitGuard AI Body Matcher
+                  <i data-lucide="sparkles" class="w-4 h-4 text-indigo-400"></i> FitGuard AI Biometric Matcher
                 </span>
                 <span class="text-[10px] font-mono bg-indigo-950 text-indigo-300 border border-indigo-800 px-2 py-0.5 rounded">Live Engine</span>
               </div>
@@ -290,11 +411,11 @@
               <!-- Inputs for height & weight -->
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                 <div>
-                  <label class="text-[11px] font-semibold text-slate-400 block mb-1">Your Height (Inches)</label>
+                  <label class="text-[11px] font-semibold text-slate-400 block mb-1">Shopper Height (Inches)</label>
                   <input type="number" id="landing-sim-height" value="70" min="48" max="88" oninput="computeLandingSim()" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white font-mono focus:ring-1 focus:ring-indigo-500 focus:outline-none" />
                 </div>
                 <div>
-                  <label class="text-[11px] font-semibold text-slate-400 block mb-1">Your Weight (lbs)</label>
+                  <label class="text-[11px] font-semibold text-slate-400 block mb-1">Shopper Weight (lbs)</label>
                   <input type="number" id="landing-sim-weight" value="175" min="80" max="350" oninput="computeLandingSim()" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white font-mono focus:ring-1 focus:ring-indigo-500 focus:outline-none" />
                 </div>
               </div>
@@ -315,14 +436,14 @@
                     <i data-lucide="check" class="w-5 h-5"></i>
                   </div>
                   <div>
-                    <div class="text-[11px] text-indigo-300 font-medium">Recommended Perfect Size</div>
+                    <div class="text-[11px] text-indigo-300 font-medium">Recommended Perfect Fit</div>
                     <div class="text-base font-extrabold text-white flex items-center gap-2">
                       <span id="landing-rec-size">Size L</span>
                       <span id="landing-rec-match" class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-800">96% Fit Match</span>
                     </div>
                   </div>
                 </div>
-                <button onclick="switchView('dashboard')" class="px-3.5 py-2 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg transition shadow">
+                <button onclick="openCheckoutModal('pro', 25)" class="px-3.5 py-2 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg transition shadow cursor-pointer">
                   Deploy to Store
                 </button>
               </div>
@@ -330,7 +451,7 @@
 
             <!-- Size Pill Selector Simulation -->
             <div class="flex items-center justify-between pt-1">
-              <span class="text-xs text-slate-400">Available Garment Sizes:</span>
+              <span class="text-xs text-slate-400">Garment Size Matrix:</span>
               <div class="flex gap-2">
                 <span class="px-3 py-1 rounded bg-slate-900 border border-slate-800 text-xs text-slate-400">S</span>
                 <span class="px-3 py-1 rounded bg-slate-900 border border-slate-800 text-xs text-slate-400">M</span>
@@ -343,7 +464,7 @@
       </div>
     </section>
 
-    <!-- Core Features Grid Section -->
+    <!-- Core Features Grid -->
     <section id="features" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center max-w-2xl mx-auto mb-14 space-y-3">
         <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">Engineered for Maximum Conversions</h2>
@@ -351,18 +472,16 @@
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- Feature 1 -->
         <div class="bg-slate-900/70 border border-slate-800/90 rounded-2xl p-6 hover:border-indigo-500/40 transition space-y-4">
           <div class="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center">
             <i data-lucide="cpu" class="w-6 h-6"></i>
           </div>
           <h3 class="text-lg font-bold text-white">Sub-10ms Neural Fit Engine</h3>
           <p class="text-xs sm:text-sm text-slate-400 leading-relaxed">
-            Lightweight client-side inference engine. Zero cumulative layout shift (CLS 0.00) and zero impact on your storefront page speed scores.
+            Ultra-lightweight client-side inference engine. Zero cumulative layout shift (CLS 0.00) and zero impact on storefront page speed.
           </p>
         </div>
 
-        <!-- Feature 2 -->
         <div class="bg-slate-900/70 border border-slate-800/90 rounded-2xl p-6 hover:border-cyan-500/40 transition space-y-4">
           <div class="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 flex items-center justify-center">
             <i data-lucide="sliders" class="w-6 h-6"></i>
@@ -373,52 +492,52 @@
           </p>
         </div>
 
-        <!-- Feature 3 -->
         <div class="bg-slate-900/70 border border-slate-800/90 rounded-2xl p-6 hover:border-emerald-500/40 transition space-y-4">
           <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center">
             <i data-lucide="badge-dollar-sign" class="w-6 h-6"></i>
           </div>
           <h3 class="text-lg font-bold text-white">Immediate Bottom-Line ROI</h3>
           <p class="text-xs sm:text-sm text-slate-400 leading-relaxed">
-            By eliminating "bracket purchasing" (buying 2 sizes to return 1), the average merchant saves over $6,100 per month in return shipping & restocking.
+            By eliminating "bracket purchasing", the average merchant saves thousands per month in shipping fees, restocking, and garment wear.
           </p>
         </div>
       </div>
     </section>
 
-    <!-- Pricing Section -->
+    <!-- Pricing Section (Starter $10 / mo & Pro $25 / mo) -->
     <section id="pricing" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center max-w-2xl mx-auto mb-12 space-y-3">
         <div class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-950/80 border border-emerald-800 text-emerald-300 text-xs font-semibold">
           <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> 14-Day Free Trial On All Plans
         </div>
         <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">Transparent, High-ROI Pricing</h2>
-        <p class="text-slate-400 text-base">Simple pricing that pays for itself on your first 3 prevented returns.</p>
+        <p class="text-slate-400 text-base">Simple pricing that pays for itself on your very first prevented return.</p>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-        <!-- Starter Tier -->
+        
+        <!-- Starter Tier: $10 / mo -->
         <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-8 space-y-6 flex flex-col justify-between hover:border-slate-700 transition">
           <div class="space-y-4">
             <div class="flex justify-between items-center">
               <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Starter Tier</span>
-              <span class="text-xs px-2.5 py-1 rounded-full bg-slate-800 text-slate-300">Emerging Brands</span>
+              <span class="text-xs px-2.5 py-1 rounded-full bg-slate-800 text-slate-300">Emerging Boutiques</span>
             </div>
             <div>
-              <span class="text-4xl sm:text-5xl font-extrabold text-white">$29</span>
+              <span class="text-4xl sm:text-5xl font-extrabold text-white">$10</span>
               <span class="text-slate-400 text-sm">/ month</span>
             </div>
             <p class="text-xs text-slate-400">Everything needed to stop returns on boutique and growing streetwear brands.</p>
             
             <div class="pt-4 border-t border-slate-800 space-y-3 text-xs text-slate-300">
               <div class="flex items-center gap-2.5">
-                <i data-lucide="check" class="w-4 h-4 text-emerald-400"></i> Up to 2,500 monthly fit recommendations
+                <i data-lucide="check" class="w-4 h-4 text-emerald-400"></i> Up to 2,500 monthly sizing recommendations
               </div>
               <div class="flex items-center gap-2.5">
                 <i data-lucide="check" class="w-4 h-4 text-emerald-400"></i> Full Garment Specification Matrix
               </div>
               <div class="flex items-center gap-2.5">
-                <i data-lucide="check" class="w-4 h-4 text-emerald-400"></i> Standard Brand Color Customizer
+                <i data-lucide="check" class="w-4 h-4 text-emerald-400"></i> Standard Brand Primary Color Customizer
               </div>
               <div class="flex items-center gap-2.5">
                 <i data-lucide="check" class="w-4 h-4 text-emerald-400"></i> Shopify & WooCommerce 1-Line Embed
@@ -426,12 +545,12 @@
             </div>
           </div>
 
-          <button onclick="switchView('dashboard')" class="w-full py-3.5 text-sm font-bold text-white bg-slate-800 hover:bg-slate-700 rounded-xl border border-slate-700 transition cursor-pointer">
-            Choose Starter Plan
+          <button onclick="openCheckoutModal('starter', 10)" class="w-full py-3.5 text-sm font-bold text-white bg-slate-800 hover:bg-slate-700 rounded-xl border border-slate-700 transition cursor-pointer">
+            Choose Starter Plan ($10/mo)
           </button>
         </div>
 
-        <!-- Pro Tier (Highlighted) -->
+        <!-- Pro Tier: $25 / mo -->
         <div class="bg-gradient-to-b from-indigo-950/40 via-slate-900 to-slate-950 border-2 border-indigo-500/80 rounded-3xl p-8 space-y-6 flex flex-col justify-between relative shadow-2xl shadow-indigo-500/10">
           <div class="absolute -top-3.5 right-6 px-3.5 py-1 rounded-full bg-indigo-600 text-white text-[11px] font-extrabold uppercase tracking-widest shadow-md">
             Most Popular
@@ -443,10 +562,10 @@
               <span class="text-xs px-2.5 py-1 rounded-full bg-indigo-950 text-indigo-300 border border-indigo-800">High Volume</span>
             </div>
             <div>
-              <span class="text-4xl sm:text-5xl font-extrabold text-white">$79</span>
+              <span class="text-4xl sm:text-5xl font-extrabold text-white">$25</span>
               <span class="text-slate-400 text-sm">/ month</span>
             </div>
-            <p class="text-xs text-slate-300">Advanced predictive biometrics and unlimited store recommendations.</p>
+            <p class="text-xs text-slate-300">Advanced predictive biometrics and unlimited sizing calculations.</p>
             
             <div class="pt-4 border-t border-slate-800 space-y-3 text-xs text-slate-200">
               <div class="flex items-center gap-2.5">
@@ -456,448 +575,601 @@
                 <i data-lucide="check-check" class="w-4 h-4 text-indigo-400"></i> Real-time Supabase Cloud sync & multi-store
               </div>
               <div class="flex items-center gap-2.5">
-                <i data-lucide="check-check" class="w-4 h-4 text-indigo-400"></i> Deep Return Analytics & Wardrobe prevention
+                <i data-lucide="check-check" class="w-4 h-4 text-indigo-400"></i> Live Analytics & Insights Dashboard Tab
               </div>
               <div class="flex items-center gap-2.5">
                 <i data-lucide="check-check" class="w-4 h-4 text-indigo-400"></i> Custom CSS injection & headless API
               </div>
               <div class="flex items-center gap-2.5">
-                <i data-lucide="check-check" class="w-4 h-4 text-indigo-400"></i> 24/7 Dedicated Fit Engineer support
+                <i data-lucide="check-check" class="w-4 h-4 text-indigo-400"></i> Priority 24/7 Fit Engineer support
               </div>
             </div>
           </div>
 
-          <button onclick="switchView('dashboard')" class="w-full py-3.5 text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl shadow-lg shadow-indigo-600/30 transition cursor-pointer">
-            Start 14-Day Pro Trial
+          <button onclick="openCheckoutModal('pro', 25)" class="w-full py-3.5 text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl shadow-lg shadow-indigo-600/30 transition cursor-pointer">
+            Start 14-Day Free Trial ($25/mo)
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+  </div>
+
+
+  <!-- ========================================================================= -->
+  <!-- VIEW 2: MERCHANT DASHBOARD & WORKSPACE -->
+  <!-- ========================================================================= -->
+  <div id="dashboard-view" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 space-y-6 w-full pb-20">
+    
+    <!-- Top Merchant Toolbar & Navigation Tabs -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-xl">
+      <div class="flex items-center gap-3">
+        <button onclick="switchView('landing')" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 transition text-xs font-semibold flex items-center gap-1.5 cursor-pointer">
+          <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Public Site
+        </button>
+        <div class="h-6 w-px bg-slate-700"></div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h2 class="text-sm font-bold text-white" id="dashboard-header-title">Aura Apparel Co.</h2>
+            <span id="dashboard-tier-badge" class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-800">Pro Plan</span>
+          </div>
+          <p class="text-[11px] text-slate-400 font-mono">Store ID: <span id="header-store-slug-badge" class="text-slate-200 font-bold">aura-apparel-co</span></p>
+        </div>
+      </div>
+
+      <!-- Dashboard Internal Tab Navigation -->
+      <div class="flex items-center gap-2 bg-slate-950 p-1.5 rounded-xl border border-slate-800">
+        <button 
+          id="tab-btn-config" 
+          onclick="switchDashboardTab('config')" 
+          class="px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 bg-indigo-600 text-white shadow cursor-pointer"
+        >
+          <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5"></i>
+          <span>Configuration & Matrix</span>
+        </button>
+        <button 
+          id="tab-btn-analytics" 
+          onclick="switchDashboardTab('analytics')" 
+          class="px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center gap-2 text-slate-400 hover:text-white cursor-pointer"
+        >
+          <i data-lucide="bar-chart-3" class="w-3.5 h-3.5"></i>
+          <span>Analytics & Insights</span>
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ----------------------------------------------------------------------- -->
+    <!-- DASHBOARD SUB-TAB 1: CONFIGURATION & MATRIX -->
+    <!-- ----------------------------------------------------------------------- -->
+    <div id="subtab-config" class="space-y-8">
+      
+      <!-- KPI Metric Summary Cards -->
+      <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-5 hover:border-slate-700 transition">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-medium uppercase tracking-wider text-slate-400">Return Reduction</span>
+            <div class="p-2 rounded-lg bg-emerald-500/10 text-emerald-400">
+              <i data-lucide="trending-down" class="w-4 h-4"></i>
+            </div>
+          </div>
+          <div class="mt-3 flex items-baseline gap-2">
+            <span class="text-3xl font-bold tracking-tight text-white">-42.4%</span>
+            <span class="text-xs font-medium text-emerald-400 flex items-center gap-0.5">
+              <i data-lucide="arrow-down-right" class="w-3 h-3"></i> vs industry
+            </span>
+          </div>
+          <p class="text-xs text-slate-400 mt-1">Saved est. $18,400 in returns this quarter</p>
+        </div>
+
+        <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-5 hover:border-slate-700 transition">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-medium uppercase tracking-wider text-slate-400">Widget Engagement</span>
+            <div class="p-2 rounded-lg bg-indigo-500/10 text-indigo-400">
+              <i data-lucide="mouse-pointer-click" class="w-4 h-4"></i>
+            </div>
+          </div>
+          <div class="mt-3 flex items-baseline gap-2">
+            <span class="text-3xl font-bold tracking-tight text-white">88.7%</span>
+            <span class="text-xs font-medium text-indigo-400">+14.2% MoM</span>
+          </div>
+          <p class="text-xs text-slate-400 mt-1">Shoppers actively using fit recommendation</p>
+        </div>
+
+        <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-5 hover:border-slate-700 transition">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-medium uppercase tracking-wider text-slate-400">Fit Match Accuracy</span>
+            <div class="p-2 rounded-lg bg-cyan-500/10 text-cyan-400">
+              <i data-lucide="crosshair" class="w-4 h-4"></i>
+            </div>
+          </div>
+          <div class="mt-3 flex items-baseline gap-2">
+            <span class="text-3xl font-bold tracking-tight text-white">96.8%</span>
+            <span class="text-xs font-medium text-cyan-400">High Confidence</span>
+          </div>
+          <p class="text-xs text-slate-400 mt-1">Based on 14,290 verified buyer deliveries</p>
+        </div>
+
+        <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-5 hover:border-slate-700 transition">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-medium uppercase tracking-wider text-slate-400">Total Fit Computations</span>
+            <div class="p-2 rounded-lg bg-purple-500/10 text-purple-400">
+              <i data-lucide="cpu" class="w-4 h-4"></i>
+            </div>
+          </div>
+          <div class="mt-3 flex items-baseline gap-2">
+            <span class="text-3xl font-bold tracking-tight text-white">64,912</span>
+            <span class="text-xs font-medium text-purple-400">AI Matches</span>
+          </div>
+          <p class="text-xs text-slate-400 mt-1">Real-time sub-10ms neural mesh matching</p>
+        </div>
+      </section>
+
+      <!-- Main Workspace Layout -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        <!-- Left Column: Store Branding, Garment Matrix, Snippet (7 Cols) -->
+        <div class="lg:col-span-7 space-y-8">
+          
+          <!-- Store Settings Card -->
+          <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 shadow-xl relative overflow-hidden">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-6">
+              <div class="flex items-center gap-3">
+                <div class="p-2 rounded-lg bg-indigo-500/20 text-indigo-400">
+                  <i data-lucide="sliders-horizontal" class="w-5 h-5"></i>
+                </div>
+                <div>
+                  <h2 class="text-lg font-bold text-white">Merchant Branding & Specs</h2>
+                  <p class="text-xs text-slate-400">Tailor how FitGuard matches your storefront identity</p>
+                </div>
+              </div>
+              <span class="text-xs px-2.5 py-1 bg-slate-800 text-slate-300 rounded-md border border-slate-700">Auto-Reactive</span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <!-- Store Name -->
+              <div class="space-y-1.5">
+                <label class="text-xs font-semibold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+                  <i data-lucide="store" class="w-3.5 h-3.5 text-indigo-400"></i> Store Brand Name
+                </label>
+                <input 
+                  type="text" 
+                  id="input-store-name" 
+                  value="Aura Apparel Co." 
+                  oninput="handleStoreNameChange(this.value)" 
+                  class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition" 
+                  placeholder="e.g. Aura Apparel Co."
+                />
+              </div>
+
+              <!-- Brand Accent Color -->
+              <div class="space-y-1.5">
+                <label class="text-xs font-semibold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+                  <i data-lucide="palette" class="w-3.5 h-3.5 text-indigo-400"></i> Brand Primary Color
+                </label>
+                <div class="flex items-center gap-3">
+                  <div class="relative flex-shrink-0">
+                    <input 
+                      type="color" 
+                      id="input-brand-color-picker" 
+                      value="#6366f1" 
+                      oninput="handleBrandColorChange(this.value)" 
+                      class="w-10 h-10 rounded-lg border-2 border-slate-700 bg-transparent cursor-pointer overflow-hidden p-0.5" 
+                    />
+                  </div>
+                  <input 
+                    type="text" 
+                    id="input-brand-color-hex" 
+                    value="#6366f1" 
+                    oninput="handleBrandColorChange(this.value)" 
+                    maxlength="7"
+                    class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3.5 py-2 text-sm text-white font-mono uppercase focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition" 
+                  />
+                </div>
+              </div>
+
+              <!-- Garment Category -->
+              <div class="space-y-1.5">
+                <label class="text-xs font-semibold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+                  <i data-lucide="tag" class="w-3.5 h-3.5 text-indigo-400"></i> Garment Category
+                </label>
+                <select id="select-category" onchange="updateCategory(this.value)" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3.5 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition">
+                  <option value="Tops & Oversized Tees" selected>Tops & Oversized Tees</option>
+                  <option value="Hoodies & Sweatshirts">Hoodies & Sweatshirts</option>
+                  <option value="Tailored Trousers & Denim">Tailored Trousers & Denim</option>
+                  <option value="Outerwear & Puffer Jackets">Outerwear & Puffer Jackets</option>
+                </select>
+              </div>
+
+              <!-- Measurement Standard Unit -->
+              <div class="space-y-1.5">
+                <label class="text-xs font-semibold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+                  <i data-lucide="ruler" class="w-3.5 h-3.5 text-indigo-400"></i> Measurement System
+                </label>
+                <div class="grid grid-cols-2 gap-2 bg-slate-950 p-1 rounded-lg border border-slate-700">
+                  <button type="button" id="unit-in-btn" onclick="setUnit('in')" class="py-1.5 text-xs font-semibold rounded bg-indigo-600 text-white transition">Inches (in)</button>
+                  <button type="button" id="unit-cm-btn" onclick="setUnit('cm')" class="py-1.5 text-xs font-semibold rounded text-slate-400 hover:text-white transition">Centimeters (cm)</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Garment Specifications Matrix Table Card -->
+          <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 shadow-xl relative">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4 mb-4">
+              <div class="flex items-center gap-3">
+                <div class="p-2 rounded-lg bg-emerald-500/20 text-emerald-400">
+                  <i data-lucide="table-2" class="w-5 h-5"></i>
+                </div>
+                <div>
+                  <h2 class="text-lg font-bold text-white">Garment Specifications Matrix</h2>
+                  <p class="text-xs text-slate-400">FitGuard computes continuous biometric interpolation from these measurements</p>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <button onclick="resetDefaultMatrix()" type="button" class="px-3 py-1.5 text-xs font-medium text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg transition flex items-center gap-1.5 cursor-pointer">
+                  <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Reset
+                </button>
+                <button onclick="addMatrixRow()" type="button" class="px-3 py-1.5 text-xs font-semibold text-indigo-300 bg-indigo-950/80 hover:bg-indigo-900 border border-indigo-800/80 rounded-lg transition flex items-center gap-1.5 cursor-pointer">
+                  <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Size
+                </button>
+              </div>
+            </div>
+
+            <!-- Table -->
+            <div class="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950">
+              <table class="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr class="bg-slate-900/90 text-slate-400 border-b border-slate-800 uppercase font-semibold tracking-wider">
+                    <th class="py-3 px-3">Size Tag</th>
+                    <th class="py-3 px-3">Chest (<span class="unit-label">in</span>)</th>
+                    <th class="py-3 px-3">Waist (<span class="unit-label">in</span>)</th>
+                    <th class="py-3 px-3">Length (<span class="unit-label">in</span>)</th>
+                    <th class="py-3 px-3">Fit Profile</th>
+                    <th class="py-3 px-2 text-center w-12">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="matrix-tbody" class="divide-y divide-slate-800/80 text-slate-200">
+                  <!-- Rows injected immediately by JavaScript -->
+                </tbody>
+              </table>
+            </div>
+
+            <div class="mt-4 flex items-center justify-between text-xs text-slate-400">
+              <div class="flex items-center gap-2">
+                <i data-lucide="info" class="w-4 h-4 text-indigo-400"></i>
+                <span>All sizes dynamically render in the live simulator and store checkout.</span>
+              </div>
+              <span id="matrix-row-count" class="font-mono text-slate-400 font-semibold">4 Sizes Active</span>
+            </div>
+          </div>
+
+          <!-- Merchant Integration Snippet Card -->
+          <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 shadow-xl relative overflow-hidden">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-4">
+              <div class="flex items-center gap-3">
+                <div class="p-2 rounded-lg bg-cyan-500/20 text-cyan-400">
+                  <i data-lucide="code-2" class="w-5 h-5"></i>
+                </div>
+                <div>
+                  <h2 class="text-lg font-bold text-white">Merchant Integration Snippet</h2>
+                  <p class="text-xs text-slate-400">Paste before the closing <code class="text-indigo-400 font-mono">&lt;/body&gt;</code> on Shopify, WooCommerce, or Custom Headless themes</p>
+                </div>
+              </div>
+              <button 
+                id="copy-snippet-btn" 
+                onclick="copyIntegrationSnippet()" 
+                class="px-3.5 py-1.5 text-xs font-semibold text-white bg-slate-800 hover:bg-slate-700 active:scale-95 border border-slate-600 rounded-lg flex items-center gap-1.5 transition cursor-pointer"
+              >
+                <i data-lucide="copy" class="w-3.5 h-3.5" id="copy-icon"></i>
+                <span id="copy-text">Copy HTML Snippet</span>
+              </button>
+            </div>
+
+            <!-- Code Snippet Display with live reactive store slug -->
+            <div class="relative bg-slate-950 rounded-xl p-4 border border-slate-800 font-mono text-xs text-slate-300 overflow-x-auto leading-relaxed shadow-inner">
+              <div class="text-slate-500 select-none pb-2">// FitGuard AI Sizing Engine Injector</div>
+              <div class="text-slate-200">
+                <span class="text-indigo-400">&lt;script</span> <br>
+                &nbsp;&nbsp;<span class="text-cyan-400">src</span>=<span class="text-emerald-400">"https://cdn.fitguard.ai/v2/widget.js"</span><br>
+                &nbsp;&nbsp;<span class="text-cyan-400">data-store-id</span>=<span class="text-amber-300" id="snippet-store-slug">"aura-apparel-co"</span><br>
+                &nbsp;&nbsp;<span class="text-cyan-400">data-brand-color</span>=<span class="text-amber-300" id="snippet-brand-color">"#6366f1"</span><br>
+                &nbsp;&nbsp;<span class="text-cyan-400">data-unit</span>=<span class="text-amber-300" id="snippet-unit">"in"</span><br>
+                &nbsp;&nbsp;<span class="text-cyan-400">async</span><br>
+                <span class="text-indigo-400">&gt;&lt;/script&gt;</span>
+              </div>
+            </div>
+            
+            <div class="mt-3 flex items-center gap-2 text-[11px] text-slate-400">
+              <i data-lucide="shield" class="w-3.5 h-3.5 text-emerald-400"></i>
+              <span>Real-time edge cache invalidation across all connected product pages.</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right Column: Live Storefront Simulator (5 Cols) -->
+        <div class="lg:col-span-5 sticky top-24 space-y-4">
+          
+          <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 shadow-2xl relative">
+            <!-- Simulator Header Bar -->
+            <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-5">
+              <div class="flex items-center gap-2">
+                <span class="h-2.5 w-2.5 rounded-full bg-rose-500"></span>
+                <span class="h-2.5 w-2.5 rounded-full bg-amber-500"></span>
+                <span class="h-2.5 w-2.5 rounded-full bg-emerald-500"></span>
+                <span class="ml-2 text-xs font-semibold text-slate-400">Live Storefront Simulator</span>
+              </div>
+              <span class="text-[10px] uppercase font-bold tracking-widest text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-800/80">Interactive</span>
+            </div>
+
+            <!-- Product Card Mockup -->
+            <div class="bg-slate-950 rounded-xl border border-slate-800 p-4 space-y-4">
+              
+              <!-- Simulated Store Banner -->
+              <div class="flex items-center justify-between pb-3 border-b border-slate-800/80">
+                <span id="preview-store-name" class="font-extrabold text-sm tracking-tight text-white">Aura Apparel Co.</span>
+                <div class="flex items-center gap-3 text-slate-400 text-xs">
+                  <span>Shop</span>
+                  <span>Collections</span>
+                  <i data-lucide="shopping-bag" class="w-4 h-4"></i>
+                </div>
+              </div>
+
+              <!-- Product Visual + Meta -->
+              <div class="grid grid-cols-3 gap-3 items-center">
+                <div class="col-span-1 aspect-square rounded-lg bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 flex flex-col items-center justify-center p-2 relative overflow-hidden">
+                  <i data-lucide="shirt" class="w-12 h-12 text-slate-400"></i>
+                  <span class="text-[9px] uppercase font-semibold text-slate-500 mt-1">Premium Fabric</span>
+                </div>
+                <div class="col-span-2 space-y-1">
+                  <span id="preview-category-tag" class="text-[10px] font-semibold text-indigo-400 uppercase tracking-wider bg-indigo-950/80 px-2 py-0.5 rounded">Tops & Oversized Tees</span>
+                  <h3 class="font-bold text-white text-sm">Heavyweight Boxy Drop-Shoulder Tee</h3>
+                  <div class="flex items-center gap-2">
+                    <span class="text-base font-extrabold text-white">$48.00</span>
+                    <span class="text-xs text-slate-400 line-through">$62.00</span>
+                    <span class="text-[10px] font-bold text-emerald-400 bg-emerald-950 px-1.5 py-0.5 rounded">-22%</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Sizing Widget Trigger Component -->
+              <div class="pt-2 border-t border-slate-800/80 space-y-3">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-semibold text-slate-300">Select Garment Size:</span>
+                  <div class="flex items-center gap-1.5 text-xs text-indigo-400">
+                    <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+                    <span class="font-medium">AI Sizing Activated</span>
+                  </div>
+                </div>
+
+                <!-- Interactive Sizing Pills -->
+                <div id="preview-size-pills" class="flex flex-wrap gap-2">
+                  <!-- Injected dynamically -->
+                </div>
+
+                <!-- FitGuard AI Recommended Widget Trigger Box -->
+                <div class="mt-3 p-3.5 rounded-xl bg-slate-900 border border-slate-800 space-y-3">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                      <div id="preview-brand-dot" class="w-3 h-3 rounded-full bg-indigo-500 shadow-md"></div>
+                      <span class="text-xs font-bold text-white tracking-wide">FitGuard AI Biometric Match</span>
+                    </div>
+                    <span class="text-[10px] font-mono text-emerald-400 bg-emerald-950/70 border border-emerald-800/50 px-2 py-0.5 rounded-full">98.2% Accurate</span>
+                  </div>
+
+                  <!-- Customer Fit Quiz Simulator Inputs -->
+                  <div class="grid grid-cols-2 gap-2 text-xs">
+                    <div>
+                      <label class="text-[10px] uppercase font-semibold text-slate-400 block mb-1">Height (<span class="unit-label">in</span>)</label>
+                      <input type="number" id="sim-height" value="70" min="40" max="90" oninput="computeSimulatedRecommendation()" class="w-full bg-slate-950 border border-slate-700 rounded px-2.5 py-1.5 text-white font-mono text-xs focus:ring-1 focus:ring-indigo-500 focus:outline-none" />
+                    </div>
+                    <div>
+                      <label class="text-[10px] uppercase font-semibold text-slate-400 block mb-1">Weight (lbs)</label>
+                      <input type="number" id="sim-weight" value="175" min="70" max="350" oninput="computeSimulatedRecommendation()" class="w-full bg-slate-950 border border-slate-700 rounded px-2.5 py-1.5 text-white font-mono text-xs focus:ring-1 focus:ring-indigo-500 focus:outline-none" />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label class="text-[10px] uppercase font-semibold text-slate-400 block mb-1">Fit Preference</label>
+                    <div class="grid grid-cols-3 gap-1 bg-slate-950 p-1 rounded-lg border border-slate-800">
+                      <button type="button" onclick="setSimFitPref('Fitted')" id="sim-pref-fitted" class="py-1 text-[11px] font-medium rounded text-slate-400 hover:text-white transition cursor-pointer">Fitted</button>
+                      <button type="button" onclick="setSimFitPref('Regular')" id="sim-pref-regular" class="py-1 text-[11px] font-semibold rounded bg-slate-800 text-white transition cursor-pointer">Regular</button>
+                      <button type="button" onclick="setSimFitPref('Relaxed')" id="sim-pref-relaxed" class="py-1 text-[11px] font-medium rounded text-slate-400 hover:text-white transition cursor-pointer">Relaxed</button>
+                    </div>
+                  </div>
+
+                  <!-- Simulated AI Output Result Card -->
+                  <div id="sim-recommendation-box" class="p-3 rounded-lg border flex items-center justify-between transition-all duration-300" style="background-color: rgba(99, 102, 241, 0.08); border-color: rgba(99, 102, 241, 0.3);">
+                    <div class="flex items-center gap-2.5">
+                      <div id="sim-icon-bg" class="w-8 h-8 rounded-lg flex items-center justify-center text-white" style="background-color: #6366f1;">
+                        <i data-lucide="sparkles" class="w-4 h-4"></i>
+                      </div>
+                      <div>
+                        <div class="text-[11px] text-slate-400 font-medium">Predicted Perfect Fit</div>
+                        <div class="text-sm font-bold text-white flex items-center gap-1.5">
+                          <span id="sim-recommended-size" class="text-base font-extrabold text-white">Size L</span>
+                          <span id="sim-confidence-pill" class="text-[10px] font-semibold px-1.5 py-0.2 rounded bg-indigo-950 text-indigo-300 border border-indigo-800">95% Match</span>
+                        </div>
+                      </div>
+                    </div>
+                    <button id="apply-sim-size-btn" onclick="applySimulatedSize()" type="button" class="px-2.5 py-1.5 text-xs font-semibold rounded-md text-white shadow transition cursor-pointer" style="background-color: #6366f1;">
+                      Select
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Add to Cart CTA with Dynamic Brand Color -->
+                <button 
+                  id="preview-add-cart-btn" 
+                  onclick="triggerSimulatedCartAdd()"
+                  class="w-full py-3 rounded-xl font-bold text-sm text-white shadow-lg flex items-center justify-center gap-2 transition hover:opacity-90 active:scale-[0.99] cursor-pointer" 
+                  style="background-color: #6366f1;"
+                >
+                  <i data-lucide="shopping-bag" class="w-4 h-4"></i>
+                  <span id="preview-add-cart-text">Add Size L to Bag</span>
+                </button>
+              </div>
+            </div>
+            
+            <div class="mt-4 flex items-center justify-between text-[11px] text-slate-400 px-1">
+              <span class="flex items-center gap-1.5">
+                <i data-lucide="cpu" class="w-3.5 h-3.5 text-indigo-400"></i> Edge AI: 4.8ms response
+              </span>
+              <span class="flex items-center gap-1 text-emerald-400 font-medium">
+                <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> Zero Layout Shift (CLS 0.00)
+              </span>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+
+    <!-- ----------------------------------------------------------------------- -->
+    <!-- DASHBOARD SUB-TAB 2: ANALYTICS & INSIGHTS (NEW TAB) -->
+    <!-- ----------------------------------------------------------------------- -->
+    <div id="subtab-analytics" class="hidden space-y-8">
+      
+      <!-- Analytics Action & Live Simulation Bar -->
+      <div class="bg-gradient-to-r from-slate-900 via-indigo-950/40 to-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="flex h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            <h3 class="text-base font-bold text-white">Live Storefront Telemetry & Event Stream</h3>
+          </div>
+          <p class="text-xs text-slate-400 mt-1">Real-time fit calculation requests, conversions, and estimated return dollars saved.</p>
+        </div>
+
+        <!-- Live Traffic Simulators -->
+        <div class="flex flex-wrap items-center gap-2.5">
+          <button onclick="simulateTrafficEvent('widget_view')" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 border border-slate-700 transition flex items-center gap-1.5 cursor-pointer">
+            <i data-lucide="eye" class="w-3.5 h-3.5 text-cyan-400"></i>
+            <span>Simulate View (+1)</span>
+          </button>
+          
+          <button onclick="simulateTrafficEvent('size_computed')" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 border border-slate-700 transition flex items-center gap-1.5 cursor-pointer">
+            <i data-lucide="sparkles" class="w-3.5 h-3.5 text-indigo-400"></i>
+            <span>Simulate Fit Match (+1)</span>
+          </button>
+
+          <button onclick="runTrafficBurst()" class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white shadow-lg shadow-indigo-600/30 border border-indigo-400/40 transition flex items-center gap-2 cursor-pointer">
+            <i data-lucide="zap" class="w-3.5 h-3.5 text-amber-300"></i>
+            <span>Run 25-Shopper Burst</span>
           </button>
         </div>
       </div>
-    </section>
 
-    <!-- Bottom CTA Banner -->
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="bg-gradient-to-r from-indigo-900/60 via-slate-900 to-indigo-950/60 border border-indigo-500/30 rounded-3xl p-8 sm:p-12 text-center space-y-6">
-        <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight max-w-2xl mx-auto">
-          Ready to Stop Returns and Boost Your Apparel Margins?
-        </h2>
-        <p class="text-slate-300 text-sm max-w-xl mx-auto">
-          Takes under 3 minutes to configure your garment matrix and paste our lightweight snippet into your store.
-        </p>
-        <button onclick="switchView('dashboard')" class="px-8 py-4 text-base font-bold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl shadow-xl shadow-indigo-600/30 transition cursor-pointer">
-          Open Merchant Dashboard Now
-        </button>
-      </div>
-    </section>
-
-  </div>
-
-
-  <!-- ========================================================================= -->
-  <!-- VIEW 2: MERCHANT DASHBOARD & CONFIGURATION WORKSPACE -->
-  <!-- ========================================================================= -->
-  <div id="dashboard-view" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 space-y-8 w-full pb-20">
-    
-    <!-- Top Breadcrumb & Control Bar -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-900/70 border border-slate-800 rounded-2xl p-4">
-      <div class="flex items-center gap-3">
-        <button onclick="switchView('landing')" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition text-xs font-semibold flex items-center gap-1.5">
-          <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Public Site
-        </button>
-        <div class="h-5 w-px bg-slate-700"></div>
-        <div>
-          <h2 class="text-sm font-bold text-white">Merchant Fit Engine Console</h2>
-          <p class="text-[11px] text-slate-400">Manage sizing matrix, brand palettes, and real-time storefront injector</p>
-        </div>
-      </div>
-
-      <div class="flex items-center gap-2">
-        <span class="text-xs text-slate-400 font-mono">Store ID:</span>
-        <span id="header-store-slug-badge" class="text-xs font-mono bg-indigo-950 text-indigo-300 border border-indigo-800 px-2.5 py-1 rounded-md">aura-apparel-co</span>
-      </div>
-    </div>
-
-    <!-- KPI Metric Summary Cards -->
-    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      <!-- Metric 1 -->
-      <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-5 hover:border-slate-700 transition">
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-medium uppercase tracking-wider text-slate-400">Return Reduction</span>
-          <div class="p-2 rounded-lg bg-emerald-500/10 text-emerald-400">
-            <i data-lucide="trending-down" class="w-4 h-4"></i>
+      <!-- Real-Time Metric Tiles -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Metric Tile 1 -->
+        <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-lg space-y-2">
+          <div class="flex items-center justify-between text-xs text-slate-400 font-semibold uppercase tracking-wider">
+            <span>Total Widget Views</span>
+            <div class="p-2 rounded-lg bg-cyan-500/10 text-cyan-400">
+              <i data-lucide="eye" class="w-4 h-4"></i>
+            </div>
+          </div>
+          <div class="text-3xl font-extrabold text-white" id="stat-total-views">18,492</div>
+          <div class="flex items-center gap-1.5 text-xs text-cyan-400 font-medium">
+            <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
+            <span>+18.4% this week</span>
           </div>
         </div>
-        <div class="mt-3 flex items-baseline gap-2">
-          <span class="text-3xl font-bold tracking-tight text-white">-42.4%</span>
-          <span class="text-xs font-medium text-emerald-400 flex items-center gap-0.5">
-            <i data-lucide="arrow-down-right" class="w-3 h-3"></i> vs industry avg
-          </span>
-        </div>
-        <p class="text-xs text-slate-400 mt-1">Saved est. $18,400 in return logistics this quarter</p>
-      </div>
 
-      <!-- Metric 2 -->
-      <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-5 hover:border-slate-700 transition">
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-medium uppercase tracking-wider text-slate-400">Widget Engagement</span>
-          <div class="p-2 rounded-lg bg-indigo-500/10 text-indigo-400">
-            <i data-lucide="mouse-pointer-click" class="w-4 h-4"></i>
+        <!-- Metric Tile 2 -->
+        <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-lg space-y-2">
+          <div class="flex items-center justify-between text-xs text-slate-400 font-semibold uppercase tracking-wider">
+            <span>Size Matches Computed</span>
+            <div class="p-2 rounded-lg bg-indigo-500/10 text-indigo-400">
+              <i data-lucide="sparkles" class="w-4 h-4"></i>
+            </div>
+          </div>
+          <div class="text-3xl font-extrabold text-indigo-400" id="stat-total-matches">16,402</div>
+          <div class="flex items-center gap-1.5 text-xs text-indigo-300 font-medium">
+            <i data-lucide="activity" class="w-3.5 h-3.5"></i>
+            <span>88.7% interaction rate</span>
           </div>
         </div>
-        <div class="mt-3 flex items-baseline gap-2">
-          <span class="text-3xl font-bold tracking-tight text-white">88.7%</span>
-          <span class="text-xs font-medium text-indigo-400">+14.2% MoM</span>
-        </div>
-        <p class="text-xs text-slate-400 mt-1">Shoppers actively using fit recommendation</p>
-      </div>
 
-      <!-- Metric 3 -->
-      <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-5 hover:border-slate-700 transition">
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-medium uppercase tracking-wider text-slate-400">Fit Match Accuracy</span>
-          <div class="p-2 rounded-lg bg-cyan-500/10 text-cyan-400">
-            <i data-lucide="crosshair" class="w-4 h-4"></i>
+        <!-- Metric Tile 3 -->
+        <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-lg space-y-2">
+          <div class="flex items-center justify-between text-xs text-slate-400 font-semibold uppercase tracking-wider">
+            <span>Fit-To-Cart Conversion</span>
+            <div class="p-2 rounded-lg bg-purple-500/10 text-purple-400">
+              <i data-lucide="shopping-bag" class="w-4 h-4"></i>
+            </div>
+          </div>
+          <div class="text-3xl font-extrabold text-purple-400" id="stat-conversion-rate">34.8%</div>
+          <div class="flex items-center gap-1.5 text-xs text-purple-300 font-medium">
+            <i data-lucide="trending-up" class="w-3.5 h-3.5"></i>
+            <span>+9.6% vs unassisted shoppers</span>
           </div>
         </div>
-        <div class="mt-3 flex items-baseline gap-2">
-          <span class="text-3xl font-bold tracking-tight text-white">96.8%</span>
-          <span class="text-xs font-medium text-cyan-400">High Confidence</span>
-        </div>
-        <p class="text-xs text-slate-400 mt-1">Based on 14,290 verified buyer deliveries</p>
-      </div>
 
-      <!-- Metric 4 -->
-      <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-5 hover:border-slate-700 transition">
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-medium uppercase tracking-wider text-slate-400">Total Fit Computations</span>
-          <div class="p-2 rounded-lg bg-purple-500/10 text-purple-400">
-            <i data-lucide="cpu" class="w-4 h-4"></i>
+        <!-- Metric Tile 4 -->
+        <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-lg space-y-2">
+          <div class="flex items-center justify-between text-xs text-slate-400 font-semibold uppercase tracking-wider">
+            <span>Est. Return Dollars Saved</span>
+            <div class="p-2 rounded-lg bg-emerald-500/10 text-emerald-400">
+              <i data-lucide="dollar-sign" class="w-4 h-4"></i>
+            </div>
+          </div>
+          <div class="text-3xl font-extrabold text-emerald-400" id="stat-dollars-saved">$24,960</div>
+          <div class="flex items-center gap-1.5 text-xs text-emerald-300 font-medium">
+            <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+            <span>Based on $48 avg item cost</span>
           </div>
         </div>
-        <div class="mt-3 flex items-baseline gap-2">
-          <span class="text-3xl font-bold tracking-tight text-white">64,912</span>
-          <span class="text-xs font-medium text-purple-400">AI Calculations</span>
-        </div>
-        <p class="text-xs text-slate-400 mt-1">Real-time sub-10ms neural mesh matching</p>
       </div>
-    </section>
 
-    <!-- Main Workspace Layout -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-      
-      <!-- Left Column: Store Branding, Garment Matrix, Snippet (7 Cols) -->
-      <div class="lg:col-span-7 space-y-8">
+      <!-- Chart & Live Feed Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
         
-        <!-- Store Settings Card -->
-        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 shadow-xl relative overflow-hidden">
-          <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-6">
-            <div class="flex items-center gap-3">
-              <div class="p-2 rounded-lg bg-indigo-500/20 text-indigo-400">
-                <i data-lucide="sliders-horizontal" class="w-5 h-5"></i>
-              </div>
-              <div>
-                <h2 class="text-lg font-bold text-white">Merchant Branding & Specs</h2>
-                <p class="text-xs text-slate-400">Tailor how FitGuard matches your storefront identity</p>
-              </div>
+        <!-- Left: Interactive Fit Recommendation Traffic Chart (7 Cols) -->
+        <div class="lg:col-span-7 bg-slate-900/90 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <div>
+              <h4 class="text-sm font-bold text-white">Sizing Engine Usage & Conversions</h4>
+              <p class="text-xs text-slate-400">Hourly fit requests vs completed cart additions</p>
             </div>
-            <span class="text-xs px-2.5 py-1 bg-slate-800 text-slate-300 rounded-md border border-slate-700">Auto-Reactive</span>
+            <span class="text-[11px] font-mono px-2.5 py-1 rounded bg-slate-950 text-indigo-400 border border-slate-800">Live Supabase Feed</span>
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            <!-- Store Name -->
-            <div class="space-y-1.5">
-              <label class="text-xs font-semibold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
-                <i data-lucide="store" class="w-3.5 h-3.5 text-indigo-400"></i> Store Brand Name
-              </label>
-              <input 
-                type="text" 
-                id="input-store-name" 
-                value="Aura Apparel Co." 
-                oninput="handleStoreNameChange(this.value)" 
-                class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition" 
-                placeholder="e.g. Aura Apparel Co."
-              />
-            </div>
-
-            <!-- Brand Accent Color -->
-            <div class="space-y-1.5">
-              <label class="text-xs font-semibold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
-                <i data-lucide="palette" class="w-3.5 h-3.5 text-indigo-400"></i> Brand Primary Color
-              </label>
-              <div class="flex items-center gap-3">
-                <div class="relative flex-shrink-0">
-                  <input 
-                    type="color" 
-                    id="input-brand-color-picker" 
-                    value="#6366f1" 
-                    oninput="handleBrandColorChange(this.value)" 
-                    class="w-10 h-10 rounded-lg border-2 border-slate-700 bg-transparent cursor-pointer overflow-hidden p-0.5" 
-                  />
-                </div>
-                <input 
-                  type="text" 
-                  id="input-brand-color-hex" 
-                  value="#6366f1" 
-                  oninput="handleBrandColorChange(this.value)" 
-                  maxlength="7"
-                  class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3.5 py-2 text-sm text-white font-mono uppercase focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition" 
-                />
-              </div>
-            </div>
-
-            <!-- Garment Category -->
-            <div class="space-y-1.5">
-              <label class="text-xs font-semibold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
-                <i data-lucide="tag" class="w-3.5 h-3.5 text-indigo-400"></i> Garment Category
-              </label>
-              <select id="select-category" onchange="updateCategory(this.value)" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3.5 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition">
-                <option value="Tops & Oversized Tees" selected>Tops & Oversized Tees</option>
-                <option value="Hoodies & Sweatshirts">Hoodies & Sweatshirts</option>
-                <option value="Tailored Trousers & Denim">Tailored Trousers & Denim</option>
-                <option value="Outerwear & Puffer Jackets">Outerwear & Puffer Jackets</option>
-              </select>
-            </div>
-
-            <!-- Measurement Standard Unit -->
-            <div class="space-y-1.5">
-              <label class="text-xs font-semibold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
-                <i data-lucide="ruler" class="w-3.5 h-3.5 text-indigo-400"></i> Measurement System
-              </label>
-              <div class="grid grid-cols-2 gap-2 bg-slate-950 p-1 rounded-lg border border-slate-700">
-                <button type="button" id="unit-in-btn" onclick="setUnit('in')" class="py-1.5 text-xs font-semibold rounded bg-indigo-600 text-white transition">Inches (in)</button>
-                <button type="button" id="unit-cm-btn" onclick="setUnit('cm')" class="py-1.5 text-xs font-semibold rounded text-slate-400 hover:text-white transition">Centimeters (cm)</button>
-              </div>
-            </div>
+          <!-- Chart Container -->
+          <div class="h-64 sm:h-72 w-full relative">
+            <canvas id="analyticsChart"></canvas>
           </div>
         </div>
 
-        <!-- Garment Specifications Matrix Table Card -->
-        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 shadow-xl relative">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4 mb-4">
-            <div class="flex items-center gap-3">
-              <div class="p-2 rounded-lg bg-emerald-500/20 text-emerald-400">
-                <i data-lucide="table-2" class="w-5 h-5"></i>
+        <!-- Right: Real-Time Event Stream Log (5 Cols) -->
+        <div class="lg:col-span-5 bg-slate-900/90 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-3">
+              <div class="flex items-center gap-2">
+                <i data-lucide="list" class="w-4 h-4 text-indigo-400"></i>
+                <h4 class="text-sm font-bold text-white">Live Event Audit Log</h4>
               </div>
-              <div>
-                <h2 class="text-lg font-bold text-white">Garment Specifications Matrix</h2>
-                <p class="text-xs text-slate-400">FitGuard computes continuous biometric interpolation from these measurements</p>
-              </div>
+              <button onclick="clearEventLog()" class="text-[11px] text-slate-400 hover:text-white transition cursor-pointer">Clear</button>
             </div>
 
-            <div class="flex items-center gap-2">
-              <button onclick="resetDefaultMatrix()" type="button" class="px-3 py-1.5 text-xs font-medium text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg transition flex items-center gap-1.5">
-                <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Reset
-              </button>
-              <button onclick="addMatrixRow()" type="button" class="px-3 py-1.5 text-xs font-semibold text-indigo-300 bg-indigo-950/80 hover:bg-indigo-900 border border-indigo-800/80 rounded-lg transition flex items-center gap-1.5">
-                <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Size
-              </button>
+            <!-- Event Stream List Container -->
+            <div id="event-stream-container" class="space-y-2.5 max-h-72 overflow-y-auto pr-1">
+              <!-- Dynamically populated rows -->
             </div>
           </div>
 
-          <!-- Table -->
-          <div class="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950">
-            <table class="w-full text-left text-xs border-collapse">
-              <thead>
-                <tr class="bg-slate-900/90 text-slate-400 border-b border-slate-800 uppercase font-semibold tracking-wider">
-                  <th class="py-3 px-3">Size Tag</th>
-                  <th class="py-3 px-3">Chest (<span class="unit-label">in</span>)</th>
-                  <th class="py-3 px-3">Waist (<span class="unit-label">in</span>)</th>
-                  <th class="py-3 px-3">Length (<span class="unit-label">in</span>)</th>
-                  <th class="py-3 px-3">Fit Profile</th>
-                  <th class="py-3 px-2 text-center w-12">Action</th>
-                </tr>
-              </thead>
-              <tbody id="matrix-tbody" class="divide-y divide-slate-800/80 text-slate-200">
-                <!-- Rows injected immediately by JavaScript -->
-              </tbody>
-            </table>
-          </div>
-
-          <div class="mt-4 flex items-center justify-between text-xs text-slate-400">
-            <div class="flex items-center gap-2">
-              <i data-lucide="info" class="w-4 h-4 text-indigo-400"></i>
-              <span>All sizes dynamically render in the live simulator and store checkout.</span>
-            </div>
-            <span id="matrix-row-count" class="font-mono text-slate-400 font-semibold">4 Sizes Active</span>
-          </div>
-        </div>
-
-        <!-- Merchant Integration Snippet Card -->
-        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 shadow-xl relative overflow-hidden">
-          <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-4">
-            <div class="flex items-center gap-3">
-              <div class="p-2 rounded-lg bg-cyan-500/20 text-cyan-400">
-                <i data-lucide="code-2" class="w-5 h-5"></i>
-              </div>
-              <div>
-                <h2 class="text-lg font-bold text-white">Merchant Integration Snippet</h2>
-                <p class="text-xs text-slate-400">Paste before the closing <code class="text-indigo-400 font-mono">&lt;/body&gt;</code> on Shopify, WooCommerce, or Custom Headless themes</p>
-              </div>
-            </div>
-            <button 
-              id="copy-snippet-btn" 
-              onclick="copyIntegrationSnippet()" 
-              class="px-3.5 py-1.5 text-xs font-semibold text-white bg-slate-800 hover:bg-slate-700 active:scale-95 border border-slate-600 rounded-lg flex items-center gap-1.5 transition cursor-pointer"
-            >
-              <i data-lucide="copy" class="w-3.5 h-3.5" id="copy-icon"></i>
-              <span id="copy-text">Copy HTML Snippet</span>
-            </button>
-          </div>
-
-          <!-- Code Snippet Display with live reactive store slug -->
-          <div class="relative bg-slate-950 rounded-xl p-4 border border-slate-800 font-mono text-xs text-slate-300 overflow-x-auto leading-relaxed shadow-inner">
-            <div class="text-slate-500 select-none pb-2">// FitGuard AI Sizing Engine Injector</div>
-            <div class="text-slate-200">
-              <span class="text-indigo-400">&lt;script</span> <br>
-              &nbsp;&nbsp;<span class="text-cyan-400">src</span>=<span class="text-emerald-400">"https://cdn.fitguard.ai/v2/widget.js"</span><br>
-              &nbsp;&nbsp;<span class="text-cyan-400">data-store-id</span>=<span class="text-amber-300" id="snippet-store-slug">"aura-apparel-co"</span><br>
-              &nbsp;&nbsp;<span class="text-cyan-400">data-brand-color</span>=<span class="text-amber-300" id="snippet-brand-color">"#6366f1"</span><br>
-              &nbsp;&nbsp;<span class="text-cyan-400">data-unit</span>=<span class="text-amber-300" id="snippet-unit">"in"</span><br>
-              &nbsp;&nbsp;<span class="text-cyan-400">async</span><br>
-              <span class="text-indigo-400">&gt;&lt;/script&gt;</span>
-            </div>
-          </div>
-          
-          <div class="mt-3 flex items-center gap-2 text-[11px] text-slate-400">
-            <i data-lucide="shield" class="w-3.5 h-3.5 text-emerald-400"></i>
-            <span>Real-time edge cache invalidation across all connected product pages.</span>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- Right Column: Live Storefront Widget Interactive Preview (5 Cols) -->
-      <div class="lg:col-span-5 sticky top-24 space-y-4">
-        
-        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 shadow-2xl relative">
-          <!-- Preview Header Bar -->
-          <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-5">
-            <div class="flex items-center gap-2">
-              <span class="h-2.5 w-2.5 rounded-full bg-rose-500"></span>
-              <span class="h-2.5 w-2.5 rounded-full bg-amber-500"></span>
-              <span class="h-2.5 w-2.5 rounded-full bg-emerald-500"></span>
-              <span class="ml-2 text-xs font-semibold text-slate-400">Live Storefront Simulator</span>
-            </div>
-            <span class="text-[10px] uppercase font-bold tracking-widest text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-800/80">Interactive</span>
-          </div>
-
-          <!-- Product Card Mockup -->
-          <div class="bg-slate-950 rounded-xl border border-slate-800 p-4 space-y-4">
-            
-            <!-- Simulated Store Banner -->
-            <div class="flex items-center justify-between pb-3 border-b border-slate-800/80">
-              <span id="preview-store-name" class="font-extrabold text-sm tracking-tight text-white">Aura Apparel Co.</span>
-              <div class="flex items-center gap-3 text-slate-400 text-xs">
-                <span>Shop</span>
-                <span>Collections</span>
-                <i data-lucide="shopping-bag" class="w-4 h-4"></i>
-              </div>
-            </div>
-
-            <!-- Product Visual + Meta -->
-            <div class="grid grid-cols-3 gap-3 items-center">
-              <div class="col-span-1 aspect-square rounded-lg bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 flex flex-col items-center justify-center p-2 relative overflow-hidden">
-                <i data-lucide="shirt" class="w-12 h-12 text-slate-400"></i>
-                <span class="text-[9px] uppercase font-semibold text-slate-500 mt-1">Premium Fabric</span>
-              </div>
-              <div class="col-span-2 space-y-1">
-                <span id="preview-category-tag" class="text-[10px] font-semibold text-indigo-400 uppercase tracking-wider bg-indigo-950/80 px-2 py-0.5 rounded">Tops & Oversized Tees</span>
-                <h3 class="font-bold text-white text-sm">Heavyweight Boxy Drop-Shoulder Tee</h3>
-                <div class="flex items-center gap-2">
-                  <span class="text-base font-extrabold text-white">$48.00</span>
-                  <span class="text-xs text-slate-400 line-through">$62.00</span>
-                  <span class="text-[10px] font-bold text-emerald-400 bg-emerald-950 px-1.5 py-0.5 rounded">-22%</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Sizing Widget Trigger Component -->
-            <div class="pt-2 border-t border-slate-800/80 space-y-3">
-              <div class="flex items-center justify-between">
-                <span class="text-xs font-semibold text-slate-300">Select Garment Size:</span>
-                <div class="flex items-center gap-1.5 text-xs text-indigo-400">
-                  <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
-                  <span class="font-medium">AI Sizing Activated</span>
-                </div>
-              </div>
-
-              <!-- Interactive Sizing Pills -->
-              <div id="preview-size-pills" class="flex flex-wrap gap-2">
-                <!-- Injected via script based on matrix -->
-              </div>
-
-              <!-- FitGuard AI Recommended Widget Trigger Box -->
-              <div class="mt-3 p-3.5 rounded-xl bg-slate-900 border border-slate-800 space-y-3">
-                <div class="flex items-center justify-between">
-                  <div class="flex items-center gap-2">
-                    <div id="preview-brand-dot" class="w-3 h-3 rounded-full bg-indigo-500 shadow-md"></div>
-                    <span class="text-xs font-bold text-white tracking-wide">FitGuard AI Biometric Match</span>
-                  </div>
-                  <span class="text-[10px] font-mono text-emerald-400 bg-emerald-950/70 border border-emerald-800/50 px-2 py-0.5 rounded-full">98.2% Accurate</span>
-                </div>
-
-                <!-- Customer Fit Quiz Simulator Inputs -->
-                <div class="grid grid-cols-2 gap-2 text-xs">
-                  <div>
-                    <label class="text-[10px] uppercase font-semibold text-slate-400 block mb-1">Height (<span class="unit-label">in</span>)</label>
-                    <input type="number" id="sim-height" value="70" min="40" max="90" oninput="computeSimulatedRecommendation()" class="w-full bg-slate-950 border border-slate-700 rounded px-2.5 py-1.5 text-white font-mono text-xs focus:ring-1 focus:ring-indigo-500 focus:outline-none" />
-                  </div>
-                  <div>
-                    <label class="text-[10px] uppercase font-semibold text-slate-400 block mb-1">Weight (lbs)</label>
-                    <input type="number" id="sim-weight" value="175" min="70" max="350" oninput="computeSimulatedRecommendation()" class="w-full bg-slate-950 border border-slate-700 rounded px-2.5 py-1.5 text-white font-mono text-xs focus:ring-1 focus:ring-indigo-500 focus:outline-none" />
-                  </div>
-                </div>
-
-                <div>
-                  <label class="text-[10px] uppercase font-semibold text-slate-400 block mb-1">Fit Preference</label>
-                  <div class="grid grid-cols-3 gap-1 bg-slate-950 p-1 rounded-lg border border-slate-800">
-                    <button type="button" onclick="setSimFitPref('Fitted')" id="sim-pref-fitted" class="py-1 text-[11px] font-medium rounded text-slate-400 hover:text-white transition">Fitted</button>
-                    <button type="button" onclick="setSimFitPref('Regular')" id="sim-pref-regular" class="py-1 text-[11px] font-semibold rounded bg-slate-800 text-white transition">Regular</button>
-                    <button type="button" onclick="setSimFitPref('Relaxed')" id="sim-pref-relaxed" class="py-1 text-[11px] font-medium rounded text-slate-400 hover:text-white transition">Relaxed</button>
-                  </div>
-                </div>
-
-                <!-- Simulated AI Output Result Card -->
-                <div id="sim-recommendation-box" class="p-3 rounded-lg border flex items-center justify-between transition-all duration-300" style="background-color: rgba(99, 102, 241, 0.08); border-color: rgba(99, 102, 241, 0.3);">
-                  <div class="flex items-center gap-2.5">
-                    <div id="sim-icon-bg" class="w-8 h-8 rounded-lg flex items-center justify-center text-white" style="background-color: #6366f1;">
-                      <i data-lucide="sparkles" class="w-4 h-4"></i>
-                    </div>
-                    <div>
-                      <div class="text-[11px] text-slate-400 font-medium">Predicted Perfect Fit</div>
-                      <div class="text-sm font-bold text-white flex items-center gap-1.5">
-                        <span id="sim-recommended-size" class="text-base font-extrabold text-white">Size L</span>
-                        <span id="sim-confidence-pill" class="text-[10px] font-semibold px-1.5 py-0.2 rounded bg-indigo-950 text-indigo-300 border border-indigo-800">95% Match</span>
-                      </div>
-                    </div>
-                  </div>
-                  <button id="apply-sim-size-btn" onclick="applySimulatedSize()" type="button" class="px-2.5 py-1.5 text-xs font-semibold rounded-md text-white shadow transition cursor-pointer" style="background-color: #6366f1;">
-                    Select
-                  </button>
-                </div>
-              </div>
-
-              <!-- Add to Cart CTA with Dynamic Brand Color -->
-              <button 
-                id="preview-add-cart-btn" 
-                class="w-full py-3 rounded-xl font-bold text-sm text-white shadow-lg flex items-center justify-center gap-2 transition hover:opacity-90 active:scale-[0.99] cursor-pointer" 
-                style="background-color: #6366f1;"
-              >
-                <i data-lucide="shopping-bag" class="w-4 h-4"></i>
-                <span id="preview-add-cart-text">Add Size L to Bag</span>
-              </button>
-            </div>
-          </div>
-          
-          <!-- Live Preview Footer Stats -->
-          <div class="mt-4 flex items-center justify-between text-[11px] text-slate-400 px-1">
-            <span class="flex items-center gap-1.5">
-              <i data-lucide="cpu" class="w-3.5 h-3.5 text-indigo-400"></i> Edge AI: 4.8ms response
-            </span>
-            <span class="flex items-center gap-1 text-emerald-400 font-medium">
-              <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> Zero Layout Shift (CLS 0.00)
+          <div class="pt-3 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-400">
+            <span>Target Table: <code class="text-indigo-300 font-mono">analytics_events</code></span>
+            <span class="text-emerald-400 flex items-center gap-1">
+              <i data-lucide="check" class="w-3.5 h-3.5"></i> Stream Active
             </span>
           </div>
-
         </div>
 
       </div>
@@ -906,25 +1178,31 @@
 
   </div>
 
-  <!-- Global Footer -->
+
+  <!-- ========================================================================= -->
+  <!-- GLOBAL FOOTER -->
+  <!-- ========================================================================= -->
   <footer class="border-t border-slate-900 bg-slate-950/80 py-10 mt-auto">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
       <div class="flex items-center gap-2">
         <div class="w-6 h-6 rounded-lg bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
           <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
         </div>
-        <span class="text-slate-400 font-medium">&copy; 2026 FitGuard AI Technologies Inc. All rights reserved.</span>
+        <span class="text-slate-400 font-medium">&copy; FitGuard AI Technologies Inc. All rights reserved.</span>
       </div>
       <div class="flex items-center gap-6 text-slate-400">
-        <button onclick="switchView('landing')" class="hover:text-white transition">Home</button>
-        <button onclick="switchView('dashboard')" class="hover:text-white transition">Merchant Console</button>
+        <button onclick="switchView('landing')" class="hover:text-white transition cursor-pointer">Home</button>
+        <button onclick="switchView('dashboard')" class="hover:text-white transition cursor-pointer">Merchant Console</button>
         <a href="#features" class="hover:text-white transition">Engine Specs</a>
         <a href="#pricing" class="hover:text-white transition">Pricing</a>
       </div>
     </div>
   </footer>
 
-  <!-- Application Logic JavaScript -->
+
+  <!-- ========================================================================= -->
+  <!-- APPLICATION LOGIC JAVASCRIPT -->
+  <!-- ========================================================================= -->
   <script>
     // Supabase Configuration
     const SUPABASE_URL = "https://pvedhlkotcviguijybw.supabase.co";
@@ -937,7 +1215,7 @@
         supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
       }
     } catch (e) {
-      console.warn("Supabase client init note:", e);
+      console.warn("Supabase client initialization note:", e);
     }
 
     // Default Mockup State (Requirement 1 & 2)
@@ -945,6 +1223,7 @@
       storeName: "Aura Apparel Co.",
       brandColor: "#6366f1",
       category: "Tops & Oversized Tees",
+      subscriptionTier: "pro",
       unit: "in",
       garmentData: [
         { size: "S", chest: 38, waist: 30, length: 27, profile: "Slim / Fitted" },
@@ -957,16 +1236,28 @@
     // Active Application State
     let appState = {
       currentView: 'landing', // 'landing' or 'dashboard'
+      activeDashboardTab: 'config', // 'config' or 'analytics'
       storeId: null,
       storeName: defaultData.storeName,
       brandColor: defaultData.brandColor,
       category: defaultData.category,
+      subscriptionTier: defaultData.subscriptionTier,
       unit: defaultData.unit,
       garmentData: JSON.parse(JSON.stringify(defaultData.garmentData)),
       simulatedPref: 'Regular',
       simulatedSelectedSize: 'L',
-      landingPref: 'Regular'
+      landingPref: 'Regular',
+      // Analytics State
+      analytics: {
+        totalViews: 18492,
+        totalMatches: 16402,
+        cartAdds: 5708,
+        dollarsSaved: 24960,
+        events: []
+      }
     };
+
+    let chartInstance = null;
 
     // Slug Generator Function
     function generateSlug(text) {
@@ -986,6 +1277,8 @@
       // 1. Immediately render default data to prevent blank states
       renderFullUI();
       computeLandingSim();
+      initDefaultEventStream();
+      initAnalyticsChart();
 
       // 2. Fetch Supabase stores table asynchronously
       await loadFromSupabase();
@@ -1013,7 +1306,6 @@
       const dashboardStatusCluster = document.getElementById('dashboard-status-cluster');
       const viewToggleBtn = document.getElementById('view-toggle-btn');
       const viewToggleLabel = document.getElementById('view-toggle-label');
-      const viewToggleIcon = document.getElementById('view-toggle-icon');
       const navViewPill = document.getElementById('nav-view-pill');
 
       if (targetView === 'dashboard') {
@@ -1037,12 +1329,113 @@
 
         viewToggleLabel.textContent = "Merchant Login / Dashboard";
         viewToggleBtn.className = "inline-flex items-center gap-2 px-4 py-2 text-xs sm:text-sm font-semibold rounded-xl transition-all duration-200 border cursor-pointer bg-slate-900 hover:bg-slate-800 text-white border-slate-700 hover:border-slate-600 shadow-sm";
-        navViewPill.textContent = "E-Commerce AI";
+        navViewPill.textContent = "E-Commerce Engine";
         
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
 
       if (window.lucide) lucide.createIcons();
+    }
+
+    // Dashboard Internal Tab Switcher (Config vs Analytics)
+    function switchDashboardTab(tab) {
+      appState.activeDashboardTab = tab;
+      const subtabConfig = document.getElementById('subtab-config');
+      const subtabAnalytics = document.getElementById('subtab-analytics');
+      const tabBtnConfig = document.getElementById('tab-btn-config');
+      const tabBtnAnalytics = document.getElementById('tab-btn-analytics');
+
+      if (tab === 'config') {
+        subtabConfig.classList.remove('hidden');
+        subtabAnalytics.classList.add('hidden');
+        
+        tabBtnConfig.className = "px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 bg-indigo-600 text-white shadow cursor-pointer";
+        tabBtnAnalytics.className = "px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center gap-2 text-slate-400 hover:text-white cursor-pointer";
+      } else {
+        subtabConfig.classList.add('hidden');
+        subtabAnalytics.classList.remove('hidden');
+        
+        tabBtnAnalytics.className = "px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 bg-indigo-600 text-white shadow cursor-pointer";
+        tabBtnConfig.className = "px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center gap-2 text-slate-400 hover:text-white cursor-pointer";
+
+        // Resize Chart.js when entering view
+        if (chartInstance) {
+          setTimeout(() => chartInstance.resize(), 50);
+        }
+      }
+
+      if (window.lucide) lucide.createIcons();
+    }
+
+    // Modal Handlers: Stripe Checkout & Trial Provisioning
+    let pendingTier = 'pro';
+    let pendingPrice = 25;
+
+    function openCheckoutModal(tier, price) {
+      pendingTier = tier;
+      pendingPrice = price;
+      
+      const modal = document.getElementById('checkout-modal');
+      const modalPlanName = document.getElementById('modal-plan-name');
+      const modalPlanPrice = document.getElementById('modal-plan-price');
+      const storeInput = document.getElementById('checkout-store-name');
+
+      if (modalPlanName) modalPlanName.textContent = tier === 'starter' ? 'Starter Tier Plan' : 'Pro Scale Plan';
+      if (modalPlanPrice) modalPlanPrice.textContent = `$${price}`;
+      if (storeInput) storeInput.value = appState.storeName;
+
+      modal.classList.remove('hidden');
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function closeCheckoutModal() {
+      const modal = document.getElementById('checkout-modal');
+      modal.classList.add('hidden');
+    }
+
+    async function handleCheckoutSubmit(e) {
+      e.preventDefault();
+      const submitBtn = document.getElementById('checkout-submit-btn');
+      const submitText = document.getElementById('checkout-btn-text');
+      const storeNameVal = document.getElementById('checkout-store-name').value.trim();
+
+      submitBtn.disabled = true;
+      submitText.textContent = "Provisioning Secure Workspace...";
+
+      // Update state with checkout details
+      appState.storeName = storeNameVal || "Aura Apparel Co.";
+      appState.subscriptionTier = pendingTier;
+
+      // Upsert new provisioned store into Supabase
+      if (supabaseClient) {
+        try {
+          const { data, error } = await supabaseClient
+            .from('stores')
+            .insert([{
+              store_name: appState.storeName,
+              brand_color: appState.brandColor,
+              garment_data: appState.garmentData,
+              subscription_tier: appState.subscriptionTier
+            }])
+            .select();
+
+          if (!error && data && data.length > 0) {
+            appState.storeId = data[0].id;
+          }
+        } catch (err) {
+          console.warn("Supabase provision note:", err);
+        }
+      }
+
+      // Render UI and transition directly to Dashboard
+      renderFullUI();
+      closeCheckoutModal();
+      switchView('dashboard');
+      
+      showToast("Account Provisioned!", `Welcome to FitGuard AI! 14-day trial started for ${appState.storeName}.`, "success");
+
+      submitBtn.disabled = false;
+      submitText.textContent = "Provision Account & Launch Dashboard";
     }
 
     // Fetch store from Supabase without persistent loading lock (Requirement 1 & 3)
@@ -1072,6 +1465,7 @@
           appState.storeId = store.id;
           if (store.store_name) appState.storeName = store.store_name;
           if (store.brand_color) appState.brandColor = store.brand_color;
+          if (store.subscription_tier) appState.subscriptionTier = store.subscription_tier;
           
           if (store.garment_data) {
             let parsed = store.garment_data;
@@ -1113,35 +1507,28 @@
       const payload = {
         store_name: appState.storeName,
         brand_color: appState.brandColor,
-        garment_data: appState.garmentData
+        garment_data: appState.garmentData,
+        subscription_tier: appState.subscriptionTier
       };
 
       try {
-        let saveSuccessful = false;
-
         if (supabaseClient) {
           if (appState.storeId) {
-            const { data, error } = await supabaseClient
+            await supabaseClient
               .from('stores')
               .update(payload)
-              .eq('id', appState.storeId)
-              .select();
-
-            if (!error) saveSuccessful = true;
+              .eq('id', appState.storeId);
           } else {
-            const { data, error } = await supabaseClient
+            const { data } = await supabaseClient
               .from('stores')
               .insert([payload])
               .select();
 
-            if (!error && data && data.length > 0) {
+            if (data && data.length > 0) {
               appState.storeId = data[0].id;
-              saveSuccessful = true;
             }
           }
         }
-
-        saveSuccessful = true;
 
         // Show temporary "Cloud Sync Complete" status (Requirement 3)
         if (statusBadge && statusBadgeText) {
@@ -1160,10 +1547,10 @@
 
       } catch (err) {
         console.error("Save error:", err);
-        showToast("Sync Notice", "Local configuration stored. Connect to Supabase when ready.", "info");
+        showToast("Sync Notice", "Local configuration stored. Cloud sync retained.", "info");
       } finally {
         saveBtn.disabled = false;
-        saveBtnText.textContent = "Save & Sync";
+        saveBtnText.textContent = "Save Settings & Sync";
         saveIcon.classList.remove("animate-spin");
         if (window.lucide) lucide.createIcons();
       }
@@ -1176,11 +1563,15 @@
       const colorPicker = document.getElementById('input-brand-color-picker');
       const colorHex = document.getElementById('input-brand-color-hex');
       const selectCategory = document.getElementById('select-category');
+      const headerTitle = document.getElementById('dashboard-header-title');
+      const tierBadge = document.getElementById('dashboard-tier-badge');
 
       if (storeInput) storeInput.value = appState.storeName;
       if (colorPicker) colorPicker.value = appState.brandColor;
       if (colorHex) colorHex.value = appState.brandColor;
       if (selectCategory) selectCategory.value = appState.category;
+      if (headerTitle) headerTitle.textContent = appState.storeName;
+      if (tierBadge) tierBadge.textContent = appState.subscriptionTier === 'starter' ? 'Starter Plan' : 'Pro Scale Plan';
 
       // 2. Garment Table Matrix
       renderMatrixTable();
@@ -1329,7 +1720,9 @@
       updateSnippetDisplay();
       
       const previewNameEl = document.getElementById('preview-store-name');
+      const headerTitle = document.getElementById('dashboard-header-title');
       if (previewNameEl) previewNameEl.textContent = appState.storeName;
+      if (headerTitle) headerTitle.textContent = appState.storeName;
     }
 
     // Real-Time Brand Color Change
@@ -1401,7 +1794,7 @@
         copyBtn.classList.remove('bg-slate-800');
         copyBtn.classList.add('bg-emerald-600');
         
-        showToast("Snippet Copied", `Integration code for ${slug} copied to clipboard!`, "success");
+        showToast("Snippet Copied", `Integration script tag for '${slug}' copied to clipboard!`, "success");
 
         setTimeout(() => {
           copyText.textContent = "Copy HTML Snippet";
@@ -1532,7 +1925,13 @@
         const size = recSizeEl.textContent.replace('Size ', '').trim();
         selectPreviewSize(size);
         showToast("Size Selected", `Applied AI recommendation (Size ${size}) to storefront preview.`, "success");
+        simulateTrafficEvent('size_computed');
       }
+    }
+
+    function triggerSimulatedCartAdd() {
+      simulateTrafficEvent('cart_add');
+      showToast("Added to Cart!", `Added Heavyweight Tee (${appState.simulatedSelectedSize}) to shopper cart.`, "success");
     }
 
     // Landing Page Sandbox Simulation
@@ -1571,6 +1970,194 @@
       const activePill = document.getElementById('landing-active-pill');
       if (recSizeEl) recSizeEl.textContent = `Size ${size}`;
       if (activePill) activePill.textContent = size;
+    }
+
+
+    // =========================================================================
+    // ANALYTICS & TELEMETRY SYSTEM WITH SUPABASE LOGGING
+    // =========================================================================
+    function initDefaultEventStream() {
+      const container = document.getElementById('event-stream-container');
+      if (!container) return;
+
+      const mockEvents = [
+        { type: 'size_computed', label: 'Size L computed (96% match)', time: 'Just now' },
+        { type: 'cart_add', label: 'Shopper added Size L to Cart', time: '1 min ago' },
+        { type: 'widget_view', label: 'Product page PDP impression', time: '2 mins ago' },
+        { type: 'return_prevented', label: 'Prevented bracket buy (S & M)', time: '4 mins ago' },
+        { type: 'size_computed', label: 'Size M computed (98% match)', time: '7 mins ago' }
+      ];
+
+      mockEvents.forEach(e => prependEventToUI(e.type, e.label, e.time));
+    }
+
+    async function simulateTrafficEvent(type) {
+      // 1. Update State Counters
+      if (type === 'widget_view') {
+        appState.analytics.totalViews += 1;
+      } else if (type === 'size_computed') {
+        appState.analytics.totalMatches += 1;
+        appState.analytics.dollarsSaved += 48;
+      } else if (type === 'cart_add') {
+        appState.analytics.cartAdds += 1;
+        appState.analytics.dollarsSaved += 48;
+      }
+
+      // Update Conversion Metric
+      const convRate = ((appState.analytics.cartAdds / Math.max(1, appState.analytics.totalMatches)) * 100).toFixed(1);
+      
+      // Update DOM Tiles
+      document.getElementById('stat-total-views').textContent = appState.analytics.totalViews.toLocaleString();
+      document.getElementById('stat-total-matches').textContent = appState.analytics.totalMatches.toLocaleString();
+      document.getElementById('stat-conversion-rate').textContent = `${convRate}%`;
+      document.getElementById('stat-dollars-saved').textContent = `$${appState.analytics.dollarsSaved.toLocaleString()}`;
+
+      // 2. Prepend to Event Stream UI
+      const labels = {
+        widget_view: 'Product page PDP impression recorded',
+        size_computed: `Biometric calculation completed (${appState.simulatedSelectedSize})`,
+        cart_add: `Shopper added Size ${appState.simulatedSelectedSize} to Bag`,
+        return_prevented: 'Prevented multi-size bracket purchase'
+      };
+      prependEventToUI(type, labels[type] || 'Event recorded', 'Just now');
+
+      // 3. Increment Chart.js real-time data
+      if (chartInstance) {
+        const lastIdx = chartInstance.data.datasets[0].data.length - 1;
+        if (type === 'widget_view' || type === 'size_computed') {
+          chartInstance.data.datasets[0].data[lastIdx] += 1;
+        } else if (type === 'cart_add') {
+          chartInstance.data.datasets[1].data[lastIdx] += 1;
+        }
+        chartInstance.update('none');
+      }
+
+      // 4. Log to Supabase analytics_events table
+      if (supabaseClient) {
+        try {
+          await supabaseClient
+            .from('analytics_events')
+            .insert([{
+              store_id: generateSlug(appState.storeName),
+              event_type: type
+            }]);
+        } catch (err) {
+          // Silent catch for resilience
+        }
+      }
+    }
+
+    function runTrafficBurst() {
+      let count = 0;
+      const interval = setInterval(() => {
+        count++;
+        const rand = Math.random();
+        if (rand < 0.5) simulateTrafficEvent('widget_view');
+        else if (rand < 0.85) simulateTrafficEvent('size_computed');
+        else simulateTrafficEvent('cart_add');
+
+        if (count >= 25) {
+          clearInterval(interval);
+          showToast("Traffic Burst Complete", "Simulated 25 active shopper fit events successfully!", "success");
+        }
+      }, 70);
+    }
+
+    function prependEventToUI(type, label, time) {
+      const container = document.getElementById('event-stream-container');
+      if (!container) return;
+
+      const item = document.createElement('div');
+      item.className = "flex items-center justify-between p-2.5 rounded-xl bg-slate-950/80 border border-slate-800/80 text-xs transition animate-fade-in";
+
+      let icon = 'eye';
+      let color = 'text-cyan-400 bg-cyan-950/60 border-cyan-800/60';
+      if (type === 'size_computed') {
+        icon = 'sparkles';
+        color = 'text-indigo-400 bg-indigo-950/60 border-indigo-800/60';
+      } else if (type === 'cart_add') {
+        icon = 'shopping-bag';
+        color = 'text-purple-400 bg-purple-950/60 border-purple-800/60';
+      } else if (type === 'return_prevented') {
+        icon = 'shield-check';
+        color = 'text-emerald-400 bg-emerald-950/60 border-emerald-800/60';
+      }
+
+      item.innerHTML = `
+        <div class="flex items-center gap-2.5 overflow-hidden">
+          <div class="p-1.5 rounded-lg border ${color} flex-shrink-0">
+            <i data-lucide="${icon}" class="w-3.5 h-3.5"></i>
+          </div>
+          <span class="text-slate-200 truncate font-medium">${escapeHtml(label)}</span>
+        </div>
+        <span class="text-[10px] text-slate-500 font-mono flex-shrink-0 ml-2">${escapeHtml(time)}</span>
+      `;
+
+      container.insertBefore(item, container.firstChild);
+      if (container.children.length > 15) {
+        container.removeChild(container.lastChild);
+      }
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function clearEventLog() {
+      const container = document.getElementById('event-stream-container');
+      if (container) container.innerHTML = '';
+    }
+
+    // Chart.js Initialization
+    function initAnalyticsChart() {
+      const ctx = document.getElementById('analyticsChart')?.getContext('2d');
+      if (!ctx) return;
+
+      chartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: ['10 AM', '11 AM', '12 PM', '1 PM', '2 PM', '3 PM', '4 PM', 'Now'],
+          datasets: [
+            {
+              label: 'Fit Calculations',
+              data: [140, 185, 290, 310, 260, 380, 420, 452],
+              borderColor: '#6366f1',
+              backgroundColor: 'rgba(99, 102, 241, 0.12)',
+              borderWidth: 2.5,
+              tension: 0.35,
+              fill: true
+            },
+            {
+              label: 'Cart Additions',
+              data: [48, 65, 110, 125, 98, 145, 168, 184],
+              borderColor: '#10b981',
+              backgroundColor: 'rgba(16, 185, 129, 0.05)',
+              borderWidth: 2,
+              tension: 0.35,
+              fill: true
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              labels: {
+                color: '#94a3b8',
+                font: { size: 11, family: 'Inter' }
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: { color: 'rgba(255, 255, 255, 0.04)' },
+              ticks: { color: '#64748b', font: { size: 10 } }
+            },
+            y: {
+              grid: { color: 'rgba(255, 255, 255, 0.04)' },
+              ticks: { color: '#64748b', font: { size: 10 } }
+            }
+          }
+        }
+      });
     }
 
     // Toast Notification Utility
