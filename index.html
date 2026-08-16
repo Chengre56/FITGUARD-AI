@@ -25,11 +25,27 @@
               800: '#3730a3',
               900: '#312e81',
               950: '#1e1b4b',
+              esewa: '#60bb46',
             }
           },
           fontFamily: {
             sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
             mono: ['JetBrains Mono', 'Menlo', 'Monaco', 'Courier New', 'monospace']
+          },
+          animation: {
+            'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'float': 'float 6s ease-in-out infinite',
+            'radar': 'radar 3s linear infinite',
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-8px)' },
+            },
+            radar: {
+              '0%': { transform: 'rotate(0deg)' },
+              '100%': { transform: 'rotate(360deg)' },
+            }
           }
         }
       }
@@ -114,7 +130,7 @@
       <span>Spring 2026 Release: Automated Vision OCR Size Parser & Multi-Staff Accounts now live on Pro Tier!</span>
     </span>
     <a href="#pricing" onclick="navigateTo('landing')" class="underline font-bold text-white hover:text-indigo-200 transition ml-2">Start 3-Day Free Trial &rarr;</a>
-    <button onclick="document.getElementById('top-announcement').remove()" class="absolute right-4 text-indigo-300 hover:text-white">
+    <button onclick="document.getElementById('top-announcement').remove()" class="absolute right-4 text-indigo-300 hover:text-white" aria-label="Close Announcement">
       <i data-lucide="x" class="w-3.5 h-3.5"></i>
     </button>
   </div>
@@ -783,9 +799,9 @@
           <i data-lucide="chevrons-up-down" class="w-4 h-4 text-slate-500 shrink-0"></i>
         </div>
 
-        <!-- Dashboard Navigation Menu -->
-        <nav class="space-y-1.5">
-          <!-- Overview Tab -->
+        <!-- Dashboard Navigation Menu (6 Active Tabs) -->
+        <nav class="space-y-1.5" id="dashboard-sidebar-nav">
+          <!-- 1. Overview Tab Button -->
           <button onclick="switchTab('overview')" id="tab-btn-overview" class="dash-tab-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-xs font-bold transition bg-indigo-600 text-white shadow-lg shadow-indigo-600/30">
             <div class="flex items-center gap-3">
               <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
@@ -793,7 +809,7 @@
             </div>
           </button>
 
-          <!-- PRO FEATURE 1: Widget Customizer & White-Label -->
+          <!-- 2. PRO FEATURE 1: Widget Customizer & White-Label Tab Button -->
           <button onclick="switchTab('customizer')" id="tab-btn-customizer" class="dash-tab-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-xs font-semibold transition text-slate-400 hover:text-slate-200 hover:bg-slate-900">
             <div class="flex items-center gap-3">
               <i data-lucide="sliders" class="w-4 h-4"></i>
@@ -802,7 +818,7 @@
             <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Pro #1</span>
           </button>
 
-          <!-- PRO FEATURE 4: Automated Size Chart OCR Generator -->
+          <!-- 3. PRO FEATURE 4: Automated Size Chart OCR Generator Tab Button -->
           <button onclick="switchTab('ocr-charts')" id="tab-btn-ocr-charts" class="dash-tab-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-xs font-semibold transition text-slate-400 hover:text-slate-200 hover:bg-slate-900">
             <div class="flex items-center gap-3">
               <i data-lucide="scan" class="w-4 h-4"></i>
@@ -811,15 +827,15 @@
             <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Pro #4</span>
           </button>
 
-          <!-- Return Logs Explorer -->
-          <button onclick="switchTab('return-logs')" id="tab-btn-return-logs" class="dash-tab-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-xs font-semibold transition text-slate-400 hover:text-slate-200 hover:bg-slate-900">
+          <!-- 4. Intercept Logs Explorer Tab Button -->
+          <button onclick="switchTab('logs')" id="tab-btn-logs" class="dash-tab-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-xs font-semibold transition text-slate-400 hover:text-slate-200 hover:bg-slate-900">
             <div class="flex items-center gap-3">
               <i data-lucide="package-x" class="w-4 h-4"></i>
               <span>Intercept Logs</span>
             </div>
           </button>
 
-          <!-- PRO FEATURE 3: Team Management Tab -->
+          <!-- 5. PRO FEATURE 3: Team Management Tab Button -->
           <button onclick="switchTab('team')" id="tab-btn-team" class="dash-tab-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-xs font-semibold transition text-slate-400 hover:text-slate-200 hover:bg-slate-900">
             <div class="flex items-center gap-3">
               <i data-lucide="users" class="w-4 h-4"></i>
@@ -828,7 +844,7 @@
             <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Pro #3</span>
           </button>
 
-          <!-- Billing & Settings Tab -->
+          <!-- 6. Billing & Settings Tab Button -->
           <button onclick="switchTab('billing')" id="tab-btn-billing" class="dash-tab-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-xs font-semibold transition text-slate-400 hover:text-slate-200 hover:bg-slate-900">
             <div class="flex items-center gap-3">
               <i data-lucide="credit-card" class="w-4 h-4"></i>
@@ -857,12 +873,12 @@
     </aside>
 
     <!-- Main Workspace Container -->
-    <div class="flex-1 overflow-y-auto p-4 sm:p-8 custom-scrollbar">
+    <div class="flex-1 overflow-y-auto p-4 sm:p-8 custom-scrollbar" id="dashboard-workspace">
       
       <!-- ===================================================================== -->
       <!-- TAB 1: OVERVIEW & RETURN PREVENTION ANALYTICS (PRO FEATURE #2)        -->
       <!-- ===================================================================== -->
-      <div id="tab-content-overview" class="tab-pane space-y-8">
+      <div id="panel-overview" class="tab-pane space-y-8">
         
         <!-- Workspace Header -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -982,7 +998,7 @@
               <i data-lucide="activity" class="w-4 h-4 text-emerald-400"></i>
               Real-Time Shopper Size Intercept Log
             </h3>
-            <button onclick="switchTab('return-logs')" class="text-xs text-indigo-400 hover:underline">View All Sessions &rarr;</button>
+            <button onclick="switchTab('logs')" class="text-xs text-indigo-400 hover:underline">View All Sessions &rarr;</button>
           </div>
 
           <div class="space-y-2.5 text-xs">
@@ -1026,7 +1042,7 @@
       <!-- ===================================================================== -->
       <!-- TAB 2: WIDGET CUSTOMIZER & WHITE-LABELING (PRO FEATURE #1)             -->
       <!-- ===================================================================== -->
-      <div id="tab-content-customizer" class="tab-pane hidden space-y-8">
+      <div id="panel-customizer" class="tab-pane hidden space-y-8">
         <div>
           <div class="flex items-center gap-2.5">
             <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight">Storefront Widget Customizer</h1>
@@ -1074,7 +1090,7 @@
                 <label class="block text-xs font-bold text-slate-300 mb-1.5">Primary Brand Accent Color</label>
                 <div class="flex items-center gap-3">
                   <input type="color" id="dash-custom-color" value="#4f46e5" oninput="updateLiveWidgetPreview()" class="w-10 h-10 rounded-xl bg-transparent border border-slate-700 cursor-pointer">
-                  <input type="text" id="dash-custom-hex" value="#4f46e5" oninput="updateLiveWidgetPreviewHex()" class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white uppercase font-mono w-32">
+                  <input type="text" id="dash-custom-hex" value="#4f46e5" oninput="updateLiveWidgetPreviewHex()" class="bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white uppercase font-mono w-32">
                 </div>
               </div>
 
@@ -1163,7 +1179,7 @@
       <!-- ===================================================================== -->
       <!-- TAB 3: AUTOMATED SIZE CHART OCR GENERATOR (PRO FEATURE #4)             -->
       <!-- ===================================================================== -->
-      <div id="tab-content-ocr-charts" class="tab-pane hidden space-y-8">
+      <div id="panel-ocr-charts" class="tab-pane hidden space-y-8">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <div class="flex items-center gap-2.5">
@@ -1275,7 +1291,7 @@
       <!-- ===================================================================== -->
       <!-- TAB 4: INTERCEPT LOGS EXPLORER                                       -->
       <!-- ===================================================================== -->
-      <div id="tab-content-return-logs" class="tab-pane hidden space-y-8">
+      <div id="panel-logs" class="tab-pane hidden space-y-8">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight">Customer Intercept & Return Log Explorer</h1>
@@ -1311,7 +1327,7 @@
       <!-- ===================================================================== -->
       <!-- TAB 5: TEAM & STAFF ACCOUNTS (PRO FEATURE #3)                         -->
       <!-- ===================================================================== -->
-      <div id="tab-content-team" class="tab-pane hidden space-y-8">
+      <div id="panel-team" class="tab-pane hidden space-y-8">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <div class="flex items-center gap-2.5">
@@ -1383,7 +1399,7 @@
       <!-- ===================================================================== -->
       <!-- TAB 6: BILLING & SUBSCRIPTIONS (eSewa + 3-DAY TRIAL)                 -->
       <!-- ===================================================================== -->
-      <div id="tab-content-billing" class="tab-pane hidden space-y-8">
+      <div id="panel-billing" class="tab-pane hidden space-y-8">
         <div>
           <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight">Subscription & eSewa Billing</h1>
           <p class="text-xs sm:text-sm text-slate-400 mt-1">Manage your active subscription tier, payments, and invoices.</p>
@@ -1520,8 +1536,8 @@
       <div class="flex flex-col items-center justify-center mb-5">
         <div class="bg-white p-4 rounded-2xl shadow-xl flex items-center justify-center border-4 border-emerald-500/20">
           <img 
-            id"esewaQrImg" 
-            src="https://github.com/Chengre56/FITGUARD-AI/blob/main/esewa-qr.jpg?raw=true" 
+            id="esewaQrImg" 
+            src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200' width='180' height='180'><rect width='200' height='200' fill='%23ffffff'/><path d='M20,20 h60 v60 h-60 z M30,30 v40 h40 v-40 z M45,45 h10 v10 h-10 z M120,20 h60 v60 h-60 z M130,30 v40 h40 v-40 z M145,45 h10 v10 h-10 z M20,120 h60 v60 h-60 z M30,130 v40 h40 v-40 z M45,145 h10 v10 h-10 z M95,20 h10 v30 h-10 z M105,40 h20 v10 h-20 z M95,70 h20 v10 h-20 z M20,95 h30 v10 h-30 z M70,95 h40 v10 h-40 z M130,95 h50 v10 h-50 z M95,120 h20 v20 h-20 z M130,120 h20 v10 h-20 z M160,120 h20 v30 h-20 z M95,160 h30 v20 h-30 z M140,150 h20 v30 h-20 z M170,165 h15 v15 h-15 z' fill='%23111827'/><rect x='85' y='85' width='30' height='30' rx='6' fill='%2360bb46'/><text x='100' y='105' fill='%23ffffff' font-family='Arial' font-weight='bold' font-size='14' text-anchor='middle'>eS</text></svg>" 
             alt="eSewa QR Code" 
             class="w-44 h-44 object-contain rounded-lg"
           />
@@ -1565,7 +1581,7 @@
           <i data-lucide="user-plus" class="w-5 h-5 text-indigo-400"></i>
           <span>Invite Store Team Member</span>
         </h3>
-        <button onclick="closeInviteModal()" class="text-slate-400 hover:text-white transition">
+        <button onclick="closeInviteModal()" class="text-slate-400 hover:text-white transition" aria-label="Close modal">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
@@ -1608,7 +1624,7 @@
           <i data-lucide="file-text" class="w-5 h-5 text-indigo-400"></i>
           Export Return Prevention CSV
         </h3>
-        <button onclick="closeExportModal()" class="text-slate-400 hover:text-white">
+        <button onclick="closeExportModal()" class="text-slate-400 hover:text-white" aria-label="Close modal">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
@@ -1688,6 +1704,7 @@
       renderMatrix();
       renderLogs(App.logs);
       initChart();
+      switchTab('overview');
       lucide.createIcons();
     });
 
@@ -1745,7 +1762,7 @@
         dashboard.classList.add('flex');
         App.view = 'dashboard';
         switchLabel.textContent = 'Switch to Landing Page';
-        setTimeout(() => { if (chartInstance) chartInstance.resize(); }, 100);
+        switchTab(App.tab || 'overview');
       } else {
         dashboard.classList.add('hidden');
         dashboard.classList.remove('flex');
@@ -1769,26 +1786,62 @@
       }, 60);
     }
 
-    function switchTab(tabId) {
-      App.tab = tabId;
-      document.querySelectorAll('.tab-pane').forEach(el => el.classList.add('hidden'));
-      document.querySelectorAll('.dash-tab-btn').forEach(btn => {
-        btn.classList.remove('bg-indigo-600', 'text-white', 'shadow-lg', 'shadow-indigo-600/30');
-        btn.classList.add('text-slate-400');
+    /**
+     * Bulletproof Dashboard Tab Switcher
+     * @param {string} tabKey - 'overview', 'customizer', 'ocr-charts', 'logs', 'team', 'billing'
+     */
+    function switchTab(tabKey) {
+      App.tab = tabKey;
+
+      const activeBtnClasses = ['bg-indigo-600', 'text-white', 'shadow-lg', 'shadow-indigo-600/30', 'font-bold'];
+      const inactiveBtnClasses = ['text-slate-400', 'hover:text-slate-200', 'hover:bg-slate-900', 'font-semibold'];
+
+      // 1. Hide all panels
+      const allPanels = document.querySelectorAll('.tab-pane');
+      allPanels.forEach(panel => {
+        panel.classList.add('hidden');
       });
 
-      const pane = document.getElementById(`tab-content-${tabId}`);
-      const btn = document.getElementById(`tab-btn-${tabId}`);
+      // 2. Reset all sidebar buttons
+      const allButtons = document.querySelectorAll('.dash-tab-btn');
+      allButtons.forEach(btn => {
+        btn.classList.remove(...activeBtnClasses);
+        btn.classList.add(...inactiveBtnClasses);
+      });
 
-      if (pane) pane.classList.remove('hidden');
-      if (btn) {
-        btn.classList.add('bg-indigo-600', 'text-white', 'shadow-lg', 'shadow-indigo-600/30');
-        btn.classList.remove('text-slate-400');
+      // 3. Find target panel and button
+      let targetPanel = document.getElementById(`panel-${tabKey}`);
+      let targetButton = document.getElementById(`tab-btn-${tabKey}`);
+
+      // Fallback if ID misnamed
+      if (!targetPanel) {
+        console.warn(`Panel "panel-${tabKey}" not found. Falling back to overview.`);
+        tabKey = 'overview';
+        App.tab = 'overview';
+        targetPanel = document.getElementById('panel-overview');
+        targetButton = document.getElementById('tab-btn-overview');
       }
-      if (tabId === 'overview' && chartInstance) {
+
+      // 4. Reveal panel
+      if (targetPanel) {
+        targetPanel.classList.remove('hidden');
+      }
+
+      // 5. Highlight button
+      if (targetButton) {
+        targetButton.classList.remove(...inactiveBtnClasses);
+        targetButton.classList.add(...activeBtnClasses);
+      }
+
+      // 6. Handle Chart.js resizing if overview tab opened
+      if (tabKey === 'overview' && typeof chartInstance !== 'undefined' && chartInstance) {
         setTimeout(() => chartInstance.resize(), 50);
       }
-      lucide.createIcons();
+
+      // 7. Re-render icons
+      if (window.lucide) {
+        lucide.createIcons();
+      }
     }
 
     // Render App UI according to Plan State
@@ -1996,7 +2049,7 @@
             </span>
           </td>
           <td class="p-4 pr-6 text-right">
-            <button onclick="removeTeamMember(${member.id})" class="text-slate-500 hover:text-red-400 transition p-1" title="Remove member">
+            <button onclick="removeTeamMember(${member.id})" class="text-slate-500 hover:text-red-400 transition p-1" title="Remove member" aria-label="Remove member">
               <i data-lucide="trash-2" class="w-4 h-4"></i>
             </button>
           </td>
@@ -2072,7 +2125,7 @@
             <input type="text" value="${row.weight}" onchange="updateMatrixCell(${idx}, 'weight', this.value)" class="w-28 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-center text-slate-200">
           </td>
           <td class="p-3 pr-4 text-center">
-            <button onclick="removeMatrixRow(${idx})" class="text-slate-500 hover:text-red-400 transition">
+            <button onclick="removeMatrixRow(${idx})" class="text-slate-500 hover:text-red-400 transition" aria-label="Delete row">
               <i data-lucide="trash-2" class="w-4 h-4"></i>
             </button>
           </td>
@@ -2394,312 +2447,5 @@
       }, 4000);
     }
   </script>
-  <!-- ========================================================================= -->
-<!-- AUTHENTICATION MODAL / VIEW (Login & Signup)                             -->
-<!-- ========================================================================= -->
-<div id="auth-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-800 p-8 rounded-3xl max-w-md w-full relative shadow-2xl">
-        <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-xl font-bold">×</button>
-        
-        <div class="text-center mb-6">
-            <div class="w-12 h-12 rounded-2xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center mx-auto mb-3">
-                <i data-lucide="lock" class="w-6 h-6 text-indigo-400"></i>
-            </div>
-            <h3 id="auth-title" class="text-xl font-bold text-white">Access Your FitGuard Dashboard</h3>
-            <p class="text-xs text-slate-400 mt-1">Enter your credentials to manage your store widget</p>
-        </div>
-
-        <form id="auth-form" onsubmit="handleAuthSubmit(event)" class="space-y-4">
-            <div>
-                <label class="block text-xs font-bold text-slate-300 mb-1">Email Address</label>
-                <input type="email" id="auth-email" required placeholder="brand@store.com" class="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:border-indigo-500">
-            </div>
-            <div>
-                <label class="block text-xs font-bold text-slate-300 mb-1">Password</label>
-                <input type="password" id="auth-password" required placeholder="••••••••" class="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:border-indigo-500">
-            </div>
-            <button type="submit" class="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm shadow-lg shadow-indigo-600/30 transition">
-                Sign In to Dashboard
-            </button>
-        </form>
-
-        <div class="mt-6 text-center text-xs text-slate-400">
-            <p>Protected by FitGuard Secure Auth Session</p>
-        </div>
-    </div>
-</div>
-  <!-- ========================================================================= -->
-<!-- VIEW 2: MERCHANT DASHBOARD (Post-Login / Management View)               -->
-<!-- ========================================================================= -->
-<main id="view-dashboard" class="flex-1 hidden flex flex-col max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
-    
-    <!-- Dashboard Header -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-800">
-        <div>
-            <div class="flex items-center gap-2">
-                <h1 class="text-2xl font-black text-white">Merchant Command Center</h1>
-                <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold border border-emerald-500/30">Pro Active</span>
-            </div>
-            <p class="text-xs text-slate-400 mt-1">Manage your active storefront widgets, telemetry, and OCR size sheets.</p>
-        </div>
-        <div class="flex items-center gap-3">
-            <button onclick="triggerOcrUploadModal()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow-lg shadow-indigo-600/30 transition flex items-center gap-2">
-                <i data-lucide="upload" class="w-4 h-4"></i>
-                <span>Upload Size Chart (OCR)</span>
-            </button>
-        </div>
-    </div>
-
-    <!-- Dashboard Metrics Overview -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 my-6">
-        <div class="glass-card p-5 rounded-3xl border border-slate-800">
-            <span class="text-xs text-slate-400 font-semibold">Total Revenue Protected</span>
-            <div class="text-2xl font-black text-emerald-400 mt-1">Rs. 342,800</div>
-            <span class="text-[10px] text-emerald-400/80 font-mono mt-1 block">&uarr; +14.2% vs last month</span>
-        </div>
-        <div class="glass-card p-5 rounded-3xl border border-slate-800">
-            <span class="text-xs text-slate-400 font-semibold">Widget Scans Today</span>
-            <div class="text-2xl font-black text-white mt-1">1,284</div>
-            <span class="text-[10px] text-slate-400 font-mono mt-1 block">Active on 3 product pages</span>
-        </div>
-        <div class="glass-card p-5 rounded-3xl border border-slate-800">
-            <span class="text-xs text-slate-400 font-semibold">First-Time Fit Rate</span>
-            <div class="text-2xl font-black text-indigo-400 mt-1">98.9%</div>
-            <span class="text-[10px] text-indigo-300 font-mono mt-1 block">Zero bracketing recorded</span>
-        </div>
-        <div class="glass-card p-5 rounded-3xl border border-slate-800">
-            <span class="text-xs text-slate-400 font-semibold">API Latency Status</span>
-            <div class="text-2xl font-black text-purple-400 mt-1">12ms</div>
-            <span class="text-[10px] text-purple-300 font-mono mt-1 block">Edge CDN operational</span>
-        </div>
-    </div>
-
-    <!-- Store Widget Embed Code Snippet Generator Box -->
-    <div class="glass-card p-6 sm:p-8 rounded-3xl border border-slate-800 mb-8">
-        <h3 class="text-base font-bold text-white mb-2 flex items-center gap-2">
-            <i data-lucide="code" class="w-4 h-4 text-indigo-400"></i>
-            Your Storefront Integration Snippet
-        </h3>
-        <p class="text-xs text-slate-400 mb-4">Paste this asynchronous script tag right before the closing `&lt;/head&gt;` tag of your Shopify or custom e-commerce theme.</p>
-        <div class="relative bg-slate-950 p-4 rounded-xl border border-slate-800 font-mono text-xs text-indigo-300 overflow-x-auto">
-            <code>&lt;script src="https://your-username.github.io/your-repo/fitguard-widget.js" data-merchant-id="live_active" async&gt;&lt;/script&gt;</code>
-        </div>
-    </div>
-
-</main>
-  <script>
-    // Toggle between Landing Page and Dashboard View
-    function navigateTo(viewName) {
-        const landingView = document.getElementById('view-landing');
-        const dashboardView = document.getElementById('view-dashboard');
-        const landingLinks = document.getElementById('nav-landing-links');
-        const switchLabel = document.getElementById('nav-switch-label');
-
-        if (viewName === 'dashboard') {
-            landingView.classList.add('hidden');
-            dashboardView.classList.remove('hidden');
-            if (landingLinks) landingLinks.classList.add('hidden');
-            if (switchLabel) switchLabel.textContent = 'Switch to Landing';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        } else {
-            dashboardView.classList.add('hidden');
-            landingView.classList.remove('hidden');
-            if (landingLinks) landingLinks.classList.remove('hidden');
-            if (switchLabel) switchLabel.textContent = 'Switch to Dashboard';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-        // Re-initialize Lucide icons for dynamically added elements
-        if (typeof lucide !== 'undefined') {
-            lucide.createIcons();
-        }
-    }
-
-    // Toggle button handler linked to navbar switch button
-    function toggleView() {
-        const dashboardView = document.getElementById('view-dashboard');
-        if (dashboardView.classList.contains('hidden')) {
-            navigateTo('dashboard');
-        } else {
-            navigateTo('landing');
-        }
-    }
-
-    // Smooth scroll helper for landing page internal links
-    function scrollToSection(sectionId) {
-        navigateTo('landing');
-        setTimeout(() => {
-            const element = document.getElementById(sectionId);
-            if (element) {
-                element.scrollIntoView({ behavior: 'smooth' });
-            }
-        }, 100);
-    }
-
-    // Modal Control Functions for Auth
-    function openAuthModal() {
-        const modal = document.getElementById('auth-modal');
-        if (modal) modal.classList.remove('hidden');
-    }
-
-    function closeAuthModal() {
-        const modal = document.getElementById('auth-modal');
-        if (modal) modal.classList.add('hidden');
-    }
-
-    function handleAuthSubmit(event) {
-        event.preventDefault();
-        const email = document.getElementById('auth-email').value;
-        if (email) {
-            closeAuthModal();
-            navigateTo('dashboard');
-            // Show toast notification if available
-            showToast('Successfully signed in! Welcome to your Command Center.');
-        }
-    }
-
-    // Simple toast notification helper
-    function showToast(message) {
-        const container = document.getElementById('toast-container');
-        if (!container) return;
-        const toast = document.createElement('div');
-        toast.className = 'glass-card p-4 rounded-2xl border border-indigo-500/40 text-xs text-white shadow-2xl flex items-center gap-3 animate-bounce';
-        toast.innerHTML = `<i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i><span>${message}</span>`;
-        container.appendChild(toast);
-        if (typeof lucide !== 'undefined') lucide.createIcons();
-        setTimeout(() => {
-            toast.remove();
-        }, 4000);
-    }
-</script>
-  <!-- ========================================================================= -->
-<!-- OCR SIZE CHART UPLOAD MODAL                                               -->
-<!-- ========================================================================= -->
-<div id="ocr-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-800 p-8 rounded-3xl max-w-md w-full relative shadow-2xl">
-        <button onclick="closeOcrUploadModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-xl font-bold">×</button>
-        
-        <div class="text-center mb-6">
-            <div class="w-12 h-12 rounded-2xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center mx-auto mb-3">
-                <i data-lucide="scan-line" class="w-6 h-6 text-indigo-400"></i>
-            </div>
-            <h3 class="text-xl font-bold text-white">FitGuard Vision OCR Parser</h3>
-            <p class="text-xs text-slate-400 mt-1">Upload an image or PDF of your factory size chart</p>
-        </div>
-
-        <div class="border-2 border-dashed border-slate-700 hover:border-indigo-500 rounded-2xl p-6 text-center cursor-pointer transition bg-slate-950/50">
-            <input type="file" id="ocr-file-input" class="hidden" accept="image/*,.pdf" onchange="handleOcrFileSelected(this)">
-            <label for="ocr-file-input" class="cursor-pointer">
-                <i data-lucide="upload-cloud" class="w-8 h-8 text-indigo-400 mx-auto mb-2"></i>
-                <span class="text-xs font-bold text-white block">Click to browse or drop file here</span>
-                <span class="text-[10px] text-slate-500 mt-1 block">Supports PNG, JPG, or PDF spec sheets</span>
-            </label>
-        </div>
-
-        <div id="ocr-loading" class="hidden mt-4 text-center text-xs text-indigo-400 animate-pulse font-mono">
-            Scanning dimensions with Vision OCR model...
-        </div>
-    </div>
-</div>
-
-<script>
-    function triggerOcrUploadModal() {
-        const modal = document.getElementById('ocr-modal');
-        if (modal) modal.classList.remove('hidden');
-    }
-
-    function closeOcrUploadModal() {
-        const modal = document.getElementById('ocr-modal');
-        if (modal) modal.classList.add('hidden');
-    }
-
-    function handleOcrFileSelected(input) {
-        if (input.files && input.files[0]) {
-            const loading = document.getElementById('ocr-loading');
-            if (loading) loading.classList.remove('hidden');
-            
-            setTimeout(() => {
-                if (loading) loading.classList.add('hidden');
-                closeOcrUploadModal();
-                showToast('Size chart successfully parsed! Matrix populated.');
-            }, 2000);
-        }
-    }
-</script>
-  <script>
-   function switchTab(tabId) {
-    // Hide all panels
-    const panels = document.querySelectorAll('.dashboard-panel, .dash-panel');
-    panels.forEach(panel => panel.classList.add('hidden'));
-
-    // Show the target panel matching the clicked tab
-    const targetPanel = document.getElementById('panel-' + tabId);
-    if (targetPanel) {
-        targetPanel.classList.remove('hidden');
-    }
-
-    // Reset button styles and highlight the active one
-    const buttons = document.querySelectorAll('.dash-tab-btn');
-    buttons.forEach(btn => btn.classList.remove('bg-indigo-600/25', 'border-indigo-500/50', 'bg-indigo-600/20'));
-
-    const activeBtn = document.getElementById('tab-btn-' + tabId);
-    if (activeBtn) {
-        activeBtn.classList.add('bg-indigo-600/20', 'border-indigo-500/50');
-    }
-
-    // Re-render Lucide icons if present
-    if (typeof lucide !== 'undefined') {
-        lucide.createIcons();
-    }
-}
-  </script>
-  <script>
-    // Universal tab switcher that catches all naming styles
-    function switchTab(tabId) {
-        showPanel(tabId);
-    }
-    function switchDashboardTab(tabId) {
-        showPanel(tabId);
-    }
-
-    function showPanel(tabId) {
-        // 1. Hide all possible dashboard panels
-        const panels = document.querySelectorAll('.dashboard-panel, .dash-panel, [id^="panel-"]');
-        panels.forEach(panel => {
-            if (!panel.id.startsWith('view-')) {
-                panel.classList.add('hidden');
-            }
-        });
-
-        // 2. Try to find and show the target panel using different ID patterns
-        let targetPanel = document.getElementById('panel-' + tabId) || 
-                          document.getElementById('dash-panel-' + tabId) || 
-                          document.getElementById(tabId);
-
-        if (targetPanel) {
-            targetPanel.classList.remove('hidden');
-        } else {
-            // Fallback: if specific panel isn't found, show the first available one so screen isn't blank
-            const firstPanel = document.querySelector('.dashboard-panel, .dash-panel');
-            if (firstPanel) firstPanel.classList.remove('hidden');
-        }
-
-        // 3. Update button active states
-        const buttons = document.querySelectorAll('.dash-tab-btn, .sidebar-btn');
-        buttons.forEach(btn => btn.classList.remove('bg-indigo-600/25', 'border-indigo-500/50', 'bg-indigo-600/20'));
-
-        // Re-render icons if Lucide is loaded
-        if (typeof lucide !== 'undefined') {
-            lucide.createIcons();
-        }
-    }
-
-    // Auto-show overview panel on load so the screen isn't black when opening dashboard
-    window.addEventListener('DOMContentLoaded', () => {
-        const defaultPanel = document.getElementById('panel-overview') || document.querySelector('.dashboard-panel, .dash-panel');
-        if (defaultPanel) {
-            defaultPanel.classList.remove('hidden');
-        }
-    });
-</script>
 </body>
 </html>
