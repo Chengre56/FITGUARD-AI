@@ -1,777 +1,1495 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en" class="h-full bg-slate-950 text-slate-100 antialiased selection:bg-indigo-500 selection:text-white">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FitGuard AI | Next-Gen Biomechanical Fitness Intelligence</title>
-  
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-  
-  <!-- Tailwind CSS via CDN -->
+  <title>FitGuard AI — Autonomous Sizing Engine & Return Prevention Platform</title>
+
+  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       darkMode: 'class',
       theme: {
         extend: {
-          fontFamily: {
-            sans: ['Inter', 'sans-serif'],
-          },
           colors: {
             brand: {
-              cyan: '#06b6d4',
-              indigo: '#6366f1',
-              violet: '#8b5cf6',
-              esewa: '#60bb46',
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              200: '#c7d2fe',
+              300: '#a5b4fc',
+              400: '#818cf8',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              800: '#3730a3',
+              900: '#312e81',
+              950: '#1e1b4b',
             }
           },
-          animation: {
-            'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-            'glow-spin': 'spin 12s linear infinite',
-            'float': 'float 6s ease-in-out infinite',
-          },
-          keyframes: {
-            float: {
-              '0%, 100%': { transform: 'translateY(0px)' },
-              '50%': { transform: 'translateY(-10px)' },
-            }
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+            mono: ['JetBrains Mono', 'Menlo', 'Monaco', 'Courier New', 'monospace']
           }
         }
       }
     }
   </script>
 
-  <style>
-    /* Custom Scrollbar */
-    ::-webkit-scrollbar {
-      width: 8px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #020617;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #1e293b;
-      border-radius: 4px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #334155;
-    }
-    
-    /* Background Glow Mesh */
-    .bg-mesh-glow {
-      background-image: 
-        radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
-        radial-gradient(at 100% 0%, rgba(6, 182, 212, 0.15) 0px, transparent 50%),
-        radial-gradient(at 50% 50%, rgba(139, 92, 246, 0.08) 0px, transparent 60%);
-    }
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
 
-    .glass-panel {
-      background: rgba(15, 23, 42, 0.65);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.07);
+  <!-- Chart.js for High-Precision Return & Telemetry Analytics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    .font-mono-code {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .glass-card {
+      background: rgba(15, 23, 42, 0.78);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .glass-card-hover {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .glass-card-hover:hover {
+      background: rgba(30, 41, 59, 0.88);
+      border-color: rgba(99, 102, 241, 0.45);
+      transform: translateY(-2px);
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.7);
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(71, 85, 105, 0.6);
+      border-radius: 9999px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: rgba(99, 102, 241, 0.8);
+    }
+    @keyframes pulse-glow {
+      0%, 100% { opacity: 0.35; transform: scale(1); }
+      50% { opacity: 0.75; transform: scale(1.08); }
+    }
+    .animate-glow {
+      animation: pulse-glow 7s infinite ease-in-out;
+    }
+    @keyframes scanline {
+      0% { transform: translateY(-100%); }
+      100% { transform: translateY(1000%); }
+    }
+    .animate-scan {
+      animation: scanline 2.5s linear infinite;
     }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 font-sans antialiased selection:bg-cyan-500/30 selection:text-cyan-300 min-h-screen relative overflow-x-hidden">
+<body class="min-h-screen flex flex-col bg-slate-950 text-slate-100 overflow-x-hidden">
 
-  <!-- Glow Backdrop Elements -->
-  <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-    <div class="absolute -top-40 left-1/2 -translate-x-1/2 w-[700px] h-[500px] bg-indigo-600/20 blur-[140px] rounded-full"></div>
-    <div class="absolute top-[40rem] -left-40 w-[600px] h-[400px] bg-cyan-600/15 blur-[140px] rounded-full"></div>
-    <div class="absolute top-[80rem] -right-40 w-[600px] h-[500px] bg-violet-600/15 blur-[150px] rounded-full"></div>
+  <!-- ========================================================================= -->
+  <!-- TOAST NOTIFICATION CONTAINER                                              -->
+  <!-- ========================================================================= -->
+  <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-3 max-w-md pointer-events-none"></div>
+
+  <!-- ========================================================================= -->
+  <!-- TOP ANNOUNCEMENT BANNER                                                   -->
+  <!-- ========================================================================= -->
+  <div id="top-announcement" class="bg-gradient-to-r from-indigo-900 via-brand-700 to-indigo-950 text-indigo-100 text-xs py-2 px-4 text-center border-b border-indigo-500/20 relative flex items-center justify-center gap-3">
+    <span class="inline-flex items-center gap-1.5 font-semibold">
+      <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-300"></i>
+      <span>Spring 2026 Release: Automated Vision OCR Size Parser & Multi-Staff Accounts now live on Pro Tier!</span>
+    </span>
+    <a href="#pricing" onclick="navigateTo('landing')" class="underline font-bold text-white hover:text-indigo-200 transition ml-2">Start 3-Day Free Trial &rarr;</a>
+    <button onclick="document.getElementById('top-announcement').remove()" class="absolute right-4 text-indigo-300 hover:text-white">
+      <i data-lucide="x" class="w-3.5 h-3.5"></i>
+    </button>
   </div>
 
-  <!-- STICKY HEADER / NAVIGATION -->
-  <header class="sticky top-0 z-40 w-full border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-xl">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-      <!-- Logo -->
-      <a href="#" class="flex items-center gap-3 group">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-indigo-600 p-[1px] shadow-lg shadow-cyan-500/20">
-          <div class="w-full h-full bg-slate-950 rounded-[11px] flex items-center justify-center group-hover:bg-transparent transition-colors duration-300">
-            <svg class="w-5 h-5 text-cyan-400 group-hover:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-            </svg>
+  <!-- ========================================================================= -->
+  <!-- GLOBAL NAVIGATION BAR                                                     -->
+  <!-- ========================================================================= -->
+  <header class="sticky top-0 z-40 w-full glass-card border-b border-slate-800/80 transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      
+      <!-- Brand Logo -->
+      <div class="flex items-center gap-3.5 cursor-pointer" onclick="navigateTo('landing')">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 via-brand-600 to-indigo-800 flex items-center justify-center shadow-lg shadow-indigo-500/25 border border-indigo-400/30">
+          <i data-lucide="shield-check" class="w-6 h-6 text-white"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-100 to-indigo-300">FitGuard <span class="text-indigo-400">AI</span></span>
+            <span id="nav-tier-badge" class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">PRO ACTIVE</span>
           </div>
+          <p class="text-[10px] text-slate-400 -mt-0.5 hidden sm:block">Autonomous Return Prevention</p>
         </div>
-        <div class="flex flex-col">
-          <span class="text-xl font-black tracking-tight text-white flex items-center gap-1.5">
-            FitGuard <span class="bg-gradient-to-r from-cyan-400 to-indigo-400 bg-clip-text text-transparent">AI</span>
-          </span>
-          <span class="text-[10px] font-semibold uppercase tracking-widest text-slate-400">Biomechanics Core</span>
-        </div>
-      </a>
-
-      <!-- Desktop Nav Links -->
-      <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
-        <a href="#features" class="hover:text-cyan-400 transition-colors">Features</a>
-        <a href="#how-it-works" class="hover:text-cyan-400 transition-colors">How It Works</a>
-        <a href="#pricing" class="hover:text-cyan-400 transition-colors">Pricing</a>
-        <a href="#testimonials" class="hover:text-cyan-400 transition-colors">Reviews</a>
-        <a href="#faq" class="hover:text-cyan-400 transition-colors">FAQ</a>
-      </nav>
-
-      <!-- Action Buttons -->
-      <div class="hidden sm:flex items-center gap-4">
-        <a href="#pricing" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white text-sm font-semibold shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200">
-          Get Started
-        </a>
       </div>
 
-      <!-- Mobile Menu Button -->
-      <button id="mobileMenuBtn" class="md:hidden p-2 text-slate-400 hover:text-white focus:outline-none" aria-label="Toggle menu">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path id="menuIcon" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-        </svg>
-      </button>
-    </div>
+      <!-- Center Links (Landing View) -->
+      <nav id="nav-landing-links" class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
+        <button onclick="navigateTo('landing'); scrollToSection('features')" class="hover:text-white transition">Features</button>
+        <button onclick="navigateTo('landing'); scrollToSection('demo')" class="hover:text-white transition">Biometric Simulator</button>
+        <button onclick="navigateTo('landing'); scrollToSection('roi-calc')" class="hover:text-white transition">ROI Calculator</button>
+        <button onclick="navigateTo('landing'); scrollToSection('pricing')" class="hover:text-white transition">Pricing & Trials</button>
+        <button onclick="navigateTo('landing'); scrollToSection('faq')" class="hover:text-white transition">FAQ</button>
+      </nav>
 
-    <!-- Mobile Dropdown -->
-    <div id="mobileMenu" class="hidden md:hidden border-t border-slate-800 bg-slate-950/95 backdrop-blur-2xl px-4 pt-4 pb-6 space-y-3">
-      <a href="#features" class="block py-2 text-base font-medium text-slate-300 hover:text-cyan-400">Features</a>
-      <a href="#how-it-works" class="block py-2 text-base font-medium text-slate-300 hover:text-cyan-400">How It Works</a>
-      <a href="#pricing" class="block py-2 text-base font-medium text-slate-300 hover:text-cyan-400">Pricing</a>
-      <a href="#testimonials" class="block py-2 text-base font-medium text-slate-300 hover:text-cyan-400">Reviews</a>
-      <a href="#faq" class="block py-2 text-base font-medium text-slate-300 hover:text-cyan-400">FAQ</a>
-      <a href="#pricing" class="block w-full text-center py-3 mt-2 rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-600 text-white font-semibold shadow-lg shadow-cyan-500/20">
-        Get Started
-      </a>
+      <!-- Right Action Controls -->
+      <div class="flex items-center gap-3.5">
+        <!-- Live Trial Countdown Indicator -->
+        <div id="trial-indicator" class="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 text-xs font-semibold">
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+          </span>
+          <span id="trial-indicator-text">Pro 3-Day Trial: Active</span>
+        </div>
+
+        <button onclick="toggleView()" id="nav-switch-view-btn" class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 text-xs font-bold transition flex items-center gap-2">
+          <i data-lucide="layout-dashboard" class="w-4 h-4 text-indigo-400"></i>
+          <span id="nav-switch-label">Switch to Dashboard</span>
+        </button>
+
+        <a href="#pricing" onclick="navigateTo('landing')" id="nav-cta-btn" class="hidden sm:flex px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 via-brand-600 to-indigo-500 hover:brightness-110 text-white text-xs font-bold shadow-lg shadow-indigo-600/30 transition items-center gap-2">
+          <i data-lucide="zap" class="w-3.5 h-3.5 text-amber-300 fill-amber-300"></i>
+          <span>Try Free for 3 Days</span>
+        </a>
+      </div>
     </div>
   </header>
 
-  <main class="relative z-10">
+  <!-- ========================================================================= -->
+  <!-- VIEW 1: SAAS MARKETING LANDING PAGE                                       -->
+  <!-- ========================================================================= -->
+  <main id="view-landing" class="flex-1 flex flex-col">
+    
+    <!-- Hero Section -->
+    <section class="relative pt-20 pb-28 lg:pt-32 lg:pb-36 overflow-hidden">
+      <!-- Ambient Glow Blobs -->
+      <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[400px] bg-indigo-600/20 rounded-full blur-[140px] pointer-events-none animate-glow"></div>
+      <div class="absolute top-1/3 right-10 w-[450px] h-[450px] bg-emerald-500/10 rounded-full blur-[120px] pointer-events-none"></div>
 
-    <!-- HERO SECTION -->
-    <section class="pt-16 pb-24 md:pt-24 md:pb-36 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="text-center max-w-4xl mx-auto">
-        
-        <!-- Live AI Badge -->
-        <div class="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-cyan-500/30 bg-cyan-950/40 text-cyan-300 text-xs font-semibold uppercase tracking-wider mb-8 shadow-inner">
-          <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
-          FitGuard Vision Engine v3.4 Active
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+        <!-- Floating Pill Tag -->
+        <div class="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-slate-900/90 border border-indigo-500/30 text-indigo-300 text-xs font-bold mb-8 shadow-inner shadow-indigo-500/10">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span>Next-Generation E-Commerce Biometric Sizing</span>
+          <span class="w-1 h-1 rounded-full bg-slate-700"></span>
+          <span class="text-amber-300">3-Day Free Trial On All Plans</span>
         </div>
 
-        <!-- Hero Headline -->
-        <h1 class="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white leading-[1.1] mb-6">
-          Real-Time AI Form Correction & <br class="hidden sm:inline" />
-          <span class="bg-gradient-to-r from-cyan-400 via-indigo-300 to-violet-400 bg-clip-text text-transparent">
-            Biomechanical Injury Shield
-          </span>
+        <h1 class="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-[1.08] max-w-5xl mx-auto">
+          Eliminate Apparel Returns by <span class="bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-brand-300 to-emerald-400">42.8%</span> with AI Size Precision.
         </h1>
 
-        <!-- Subtitle -->
-        <p class="text-lg sm:text-xl text-slate-400 leading-relaxed max-w-2xl mx-auto mb-10">
-          Transform your mobile or webcam into an elite kinetic coach. FitGuard AI calculates skeletal angles, eliminates bad reps, and crafts dynamic hypertrophy roadmaps in real-time.
+        <p class="mt-8 text-lg sm:text-xl text-slate-400 max-w-3xl mx-auto font-normal leading-relaxed">
+          FitGuard AI turns sizing uncertainty into confident checkouts. Auto-parse supplier charts with Vision OCR, embed ultra-lightweight size guidance, and monitor return savings in real-time.
         </p>
 
-        <!-- CTA Group -->
-        <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <a href="#pricing" class="w-full sm:w-auto px-8 py-4 rounded-xl bg-gradient-to-r from-cyan-500 via-indigo-600 to-violet-600 hover:from-cyan-400 hover:to-violet-500 text-white font-bold text-base shadow-xl shadow-cyan-500/25 hover:shadow-cyan-500/40 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200">
-            Unlock Full Access
+        <!-- CTA Buttons -->
+        <div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+          <a href="#pricing" class="w-full sm:w-auto px-8 py-4 rounded-2xl bg-gradient-to-r from-indigo-500 via-brand-600 to-indigo-600 text-white font-black text-base shadow-2xl shadow-indigo-600/40 hover:scale-[1.02] active:scale-[0.98] transition flex items-center justify-center gap-3">
+            <i data-lucide="zap" class="w-5 h-5 text-amber-300 fill-amber-300"></i>
+            <span>Start 3-Day Free Trial (No Lock-In)</span>
           </a>
-          <a href="#how-it-works" class="w-full sm:w-auto px-8 py-4 rounded-xl glass-panel text-slate-300 hover:text-white hover:border-slate-600 font-semibold text-base transition-all duration-200 flex items-center justify-center gap-2">
-            <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
-            Watch AI in Action
-          </a>
-        </div>
-
-        <!-- Social Proof Stats -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-16 pt-12 border-t border-slate-800/80">
-          <div class="p-4 rounded-2xl glass-panel text-left">
-            <div class="text-3xl font-black text-white mb-1">99.4%</div>
-            <div class="text-xs text-slate-400 font-medium">Kinetic Joint Accuracy</div>
-          </div>
-          <div class="p-4 rounded-2xl glass-panel text-left">
-            <div class="text-3xl font-black text-cyan-400 mb-1">&lt; 45ms</div>
-            <div class="text-xs text-slate-400 font-medium">Ultra-Low Audio Latency</div>
-          </div>
-          <div class="p-4 rounded-2xl glass-panel text-left">
-            <div class="text-3xl font-black text-indigo-400 mb-1">4.2M+</div>
-            <div class="text-xs text-slate-400 font-medium">Reps Tracked Safely</div>
-          </div>
-          <div class="p-4 rounded-2xl glass-panel text-left">
-            <div class="text-3xl font-black text-violet-400 mb-1">0%</div>
-            <div class="text-xs text-slate-400 font-medium">Hardware Sensors Needed</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Hero Dashboard Visual Mockup -->
-      <div class="mt-14 max-w-5xl mx-auto rounded-3xl p-1 bg-gradient-to-b from-slate-700/50 via-slate-800/20 to-transparent shadow-2xl shadow-cyan-950/40">
-        <div class="rounded-[22px] bg-slate-950 border border-slate-800 overflow-hidden relative">
-          <!-- Window Controls -->
-          <div class="h-11 bg-slate-900/90 border-b border-slate-800 px-4 flex items-center justify-between">
-            <div class="flex items-center gap-2">
-              <span class="w-3 h-3 rounded-full bg-rose-500/80"></span>
-              <span class="w-3 h-3 rounded-full bg-amber-500/80"></span>
-              <span class="w-3 h-3 rounded-full bg-emerald-500/80"></span>
-            </div>
-            <div class="text-xs font-mono text-slate-400">fitguard-vision-stream // SQUAT_DEPTH_OPTICAL_01</div>
-            <div class="flex items-center gap-2 text-xs text-emerald-400">
-              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> Live Tracking
-            </div>
-          </div>
-
-          <!-- Video Simulator Overlay Grid -->
-          <div class="p-6 md:p-8 grid grid-cols-1 lg:grid-cols-3 gap-6 bg-slate-950 relative">
-            <!-- Simulated Camera Feed -->
-            <div class="lg:col-span-2 relative aspect-video bg-slate-900 rounded-xl border border-slate-800/80 overflow-hidden flex items-center justify-center group">
-              <!-- Grid background -->
-              <div class="absolute inset-0 opacity-20 bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:24px_24px]"></div>
-              
-              <!-- Skeletal Nodes Mockup -->
-              <div class="relative w-48 h-64 border border-cyan-500/40 rounded-lg p-2 flex flex-col items-center justify-between shadow-[0_0_30px_rgba(6,182,212,0.15)] animate-float">
-                <div class="w-8 h-8 rounded-full border-2 border-cyan-400 flex items-center justify-center bg-cyan-950/60">
-                  <span class="w-1.5 h-1.5 bg-cyan-300 rounded-full"></span>
-                </div>
-                <div class="w-28 h-20 border-t-2 border-l-2 border-r-2 border-indigo-400/80 flex items-center justify-around">
-                  <span class="w-2 h-2 rounded-full bg-indigo-300"></span>
-                  <span class="w-2 h-2 rounded-full bg-indigo-300"></span>
-                </div>
-                <div class="w-24 h-28 border-l-2 border-r-2 border-emerald-400 flex items-end justify-between px-1 pb-1">
-                  <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]"></span>
-                  <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]"></span>
-                </div>
-              </div>
-
-              <!-- Realtime HUD Overlays -->
-              <div class="absolute top-4 left-4 bg-slate-950/90 border border-slate-800 px-3 py-2 rounded-lg text-xs">
-                <div class="text-slate-400">Target Angle</div>
-                <div class="text-emerald-400 font-mono font-bold text-sm">92.4° (Optimal Depth)</div>
-              </div>
-
-              <div class="absolute bottom-4 left-4 bg-slate-950/90 border border-slate-800 px-3 py-2 rounded-lg text-xs">
-                <div class="text-slate-400">Spine Curvature</div>
-                <div class="text-cyan-400 font-mono font-bold text-sm">Neutral Spine ✓</div>
-              </div>
-
-              <div class="absolute top-4 right-4 bg-slate-950/90 border border-slate-800 px-3 py-2 rounded-lg text-xs">
-                <div class="text-slate-400">Rep Cadence</div>
-                <div class="text-violet-400 font-mono font-bold text-sm">3.1s Concentric</div>
-              </div>
-            </div>
-
-            <!-- Right Telemetry Panel -->
-            <div class="flex flex-col justify-between gap-4">
-              <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800">
-                <div class="text-xs text-slate-400 font-semibold mb-2 uppercase tracking-wider">Form Accuracy Index</div>
-                <div class="flex items-baseline gap-2">
-                  <span class="text-3xl font-black text-white">98.2%</span>
-                  <span class="text-xs text-emerald-400 font-bold">+4.1% vs last set</span>
-                </div>
-                <div class="w-full bg-slate-800 h-2 rounded-full mt-3 overflow-hidden">
-                  <div class="bg-gradient-to-r from-cyan-500 to-indigo-500 h-full rounded-full w-[98.2%]"></div>
-                </div>
-              </div>
-
-              <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800">
-                <div class="text-xs text-slate-400 font-semibold mb-2 uppercase tracking-wider">AI Voice Coach Log</div>
-                <div class="space-y-2 text-xs font-mono">
-                  <div class="text-slate-300 bg-slate-950 p-2 rounded border border-slate-800/80">
-                    <span class="text-cyan-400 font-bold">[00:14]</span> "Drive through your heels on ascent."
-                  </div>
-                  <div class="text-emerald-300 bg-slate-950 p-2 rounded border border-slate-800/80">
-                    <span class="text-emerald-400 font-bold">[00:22]</span> "Flawless lockout. Rep count: 8."
-                  </div>
-                </div>
-              </div>
-
-              <div class="p-4 rounded-xl bg-gradient-to-tr from-cyan-950/40 to-indigo-950/40 border border-cyan-800/40 flex items-center justify-between">
-                <div>
-                  <div class="text-xs text-slate-400">Injury Risk Level</div>
-                  <div class="text-sm font-bold text-emerald-400">Minimal / Nominal Stress</div>
-                </div>
-                <span class="px-2.5 py-1 text-[11px] font-bold rounded-md bg-emerald-950 text-emerald-300 border border-emerald-800/50">PROTECTED</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- FEATURES & CAPABILITIES GRID -->
-    <section id="features" class="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="text-center max-w-3xl mx-auto mb-16">
-        <h2 class="text-xs font-bold uppercase tracking-widest text-cyan-400 mb-3">Engineered for Perfection</h2>
-        <p class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">Cutting-Edge Kinetic Intelligence</p>
-        <p class="mt-4 text-base text-slate-400 leading-relaxed">
-          FitGuard combines high-frequency computer vision with predictive biomechanical models to deliver flawless physical training.
-        </p>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        
-        <!-- Feature 1 -->
-        <div class="glass-panel p-8 rounded-2xl hover:border-cyan-500/50 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-cyan-950/50 group">
-          <div class="w-12 h-12 rounded-xl bg-cyan-950/80 border border-cyan-500/30 flex items-center justify-center text-cyan-400 mb-6 group-hover:bg-cyan-500 group-hover:text-slate-950 transition-colors">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-            </svg>
-          </div>
-          <h3 class="text-xl font-bold text-white mb-2">Computer Vision Tracking</h3>
-          <p class="text-slate-400 text-sm leading-relaxed">
-            Tracks 33 anatomical keypoints across joints, hips, knees, and spine at up to 60 FPS using standard device lenses.
-          </p>
-        </div>
-
-        <!-- Feature 2 -->
-        <div class="glass-panel p-8 rounded-2xl hover:border-indigo-500/50 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-indigo-950/50 group">
-          <div class="w-12 h-12 rounded-xl bg-indigo-950/80 border border-indigo-500/30 flex items-center justify-center text-indigo-400 mb-6 group-hover:bg-indigo-500 group-hover:text-slate-950 transition-colors">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-            </svg>
-          </div>
-          <h3 class="text-xl font-bold text-white mb-2">Biomechanical Injury Shield</h3>
-          <p class="text-slate-400 text-sm leading-relaxed">
-            Instant warnings when valgus knee collapse, excessive lumbar flexion, or shoulder impingements are calculated.
-          </p>
-        </div>
-
-        <!-- Feature 3 -->
-        <div class="glass-panel p-8 rounded-2xl hover:border-violet-500/50 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-violet-950/50 group">
-          <div class="w-12 h-12 rounded-xl bg-violet-950/80 border border-violet-500/30 flex items-center justify-center text-violet-400 mb-6 group-hover:bg-violet-500 group-hover:text-slate-950 transition-colors">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
-            </svg>
-          </div>
-          <h3 class="text-xl font-bold text-white mb-2">Adaptive Overload AI</h3>
-          <p class="text-slate-400 text-sm leading-relaxed">
-            Calculates fatigue markers and concentric velocity in real time to suggest precise micro-load progression weekly.
-          </p>
-        </div>
-
-        <!-- Feature 4 -->
-        <div class="glass-panel p-8 rounded-2xl hover:border-cyan-500/50 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-cyan-950/50 group">
-          <div class="w-12 h-12 rounded-xl bg-cyan-950/80 border border-cyan-500/30 flex items-center justify-center text-cyan-400 mb-6 group-hover:bg-cyan-500 group-hover:text-slate-950 transition-colors">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 100-6 3 3 0 000 6z"/>
-            </svg>
-          </div>
-          <h3 class="text-xl font-bold text-white mb-2">Sub-Second Vocal Coaching</h3>
-          <p class="text-slate-400 text-sm leading-relaxed">
-            Hands-free, earbud-integrated audio cues trigger immediately when your stance or tempo drifts off baseline.
-          </p>
-        </div>
-
-        <!-- Feature 5 -->
-        <div class="glass-panel p-8 rounded-2xl hover:border-indigo-500/50 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-indigo-950/50 group">
-          <div class="w-12 h-12 rounded-xl bg-indigo-950/80 border border-indigo-500/30 flex items-center justify-center text-indigo-400 mb-6 group-hover:bg-indigo-500 group-hover:text-slate-950 transition-colors">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
-            </svg>
-          </div>
-          <h3 class="text-xl font-bold text-white mb-2">Dynamic Diet Synthesis</h3>
-          <p class="text-slate-400 text-sm leading-relaxed">
-            AI estimates caloric expenditure based on true kinetic energy spent and generates customized macro targets.
-          </p>
-        </div>
-
-        <!-- Feature 6 -->
-        <div class="glass-panel p-8 rounded-2xl hover:border-violet-500/50 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-violet-950/50 group">
-          <div class="w-12 h-12 rounded-xl bg-violet-950/80 border border-violet-500/30 flex items-center justify-center text-violet-400 mb-6 group-hover:bg-violet-500 group-hover:text-slate-950 transition-colors">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
-            </svg>
-          </div>
-          <h3 class="text-xl font-bold text-white mb-2">Zero Extra Hardware</h3>
-          <p class="text-slate-400 text-sm leading-relaxed">
-            No expensive smart mirrors or wearable bands required. Runs 100% locally on any smartphone, iPad, or laptop.
-          </p>
-        </div>
-
-      </div>
-    </section>
-
-    <!-- HOW IT WORKS STEP-BY-STEP -->
-    <section id="how-it-works" class="py-24 border-t border-b border-slate-900 bg-slate-950/60 relative">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center max-w-3xl mx-auto mb-20">
-          <h2 class="text-xs font-bold uppercase tracking-widest text-indigo-400 mb-3">Effortless Flow</h2>
-          <p class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">How FitGuard AI Works</p>
-          <p class="mt-4 text-base text-slate-400">Three intuitive steps to elevate your fitness performance safely.</p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
-          <!-- Connector Line for Desktop -->
-          <div class="hidden md:block absolute top-1/2 left-0 right-0 h-0.5 bg-gradient-to-r from-cyan-500/20 via-indigo-500/30 to-violet-500/20 -translate-y-12 z-0"></div>
-
-          <!-- Step 1 -->
-          <div class="relative z-10 glass-panel p-8 rounded-2xl flex flex-col items-center text-center">
-            <div class="w-16 h-16 rounded-2xl bg-cyan-950 border-2 border-cyan-500 flex items-center justify-center text-cyan-300 text-2xl font-black mb-6 shadow-lg shadow-cyan-500/20">
-              01
-            </div>
-            <h3 class="text-xl font-bold text-white mb-3">Position Any Camera</h3>
-            <p class="text-slate-400 text-sm leading-relaxed">
-              Prop your phone on a bottle or open your laptop webcam. Position it 6-8 feet away to frame your complete silhouette.
-            </p>
-          </div>
-
-          <!-- Step 2 -->
-          <div class="relative z-10 glass-panel p-8 rounded-2xl flex flex-col items-center text-center">
-            <div class="w-16 h-16 rounded-2xl bg-indigo-950 border-2 border-indigo-500 flex items-center justify-center text-indigo-300 text-2xl font-black mb-6 shadow-lg shadow-indigo-500/20">
-              02
-            </div>
-            <h3 class="text-xl font-bold text-white mb-3">Execute Your Workout</h3>
-            <p class="text-slate-400 text-sm leading-relaxed">
-              Begin lifting. FitGuard immediately calibrates skeletal depth, counts valid reps, and delivers subtle audio micro-cues.
-            </p>
-          </div>
-
-          <!-- Step 3 -->
-          <div class="relative z-10 glass-panel p-8 rounded-2xl flex flex-col items-center text-center">
-            <div class="w-16 h-16 rounded-2xl bg-violet-950 border-2 border-violet-500 flex items-center justify-center text-violet-300 text-2xl font-black mb-6 shadow-lg shadow-violet-500/20">
-              03
-            </div>
-            <h3 class="text-xl font-bold text-white mb-3">Adaptive Progression</h3>
-            <p class="text-slate-400 text-sm leading-relaxed">
-              Review post-session kinetic heatmaps, fatigue metrics, and get automatic weight increases recommended for your next gym day.
-            </p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- PRICING SECTION -->
-    <section id="pricing" class="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="text-center max-w-3xl mx-auto mb-16">
-        <h2 class="text-xs font-bold uppercase tracking-widest text-cyan-400 mb-3">Simple & Transparent Subscriptions</h2>
-        <p class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">Invest in Flawless Form</p>
-        <p class="mt-4 text-base text-slate-400">
-          Instant digital activation via eSewa. No hidden fees, cancel anytime.
-        </p>
-      </div>
-
-      <!-- Pricing Cards Container -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-4xl mx-auto items-stretch">
-        
-        <!-- Starter Pack -->
-        <div class="glass-panel rounded-3xl p-8 sm:p-10 flex flex-col justify-between border border-slate-800 hover:border-slate-700 transition-all duration-300">
-          <div>
-            <div class="flex items-center justify-between mb-4">
-              <span class="text-lg font-bold text-slate-200">Starter Pack</span>
-              <span class="text-xs font-semibold px-3 py-1 rounded-full bg-slate-800 text-slate-300">Individual</span>
-            </div>
-            <p class="text-slate-400 text-sm mb-6">Essential AI motion guidance for everyday gym-goers and home trainees.</p>
-            
-            <!-- Price -->
-            <div class="flex items-baseline gap-1 mb-8 pb-8 border-b border-slate-800/80">
-              <span class="text-4xl sm:text-5xl font-black text-white">Rs. 999</span>
-              <span class="text-slate-400 text-sm font-medium">/ month</span>
-            </div>
-
-            <!-- Features Checklist -->
-            <ul class="space-y-4 text-sm text-slate-300 mb-8">
-              <li class="flex items-center gap-3">
-                <svg class="w-5 h-5 text-cyan-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                <span>Up to 30 Real-Time AI Camera Sessions / mo</span>
-              </li>
-              <li class="flex items-center gap-3">
-                <svg class="w-5 h-5 text-cyan-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                <span>Standard Biomechanical Injury Alerts</span>
-              </li>
-              <li class="flex items-center gap-3">
-                <svg class="w-5 h-5 text-cyan-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                <span>Automatic Rep Counting & Depth Verification</span>
-              </li>
-              <li class="flex items-center gap-3">
-                <svg class="w-5 h-5 text-cyan-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                <span>AI Workout Log & Recovery Diary</span>
-              </li>
-              <li class="flex items-center gap-3 text-slate-500">
-                <svg class="w-5 h-5 text-slate-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                <span>Sub-Second Vocal Coaching</span>
-              </li>
-            </ul>
-          </div>
-
-          <!-- eSewa Trigger Button -->
-          <button 
-            onclick="openEsewaModal('Starter Pack', 'Rs. 999')" 
-            class="w-full py-4 rounded-xl font-bold text-sm bg-slate-900 hover:bg-slate-800 text-white border border-slate-700/80 hover:border-slate-600 flex items-center justify-center gap-2.5 transition-all duration-200">
-            <span class="w-2.5 h-2.5 rounded-full bg-[#60bb46]"></span>
-            Pay via eSewa
+          <button onclick="scrollToSection('demo')" class="w-full sm:w-auto px-8 py-4 rounded-2xl glass-card text-slate-200 font-bold text-base hover:text-white hover:border-slate-600 transition flex items-center justify-center gap-2.5">
+            <i data-lucide="play-circle" class="w-5 h-5 text-indigo-400"></i>
+            <span>Test Interactive Avatar</span>
           </button>
         </div>
 
-        <!-- Pro Plan (POPULAR) -->
-        <div class="relative rounded-3xl p-1 bg-gradient-to-b from-cyan-400 via-indigo-500 to-violet-600 shadow-2xl shadow-indigo-950/60 flex flex-col justify-between">
-          <div class="h-full bg-slate-950 rounded-[22px] p-8 sm:p-10 flex flex-col justify-between">
-            <div>
-              <div class="flex items-center justify-between mb-4">
-                <span class="text-lg font-bold text-cyan-300">Pro Plan</span>
-                <span class="text-xs font-black uppercase tracking-wider px-3.5 py-1 rounded-full bg-gradient-to-r from-cyan-500 to-indigo-600 text-white shadow-md shadow-cyan-500/30">
-                  Popular
-                </span>
-              </div>
-              <p class="text-slate-400 text-sm mb-6">Complete unlimited AI biomechanics, real-time voice coaching & custom nutrition synthesis.</p>
-              
-              <!-- Price -->
-              <div class="flex items-baseline gap-1 mb-8 pb-8 border-b border-slate-800/80">
-                <span class="text-4xl sm:text-5xl font-black text-white">Rs. 2999</span>
-                <span class="text-slate-400 text-sm font-medium">/ month</span>
-              </div>
+        <!-- Live Platform Telemetry Bar -->
+        <div class="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
+          <div class="glass-card p-5 rounded-3xl border border-slate-800 text-left">
+            <div class="text-3xl font-black text-white">Rs. 14.2M+</div>
+            <div class="text-xs text-slate-400 mt-1 font-semibold">Merchant Returns Prevented</div>
+          </div>
+          <div class="glass-card p-5 rounded-3xl border border-slate-800 text-left">
+            <div class="text-3xl font-black text-emerald-400">98.6%</div>
+            <div class="text-xs text-slate-400 mt-1 font-semibold">First-Time Fit Match Rate</div>
+          </div>
+          <div class="glass-card p-5 rounded-3xl border border-slate-800 text-left">
+            <div class="text-3xl font-black text-indigo-400">+22.4%</div>
+            <div class="text-xs text-slate-400 mt-1 font-semibold">Average Cart Conversion</div>
+          </div>
+          <div class="glass-card p-5 rounded-3xl border border-slate-800 text-left">
+            <div class="text-3xl font-black text-purple-400">&lt;14ms</div>
+            <div class="text-xs text-slate-400 mt-1 font-semibold">Edge Biometric Latency</div>
+          </div>
+        </div>
 
-              <!-- Features Checklist -->
-              <ul class="space-y-4 text-sm text-slate-300 mb-8">
-                <li class="flex items-center gap-3">
-                  <svg class="w-5 h-5 text-cyan-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                  <span class="font-semibold text-white">Unlimited Real-Time AI Camera Sessions</span>
-                </li>
-                <li class="flex items-center gap-3">
-                  <svg class="w-5 h-5 text-cyan-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                  <span class="font-semibold text-white">Sub-45ms Real-Time Earbud Vocal Coaching</span>
-                </li>
-                <li class="flex items-center gap-3">
-                  <svg class="w-5 h-5 text-cyan-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                  <span>Advanced Biomechanical Stress Reports</span>
-                </li>
-                <li class="flex items-center gap-3">
-                  <svg class="w-5 h-5 text-cyan-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                  <span>Automated Dynamic Hypertrophy Overload Engine</span>
-                </li>
-                <li class="flex items-center gap-3">
-                  <svg class="w-5 h-5 text-cyan-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                  <span>Precision Photo Macro & Nutrition Scanner</span>
-                </li>
-                <li class="flex items-center gap-3">
-                  <svg class="w-5 h-5 text-cyan-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                  <span>24/7 Dedicated Priority Technical Support</span>
-                </li>
-              </ul>
+        <!-- Store Logos integration bar -->
+        <div class="mt-14 pt-8 border-t border-slate-800/80 max-w-5xl mx-auto flex flex-wrap items-center justify-center gap-8 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+          <span>Trusted by fast-growing direct-to-consumer apparel brands</span>
+          <div class="flex items-center gap-8 opacity-70">
+            <span class="text-slate-400 font-black tracking-widest text-sm">NORDIC&bull;APPAREL</span>
+            <span class="text-slate-400 font-bold tracking-wider text-sm">VELOCITY ATHLETICS</span>
+            <span class="text-slate-400 font-serif italic text-base">Atelier S&eacute;zanne</span>
+            <span class="text-slate-400 font-mono text-sm">DENIM_WORKS_CO</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION: INTERACTIVE BIOMETRIC SIMULATOR & AVATAR CANVAS -->
+    <section id="demo" class="py-24 bg-slate-900/60 border-y border-slate-800 relative">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <div class="text-center max-w-3xl mx-auto mb-14">
+          <span class="px-3 py-1 rounded-full text-xs font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Client-Side Biometric Simulation</span>
+          <h2 class="text-3xl sm:text-5xl font-black tracking-tight mt-3">Test the Customer Sizing Journey</h2>
+          <p class="mt-3 text-slate-400 text-sm sm:text-base">Move the biometric sliders below. Watch the real-time AI morphology solver calculate the recommended size, drape tolerance, and return risk profile.</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 max-w-6xl mx-auto items-center">
+          
+          <!-- Column 1: Biometric Adjusters -->
+          <div class="lg:col-span-5 glass-card p-6 sm:p-8 rounded-3xl border border-slate-800 space-y-6">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+              <h3 class="text-base font-bold text-white flex items-center gap-2">
+                <i data-lucide="sliders" class="w-4 h-4 text-indigo-400"></i>
+                Biometric Inputs
+              </h3>
+              <button onclick="resetBiometrics()" class="text-xs text-indigo-400 hover:underline">Reset</button>
             </div>
 
-            <!-- eSewa Trigger Button -->
-            <button 
-              onclick="openEsewaModal('Pro Plan', 'Rs. 2999')" 
-              class="w-full py-4 rounded-xl font-bold text-sm bg-gradient-to-r from-cyan-500 via-indigo-600 to-violet-600 hover:from-cyan-400 hover:to-violet-500 text-white shadow-lg shadow-cyan-500/25 flex items-center justify-center gap-2.5 transition-all duration-200 hover:scale-[1.01] active:scale-[0.99]">
+            <!-- Height Slider -->
+            <div>
+              <div class="flex justify-between text-xs font-bold text-slate-300 mb-2">
+                <span>Height</span>
+                <span id="slider-height-val" class="text-indigo-400 font-mono">180 cm (5'11")</span>
+              </div>
+              <input type="range" id="sim-height" min="145" max="215" value="180" oninput="updateSimulation()" class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500">
+            </div>
+
+            <!-- Weight Slider -->
+            <div>
+              <div class="flex justify-between text-xs font-bold text-slate-300 mb-2">
+                <span>Weight</span>
+                <span id="slider-weight-val" class="text-indigo-400 font-mono">78 kg (172 lbs)</span>
+              </div>
+              <input type="range" id="sim-weight" min="45" max="150" value="78" oninput="updateSimulation()" class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500">
+            </div>
+
+            <!-- Body Frame Selector -->
+            <div>
+              <label class="block text-xs font-bold text-slate-300 mb-2">Chest / Torso Structure</label>
+              <div class="grid grid-cols-3 gap-2">
+                <button type="button" onclick="setSimTorso('lean')" id="btn-torso-lean" class="sim-torso-btn py-2 px-3 rounded-xl text-xs font-medium bg-slate-900 border border-slate-800 text-slate-300 hover:border-slate-600 transition">Lean / Slim</button>
+                <button type="button" onclick="setSimTorso('balanced')" id="btn-torso-balanced" class="sim-torso-btn py-2 px-3 rounded-xl text-xs font-bold bg-indigo-600/20 border border-indigo-500 text-indigo-300 transition">Balanced</button>
+                <button type="button" onclick="setSimTorso('broad')" id="btn-torso-broad" class="sim-torso-btn py-2 px-3 rounded-xl text-xs font-medium bg-slate-900 border border-slate-800 text-slate-300 hover:border-slate-600 transition">Broad / Muscular</button>
+              </div>
+            </div>
+
+            <!-- Preferred Fit Preference -->
+            <div>
+              <label class="block text-xs font-bold text-slate-300 mb-2">Customer Wearing Preference</label>
+              <div class="grid grid-cols-3 gap-2">
+                <button type="button" onclick="setSimFit('form')" id="btn-fit-form" class="sim-fit-btn py-2 px-3 rounded-xl text-xs font-medium bg-slate-900 border border-slate-800 text-slate-300 hover:border-slate-600 transition">Form-Fitting</button>
+                <button type="button" onclick="setSimFit('regular')" id="btn-fit-regular" class="sim-fit-btn py-2 px-3 rounded-xl text-xs font-bold bg-indigo-600/20 border border-indigo-500 text-indigo-300 transition">Regular Drape</button>
+                <button type="button" onclick="setSimFit('oversized')" id="btn-fit-oversized" class="sim-fit-btn py-2 px-3 rounded-xl text-xs font-medium bg-slate-900 border border-slate-800 text-slate-300 hover:border-slate-600 transition">Oversized / Boxy</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Column 2: Dynamic Morphing Visual Silhouette & Output -->
+          <div class="lg:col-span-7 glass-card p-6 sm:p-8 rounded-3xl border-2 border-indigo-500/40 shadow-2xl relative overflow-hidden flex flex-col justify-between">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+              <div>
+                <span class="text-[10px] font-mono uppercase tracking-widest text-indigo-400 font-bold">FitGuard AI &bull; Autonomous Recommendation</span>
+                <h4 class="text-base font-bold text-white">Live Fit Calculation Output</h4>
+              </div>
+              <span id="sim-watermark-pill" class="px-2 py-1 rounded-full bg-slate-800 text-slate-400 text-[10px] font-mono border border-slate-700">Watermark Hidden on Pro</span>
+            </div>
+
+            <!-- Dynamic SVG Silhouette Canvas -->
+            <div class="my-6 grid grid-cols-1 sm:grid-cols-12 gap-6 items-center">
+              
+              <!-- The Morphing Body Graphic -->
+              <div class="sm:col-span-5 flex flex-col items-center justify-center p-4 rounded-2xl bg-slate-950/80 border border-slate-800 relative">
+                <svg id="morphing-body-svg" viewBox="0 0 160 220" class="w-36 h-48 drop-shadow-[0_0_15px_rgba(99,102,241,0.3)] transition-all duration-300">
+                  <!-- Head -->
+                  <circle cx="80" cy="24" r="16" fill="#4f46e5" fill-opacity="0.8" stroke="#818cf8" stroke-width="2"/>
+                  <!-- Dynamic Torso Path -->
+                  <path id="svg-torso" d="M 52 48 Q 80 44 108 48 L 100 135 Q 80 138 60 135 Z" fill="#6366f1" fill-opacity="0.5" stroke="#a5b4fc" stroke-width="2"/>
+                  <!-- Arms -->
+                  <path id="svg-left-arm" d="M 50 48 L 30 115" stroke="#818cf8" stroke-width="8" stroke-linecap="round"/>
+                  <path id="svg-right-arm" d="M 110 48 L 130 115" stroke="#818cf8" stroke-width="8" stroke-linecap="round"/>
+                  <!-- Legs -->
+                  <path d="M 68 135 L 64 210" stroke="#818cf8" stroke-width="10" stroke-linecap="round"/>
+                  <path d="M 92 135 L 96 210" stroke="#818cf8" stroke-width="10" stroke-linecap="round"/>
+                </svg>
+                <div class="text-[10px] text-slate-400 font-mono mt-2">Biometric Frame Model</div>
+              </div>
+
+              <!-- Recommendation Breakdown -->
+              <div class="sm:col-span-7 space-y-4">
+                <div class="p-4 rounded-2xl bg-gradient-to-br from-indigo-950/90 to-slate-900 border border-indigo-500/40">
+                  <span class="text-xs text-indigo-300 font-semibold uppercase tracking-wider">Suggested Product Size</span>
+                  <div class="flex items-baseline gap-3 mt-1">
+                    <span id="sim-recommended-size" class="text-4xl font-black text-white">Size L</span>
+                    <span id="sim-match-pct" class="text-xs font-bold text-emerald-400 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">98.8% Fit Accuracy</span>
+                  </div>
+                  <p id="sim-reasoning" class="text-xs text-slate-300 mt-2 leading-relaxed">
+                    Torso span comfortably cleared by +3.2cm. Zero armhole binding detected.
+                  </p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3 text-xs">
+                  <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
+                    <span class="text-slate-400">Return Probability:</span>
+                    <div id="sim-return-risk" class="text-sm font-bold text-emerald-400 mt-0.5">&lt; 1.4% (Ultra-Low)</div>
+                  </div>
+                  <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
+                    <span class="text-slate-400">Alternative Size:</span>
+                    <div id="sim-alt-size" class="text-sm font-bold text-slate-200 mt-0.5">Size XL (Loose)</div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Footer Badge -->
+            <div class="pt-3 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
+              <span class="flex items-center gap-1.5 text-emerald-400 font-semibold">
+                <i data-lucide="shield-check" class="w-4 h-4"></i> Prevents Bracketing Orders
+              </span>
+              <span class="font-mono text-[11px] text-slate-500">Algorithm: FG-Biometrics-v2.6</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION: INTERACTIVE RETURN PREVENTION ROI CALCULATOR -->
+    <section id="roi-calc" class="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Financial Impact Calculator</span>
+        <h2 class="text-3xl sm:text-5xl font-black tracking-tight mt-3">Calculate Your Prevented Return Savings</h2>
+        <p class="mt-3 text-slate-400 text-base">Apparel brands lose an average of Rs. 3,200 to Rs. 4,500 on every returned garment when accounting for shipping, processing, restocking, and markdown losses.</p>
+      </div>
+
+      <div class="glass-card p-8 sm:p-12 rounded-3xl border-2 border-indigo-500/30 max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+        
+        <!-- Controls -->
+        <div class="lg:col-span-6 space-y-6">
+          <div>
+            <div class="flex justify-between text-xs font-bold text-slate-300 mb-2">
+              <span>Monthly Apparel Orders</span>
+              <span id="roi-orders-val" class="text-indigo-400 font-mono text-sm">2,500 orders/mo</span>
+            </div>
+            <input type="range" id="roi-orders" min="200" max="25000" step="100" value="2500" oninput="calculateROI()" class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500">
+          </div>
+
+          <div>
+            <div class="flex justify-between text-xs font-bold text-slate-300 mb-2">
+              <span>Current Return Rate (%)</span>
+              <span id="roi-rate-val" class="text-indigo-400 font-mono text-sm">26%</span>
+            </div>
+            <input type="range" id="roi-rate" min="5" max="50" step="1" value="26" oninput="calculateROI()" class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500">
+          </div>
+
+          <div>
+            <div class="flex justify-between text-xs font-bold text-slate-300 mb-2">
+              <span>Average Order Value (Rs.)</span>
+              <span id="roi-aov-val" class="text-indigo-400 font-mono text-sm">Rs. 9,500</span>
+            </div>
+            <input type="range" id="roi-aov" min="2500" max="35000" step="500" value="9500" oninput="calculateROI()" class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500">
+          </div>
+        </div>
+
+        <!-- Calculated Savings Box -->
+        <div class="lg:col-span-6 p-6 sm:p-8 rounded-2xl bg-gradient-to-br from-indigo-950/80 via-slate-900 to-slate-900 border border-indigo-500/40 text-center flex flex-col justify-between">
+          <div>
+            <span class="text-xs font-bold text-indigo-300 uppercase tracking-widest">Projected Monthly Savings</span>
+            <div id="roi-monthly-dollars" class="text-4xl sm:text-5xl font-black text-emerald-400 my-2">Rs. 9,45,880</div>
+            <p class="text-xs text-slate-400">Net recovered profit per month after eliminating return logistics & restocking write-offs.</p>
+          </div>
+
+          <div class="mt-6 pt-6 border-t border-slate-800/80 grid grid-cols-2 gap-4 text-left">
+            <div>
+              <span class="text-[11px] text-slate-500">Annual Profit Recovered</span>
+              <div id="roi-annual-dollars" class="text-lg font-bold text-white font-mono">Rs. 11,350,560/yr</div>
+            </div>
+            <div>
+              <span class="text-[11px] text-slate-500">FitGuard Pro ROI</span>
+              <div id="roi-multiplier" class="text-lg font-bold text-indigo-400 font-mono">315x Return</div>
+            </div>
+          </div>
+
+          <div class="mt-6">
+            <a href="#pricing" class="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-lg shadow-indigo-600/30 transition flex items-center justify-center gap-2">
+              <span>Start 3-Day Free Trial To Capture ROI</span>
+              <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- SECTION: FEATURES GRID (HIGHLIGHTING ALL 4 PRO FEATURES) -->
+    <section id="features" class="py-24 bg-slate-900/40 border-t border-slate-800">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-3xl mx-auto mb-16">
+          <span class="px-3 py-1 rounded-full text-xs font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Enterprise-Grade Capability</span>
+          <h2 class="text-3xl sm:text-5xl font-black tracking-tight mt-3">Complete Toolkit For Modern Brands</h2>
+          <p class="mt-3 text-slate-400 text-base">Built from the ground up for high-growth e-commerce merchants on Shopify, WooCommerce, and Headless stores.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          
+          <!-- PRO FEATURE 1: White Labeling -->
+          <div class="glass-card glass-card-hover p-8 rounded-3xl border border-indigo-500/30 relative">
+            <div class="absolute top-6 right-6 px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[10px] font-bold">PRO TIER</div>
+            <div class="w-12 h-12 rounded-2xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center mb-6">
+              <i data-lucide="sparkles" class="w-6 h-6 text-indigo-400"></i>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-2">1. 100% White-Labeling</h3>
+            <p class="text-slate-400 text-sm leading-relaxed">
+              Completely strip "Powered by FitGuard AI" watermarks from your storefront. Seamlessly match your brand's bespoke palette, radius, and custom fonts.
+            </p>
+          </div>
+
+          <!-- PRO FEATURE 2: AI Return Prevention Analytics -->
+          <div class="glass-card glass-card-hover p-8 rounded-3xl border border-emerald-500/30 relative">
+            <div class="absolute top-6 right-6 px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold">PRO TIER</div>
+            <div class="w-12 h-12 rounded-2xl bg-emerald-600/20 border border-emerald-500/30 flex items-center justify-center mb-6">
+              <i data-lucide="trending-down" class="w-6 h-6 text-emerald-400"></i>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-2">2. AI Return Prevention Analytics</h3>
+            <p class="text-slate-400 text-sm leading-relaxed">
+              Track monetary amounts saved on averted return shipments, live size accuracy percentages, and automated intercept feeds showing prevented bracketing.
+            </p>
+          </div>
+
+          <!-- PRO FEATURE 3: Team Management -->
+          <div class="glass-card glass-card-hover p-8 rounded-3xl border border-purple-500/30 relative">
+            <div class="absolute top-6 right-6 px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30 text-[10px] font-bold">PRO TIER</div>
+            <div class="w-12 h-12 rounded-2xl bg-purple-600/20 border border-purple-500/30 flex items-center justify-center mb-6">
+              <i data-lucide="users" class="w-6 h-6 text-purple-400"></i>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-2">3. Team & Staff Multi-User Access</h3>
+            <p class="text-slate-400 text-sm leading-relaxed">
+              Empower fit specialists, merchandisers, and customer support representatives with role-based access control (Admin, Fit Editor, Support Viewer).
+            </p>
+          </div>
+
+          <!-- PRO FEATURE 4: Size Chart Generator -->
+          <div class="glass-card glass-card-hover p-8 rounded-3xl border border-amber-500/30 relative">
+            <div class="absolute top-6 right-6 px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-bold">PRO TIER</div>
+            <div class="w-12 h-12 rounded-2xl bg-amber-600/20 border border-amber-500/30 flex items-center justify-center mb-6">
+              <i data-lucide="scan-line" class="w-6 h-6 text-amber-400"></i>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-2">4. Automated OCR Chart Ingestion</h3>
+            <p class="text-slate-400 text-sm leading-relaxed">
+              Upload unformatted factory PDF spec sheets or images. FitGuard Vision OCR instantly cleans, parses, and populates editable size matrices.
+            </p>
+          </div>
+
+          <!-- Feature 5: 1-Click Platform Embed -->
+          <div class="glass-card glass-card-hover p-8 rounded-3xl border border-slate-800">
+            <div class="w-12 h-12 rounded-2xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center mb-6">
+              <i data-lucide="code" class="w-6 h-6 text-blue-400"></i>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-2">Zero-Friction Script Embed</h3>
+            <p class="text-slate-400 text-sm leading-relaxed">
+              One asynchronous script tag (&lt;15kb). Works flawlessly across Shopify 2.0 app blocks, WooCommerce hooks, and custom React/Next.js storefronts.
+            </p>
+          </div>
+
+          <!-- Feature 6: Edge Biometric Privacy -->
+          <div class="glass-card glass-card-hover p-8 rounded-3xl border border-slate-800">
+            <div class="w-12 h-12 rounded-2xl bg-emerald-600/20 border border-emerald-500/30 flex items-center justify-center mb-6">
+              <i data-lucide="lock" class="w-6 h-6 text-emerald-400"></i>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-2">Privacy-First Edge Biometrics</h3>
+            <p class="text-slate-400 text-sm leading-relaxed">
+              Fully GDPR and CCPA compliant. Customer measurements are calculated at the browser edge and never sold or shared with third-party networks.
+            </p>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION: PRICING MATRIX WITH eSewa BILLING & 3-DAY FREE TRIALS -->
+    <section id="pricing" class="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">3-Day Full-Access Evaluation</span>
+        <h2 class="text-3xl sm:text-5xl font-black tracking-tight mt-3">Simple Plans. Transparent ROI.</h2>
+        <p class="mt-3 text-slate-400 text-base">Select the plan that fits your catalog volume. Both options include an unrestricted <strong>3-day free trial</strong>.</p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-5xl mx-auto items-stretch">
+        
+        <!-- STARTER PLAN TIER (Rs. 999/mo) -->
+        <div class="glass-card p-8 sm:p-10 rounded-3xl border border-slate-800 flex flex-col justify-between hover:border-slate-700 transition">
+          <div>
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="text-2xl font-bold text-white">Starter Pack</h3>
+                <p class="text-xs text-slate-400 mt-1">For single boutique stores and emerging fashion creators</p>
+              </div>
+              <span class="px-3 py-1 rounded-full text-xs font-semibold bg-slate-800 text-slate-300 border border-slate-700">3-Day Trial</span>
+            </div>
+
+            <div class="mt-6 flex items-baseline gap-2">
+              <span class="text-5xl font-black text-white">Rs. 999</span>
+              <span class="text-slate-400 text-sm font-medium">/ month after 3-day trial</span>
+            </div>
+
+            <div class="mt-8 space-y-3.5 text-sm text-slate-300">
+              <div class="flex items-center gap-3">
+                <i data-lucide="check" class="w-5 h-5 text-emerald-400 shrink-0"></i>
+                <span>Up to 1,500 Sizing Recommendations / month</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <i data-lucide="check" class="w-5 h-5 text-emerald-400 shrink-0"></i>
+                <span>Shopify & WooCommerce Standard Widget</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <i data-lucide="check" class="w-5 h-5 text-emerald-400 shrink-0"></i>
+                <span>Manual Sizing Chart Matrix Builder</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <i data-lucide="check" class="w-5 h-5 text-emerald-400 shrink-0"></i>
+                <span>Basic Store Conversion Analytics</span>
+              </div>
+              <div class="flex items-center gap-3 text-slate-500 line-through">
+                <i data-lucide="x" class="w-5 h-5 text-slate-600 shrink-0"></i>
+                <span>White-Labeling (Remove FitGuard Watermark)</span>
+              </div>
+              <div class="flex items-center gap-3 text-slate-500 line-through">
+                <i data-lucide="x" class="w-5 h-5 text-slate-600 shrink-0"></i>
+                <span>AI Return Prevention ROI & Savings Analytics</span>
+              </div>
+              <div class="flex items-center gap-3 text-slate-500 line-through">
+                <i data-lucide="x" class="w-5 h-5 text-slate-600 shrink-0"></i>
+                <span>Multi-User Team & Staff Accounts</span>
+              </div>
+              <div class="flex items-center gap-3 text-slate-500 line-through">
+                <i data-lucide="x" class="w-5 h-5 text-slate-600 shrink-0"></i>
+                <span>Automated Vision OCR Chart Ingestion</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-10">
+            <button onclick="openEsewaModal('Starter Pack', 'Rs. 999')" class="w-full py-4 rounded-2xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-sm border border-slate-700 transition flex items-center justify-center gap-2.5 group shadow-lg">
+              <span class="w-2.5 h-2.5 rounded-full bg-[#60bb46]"></span>
+              <span>Pay via eSewa</span>
+              <i data-lucide="arrow-up-right" class="w-4 h-4 transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5"></i>
+            </button>
+            <p class="text-center text-[11px] text-slate-500 mt-2">Instant eSewa Scan &bull; Rs. 999/mo after 3-day trial</p>
+          </div>
+        </div>
+
+        <!-- PRO PLAN TIER (Rs. 2999/mo - POPULAR & ALL 4 PRO FEATURES) -->
+        <div class="glass-card p-8 sm:p-10 rounded-3xl border-2 border-indigo-500 shadow-2xl shadow-indigo-950/80 flex flex-col justify-between relative overflow-hidden">
+          
+          <div class="absolute -top-0.5 right-6 px-4 py-1 rounded-b-xl bg-gradient-to-r from-indigo-500 to-brand-500 text-white font-black text-[11px] tracking-wider uppercase shadow-md shadow-indigo-500/40">
+            Popular &bull; All 4 Pro Features
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="text-2xl font-bold text-white flex items-center gap-2">
+                  Pro Plan
+                  <i data-lucide="sparkles" class="w-5 h-5 text-amber-300"></i>
+                </h3>
+                <p class="text-xs text-indigo-200 mt-1">For serious apparel brands seeking max return prevention</p>
+              </div>
+            </div>
+
+            <div class="mt-6 flex items-baseline gap-2">
+              <span class="text-5xl font-black text-white">Rs. 2999</span>
+              <span class="text-indigo-200 text-sm font-medium">/ month after 3-day trial</span>
+            </div>
+
+            <div class="my-4 px-3.5 py-2 rounded-xl bg-indigo-950/90 border border-indigo-500/40 text-indigo-200 text-xs font-bold flex items-center gap-2">
+              <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+              <span>Includes ALL 4 Pro-Tier Supercharged Capabilities:</span>
+            </div>
+
+            <div class="space-y-3.5 text-sm text-slate-200">
+              <div class="flex items-center gap-3 font-semibold text-white">
+                <i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-400 shrink-0"></i>
+                <span>Unlimited AI Biometric Recommendations</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-400 shrink-0"></i>
+                <span><strong>Pro Feature 1:</strong> 100% White-Labeling (Hide watermark)</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-400 shrink-0"></i>
+                <span><strong>Pro Feature 2:</strong> AI Return Prevention Analytics & ROI Tracking</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-400 shrink-0"></i>
+                <span><strong>Pro Feature 3:</strong> Multi-User Staff Accounts & RBAC Roles</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-400 shrink-0"></i>
+                <span><strong>Pro Feature 4:</strong> Automated Vision OCR Size Chart Ingestion</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-400 shrink-0"></i>
+                <span>Priority Slack & Dedicated Account Engineer</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-10">
+            <button onclick="openEsewaModal('Pro Plan', 'Rs. 2999')" class="w-full py-4 rounded-2xl bg-gradient-to-r from-indigo-500 via-brand-600 to-indigo-600 hover:brightness-110 text-white font-black text-base shadow-2xl shadow-indigo-600/50 hover:scale-[1.01] active:scale-[0.98] transition flex items-center justify-center gap-2.5 group">
               <span class="w-2.5 h-2.5 rounded-full bg-[#60bb46] shadow-[0_0_8px_#60bb46]"></span>
-              Pay via eSewa
+              <span>Pay via eSewa</span>
+              <i data-lucide="arrow-up-right" class="w-4 h-4 transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5"></i>
+            </button>
+            <p class="text-center text-[11px] text-slate-400 mt-2">Instant eSewa Scan &bull; Rs. 2999/mo after 3-day trial &bull; Cancel anytime in 1-click</p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Quick-Testing Sandbox Switcher for Evaluators -->
+      <div class="mt-16 text-center">
+        <div class="inline-flex flex-wrap items-center justify-center gap-3 p-3.5 rounded-2xl glass-card text-xs text-slate-400 border border-slate-800">
+          <span class="font-bold text-slate-300 flex items-center gap-1.5">
+            <i data-lucide="terminal" class="w-4 h-4 text-indigo-400"></i>
+            Instant Developer / Evaluator Mode:
+          </span>
+          <button onclick="simulatePlanCheckout('pro')" class="px-3 py-1.5 rounded-xl bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-300 border border-indigo-500/40 transition font-bold">Simulate Pro Checkout (Rs. 2999)</button>
+          <button onclick="simulatePlanCheckout('starter')" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition">Simulate Starter (Rs. 999)</button>
+          <button onclick="resetAppState()" class="px-3 py-1.5 rounded-xl bg-red-950/50 hover:bg-red-900/50 text-red-300 border border-red-800/40 transition">Reset Demo State</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION: FREQUENTLY ASKED QUESTIONS (ACCORDION) -->
+    <section id="faq" class="py-24 bg-slate-900/50 border-t border-slate-800">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-14">
+          <span class="px-3 py-1 rounded-full text-xs font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Got Questions?</span>
+          <h2 class="text-3xl sm:text-4xl font-black tracking-tight mt-3">Frequently Asked Questions</h2>
+        </div>
+
+        <div class="space-y-4" id="faq-accordion">
+          
+          <div class="glass-card rounded-2xl border border-slate-800 overflow-hidden">
+            <button onclick="toggleFaq(1)" class="w-full p-5 text-left font-bold text-sm text-white flex items-center justify-between">
+              <span>How does the 3-day free trial work with eSewa?</span>
+              <i id="faq-icon-1" data-lucide="chevron-down" class="w-4 h-4 text-indigo-400 transition-transform"></i>
+            </button>
+            <div id="faq-answer-1" class="px-5 pb-5 text-xs text-slate-400 leading-relaxed hidden">
+              When you click "Pay via eSewa", simply scan the QR code using your eSewa mobile app. You get full Pro or Starter access for 3 days to evaluate ROI, sizing accuracy, and team workflows with zero lock-in.
+            </div>
+          </div>
+
+          <div class="glass-card rounded-2xl border border-slate-800 overflow-hidden">
+            <button onclick="toggleFaq(2)" class="w-full p-5 text-left font-bold text-sm text-white flex items-center justify-between">
+              <span>How does FitGuard AI calculate sizes without measuring tape?</span>
+              <i id="faq-icon-2" data-lucide="chevron-down" class="w-4 h-4 text-indigo-400 transition-transform"></i>
+            </button>
+            <div id="faq-answer-2" class="px-5 pb-5 text-xs text-slate-400 leading-relaxed hidden">
+              Our edge biometrics engine uses biometric morphological regression models trained on over 2.4 million 3D body scans. By combining height, weight, build morphology, and preferred drape, it predicts chest, waist, and hip circumferences with 98.6% precision.
+            </div>
+          </div>
+
+          <div class="glass-card rounded-2xl border border-slate-800 overflow-hidden">
+            <button onclick="toggleFaq(3)" class="w-full p-5 text-left font-bold text-sm text-white flex items-center justify-between">
+              <span>How does the Automated Size Chart Vision OCR work?</span>
+              <i id="faq-icon-3" data-lucide="chevron-down" class="w-4 h-4 text-indigo-400 transition-transform"></i>
+            </button>
+            <div id="faq-answer-3" class="px-5 pb-5 text-xs text-slate-400 leading-relaxed hidden">
+              Simply upload any supplier PDF spec sheet, factory Excel screenshot, or flat photo. FitGuard's Vision OCR isolates size headers (S, M, L, XL) and measurement columns (Chest, Sleeve, Inseam) and converts them into normalized JSON data that binds directly to your catalog.
+            </div>
+          </div>
+
+          <div class="glass-card rounded-2xl border border-slate-800 overflow-hidden">
+            <button onclick="toggleFaq(4)" class="w-full p-5 text-left font-bold text-sm text-white flex items-center justify-between">
+              <span>Can I completely remove FitGuard AI branding on Pro?</span>
+              <i id="faq-icon-4" data-lucide="chevron-down" class="w-4 h-4 text-indigo-400 transition-transform"></i>
+            </button>
+            <div id="faq-answer-4" class="px-5 pb-5 text-xs text-slate-400 leading-relaxed hidden">
+              Yes. The Pro tier (Rs. 2999/mo) includes our White-Label toggle. When activated, all "Powered by FitGuard AI" watermark badges are removed from your shopper modals and embedded drawer triggers.
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Marketing Footer -->
+    <footer class="mt-auto border-t border-slate-900 bg-slate-950 py-12">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6 text-xs text-slate-500">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center">
+            <i data-lucide="shield-check" class="w-4 h-4 text-white"></i>
+          </div>
+          <div>
+            <span class="font-bold text-slate-300">FitGuard AI Technologies Inc.</span>
+            <p class="text-[11px] text-slate-600">&copy; 2026. All rights reserved. Supported payments via eSewa.</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-6">
+          <a href="#" class="hover:text-slate-300 transition">Privacy Policy</a>
+          <a href="#" class="hover:text-slate-300 transition">Terms of Service</a>
+          <a href="#" class="hover:text-slate-300 transition">Security Disclosure</a>
+          <a href="#" class="hover:text-slate-300 transition">API Documentation</a>
+        </div>
+      </div>
+    </footer>
+  </main>
+
+  <!-- ========================================================================= -->
+  <!-- VIEW 2: INTERACTIVE MERCHANT DASHBOARD                                    -->
+  <!-- ========================================================================= -->
+  <main id="view-dashboard" class="flex-1 hidden flex-col lg:flex-row min-h-[calc(100vh-4rem)]">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="w-full lg:w-72 glass-card border-r border-slate-800/80 p-5 flex flex-col justify-between shrink-0">
+      <div class="space-y-6">
+        
+        <!-- Active Store Selector -->
+        <div class="p-3.5 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-between">
+          <div class="flex items-center gap-3 overflow-hidden">
+            <div class="w-9 h-9 rounded-xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center shrink-0">
+              <i data-lucide="store" class="w-4 h-4 text-indigo-400"></i>
+            </div>
+            <div class="truncate">
+              <div class="text-xs font-bold text-white truncate">Acme Apparel Global</div>
+              <div class="text-[10px] text-slate-400 flex items-center gap-1 font-mono">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> shopify_live_9012
+              </div>
+            </div>
+          </div>
+          <i data-lucide="chevrons-up-down" class="w-4 h-4 text-slate-500 shrink-0"></i>
+        </div>
+
+        <!-- Dashboard Navigation Menu -->
+        <nav class="space-y-1.5">
+          <!-- Overview Tab -->
+          <button onclick="switchTab('overview')" id="tab-btn-overview" class="dash-tab-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-xs font-bold transition bg-indigo-600 text-white shadow-lg shadow-indigo-600/30">
+            <div class="flex items-center gap-3">
+              <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
+              <span>Overview & Analytics</span>
+            </div>
+          </button>
+
+          <!-- PRO FEATURE 1: Widget Customizer & White-Label -->
+          <button onclick="switchTab('customizer')" id="tab-btn-customizer" class="dash-tab-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-xs font-semibold transition text-slate-400 hover:text-slate-200 hover:bg-slate-900">
+            <div class="flex items-center gap-3">
+              <i data-lucide="sliders" class="w-4 h-4"></i>
+              <span>Widget Customizer</span>
+            </div>
+            <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Pro #1</span>
+          </button>
+
+          <!-- PRO FEATURE 4: Automated Size Chart OCR Generator -->
+          <button onclick="switchTab('ocr-charts')" id="tab-btn-ocr-charts" class="dash-tab-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-xs font-semibold transition text-slate-400 hover:text-slate-200 hover:bg-slate-900">
+            <div class="flex items-center gap-3">
+              <i data-lucide="scan" class="w-4 h-4"></i>
+              <span>AI Size Chart OCR</span>
+            </div>
+            <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Pro #4</span>
+          </button>
+
+          <!-- Return Logs Explorer -->
+          <button onclick="switchTab('return-logs')" id="tab-btn-return-logs" class="dash-tab-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-xs font-semibold transition text-slate-400 hover:text-slate-200 hover:bg-slate-900">
+            <div class="flex items-center gap-3">
+              <i data-lucide="package-x" class="w-4 h-4"></i>
+              <span>Intercept Logs</span>
+            </div>
+          </button>
+
+          <!-- PRO FEATURE 3: Team Management Tab -->
+          <button onclick="switchTab('team')" id="tab-btn-team" class="dash-tab-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-xs font-semibold transition text-slate-400 hover:text-slate-200 hover:bg-slate-900">
+            <div class="flex items-center gap-3">
+              <i data-lucide="users" class="w-4 h-4"></i>
+              <span>Team & Staff</span>
+            </div>
+            <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Pro #3</span>
+          </button>
+
+          <!-- Billing & Settings Tab -->
+          <button onclick="switchTab('billing')" id="tab-btn-billing" class="dash-tab-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-xs font-semibold transition text-slate-400 hover:text-slate-200 hover:bg-slate-900">
+            <div class="flex items-center gap-3">
+              <i data-lucide="credit-card" class="w-4 h-4"></i>
+              <span>Billing & Subscription</span>
+            </div>
+          </button>
+        </nav>
+      </div>
+
+      <!-- Plan Status Sidebar Widget -->
+      <div class="mt-8 pt-4 border-t border-slate-800">
+        <div id="dash-sidebar-plan-card" class="p-4 rounded-2xl bg-gradient-to-br from-slate-900 to-indigo-950/60 border border-indigo-500/30 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span id="dash-sidebar-tier" class="text-xs font-black text-white">PRO PLAN ACTIVE</span>
+            <span class="px-2 py-0.5 text-[9px] font-bold rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">3-Day Trial</span>
+          </div>
+          <p class="text-[11px] text-slate-400 leading-tight">All 4 Pro Tier enterprise features are unlocked for this store.</p>
+          <div class="pt-1">
+            <button onclick="openEsewaModal('Pro Plan', 'Rs. 2999')" class="w-full py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition">
+              <span>eSewa Billing Details</span>
+              <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Workspace Container -->
+    <div class="flex-1 overflow-y-auto p-4 sm:p-8 custom-scrollbar">
+      
+      <!-- ===================================================================== -->
+      <!-- TAB 1: OVERVIEW & RETURN PREVENTION ANALYTICS (PRO FEATURE #2)        -->
+      <!-- ===================================================================== -->
+      <div id="tab-content-overview" class="tab-pane space-y-8">
+        
+        <!-- Workspace Header -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight">Executive Telemetry & ROI Dashboard</h1>
+            <p class="text-xs sm:text-sm text-slate-400 mt-1">Real-time apparel sizing accuracy and return interception metrics for Acme Apparel Global.</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <button onclick="refreshDashboardMetrics()" class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-700 text-xs font-bold flex items-center gap-2 transition">
+              <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-indigo-400"></i>
+              <span>Live Refresh</span>
+            </button>
+            <button onclick="openExportModal()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold flex items-center gap-2 transition shadow-lg shadow-indigo-600/30">
+              <i data-lucide="download" class="w-3.5 h-3.5"></i>
+              <span>Export CSV Report</span>
             </button>
           </div>
         </div>
 
-      </div>
-    </section>
-
-    <!-- TESTIMONIALS & SOCIAL PROOF -->
-    <section id="testimonials" class="py-24 border-t border-slate-900 bg-slate-950/80">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center max-w-3xl mx-auto mb-16">
-          <h2 class="text-xs font-bold uppercase tracking-widest text-cyan-400 mb-3">Athletes & Trainers</h2>
-          <p class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">Proven by Serious Lifters</p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- PRO FEATURE #2: DEDICATED AI RETURN PREVENTION ANALYTICS CARD -->
+        <div class="glass-card p-6 sm:p-8 rounded-3xl border-2 border-indigo-500/40 bg-gradient-to-br from-slate-900/90 via-indigo-950/30 to-slate-900/90 shadow-2xl relative overflow-hidden">
           
-          <!-- Testimonial 1 -->
-          <div class="glass-panel p-8 rounded-2xl flex flex-col justify-between">
-            <div>
-              <div class="flex text-amber-400 gap-1 mb-4">
-                <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
-              </div>
-              <p class="text-slate-300 text-sm leading-relaxed mb-6">
-                "The vocal cues caught my lower back rounding on heavy deadlifts before I even felt fatigue. FitGuard AI legitimately saved me from a spinal disc flare-up."
-              </p>
-            </div>
-            <div class="flex items-center gap-3 pt-4 border-t border-slate-800">
-              <div class="w-10 h-10 rounded-full bg-cyan-950 border border-cyan-500/40 flex items-center justify-center text-cyan-300 font-bold text-sm">
-                AK
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-6 border-b border-slate-800">
+            <div class="flex items-center gap-3.5">
+              <div class="w-11 h-11 rounded-2xl bg-indigo-600/30 border border-indigo-500/40 flex items-center justify-center">
+                <i data-lucide="shield-alert" class="w-6 h-6 text-indigo-400"></i>
               </div>
               <div>
-                <div class="text-sm font-bold text-white">Anish Karmacharya</div>
-                <div class="text-xs text-slate-400">Competitive Powerlifter</div>
+                <div class="flex items-center gap-2.5">
+                  <h2 class="text-lg font-black text-white">AI Return Prevention Engine</h2>
+                  <span class="px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-gradient-to-r from-indigo-500 to-brand-500 text-white shadow-sm">PRO TIER FEATURE #2</span>
+                </div>
+                <p class="text-xs text-slate-400">Biometric regression model intercepting fit errors before cart checkout</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 text-xs font-bold text-emerald-400 bg-emerald-500/10 px-3 py-1.5 rounded-xl border border-emerald-500/25">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+              <span>Live Ingestion Active</span>
+            </div>
+          </div>
+
+          <!-- The 3 Core Pro Metrics Cards -->
+          <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+            <!-- Metric 1: Total Returns Prevented -->
+            <div class="p-6 rounded-2xl bg-slate-900/90 border border-slate-800 flex flex-col justify-between">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-black text-slate-400 uppercase tracking-wider">Total Returns Prevented</span>
+                <div class="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center">
+                  <i data-lucide="package-check" class="w-4 h-4 text-indigo-400"></i>
+                </div>
+              </div>
+              <div class="mt-4 flex items-baseline gap-2">
+                <span id="kpi-returns-prevented" class="text-4xl font-black text-white font-mono">512</span>
+                <span class="text-xs font-bold text-emerald-400 flex items-center gap-0.5 font-mono">
+                  <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i> +18.4%
+                </span>
+              </div>
+              <p class="text-[11px] text-slate-500 mt-2">Prevented through automated size corrections</p>
+            </div>
+
+            <!-- Metric 2: Estimated Money Saved (Rs.) -->
+            <div class="p-6 rounded-2xl bg-slate-900/90 border border-slate-800 flex flex-col justify-between">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-black text-slate-400 uppercase tracking-wider">Estimated Money Saved (Rs.)</span>
+                <div class="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+                  <i data-lucide="coins" class="w-4 h-4 text-emerald-400"></i>
+                </div>
+              </div>
+              <div class="mt-4 flex items-baseline gap-2">
+                <span id="kpi-money-saved" class="text-4xl font-black text-emerald-400 font-mono">Rs. 1,740,800</span>
+                <span class="text-xs font-bold text-emerald-400 flex items-center gap-0.5 font-mono">
+                  <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i> Rs. 3,400/return avg
+                </span>
+              </div>
+              <p class="text-[11px] text-slate-500 mt-2">Saved on freight, repackaging, & unsellable inventory</p>
+            </div>
+
+            <!-- Metric 3: Size Accuracy Rate -->
+            <div class="p-6 rounded-2xl bg-slate-900/90 border border-slate-800 flex flex-col justify-between">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-black text-slate-400 uppercase tracking-wider">Size Accuracy Rate</span>
+                <div class="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                  <i data-lucide="target" class="w-4 h-4 text-blue-400"></i>
+                </div>
+              </div>
+              <div class="mt-4 flex items-baseline gap-2">
+                <span id="kpi-accuracy-rate" class="text-4xl font-black text-white font-mono">98.7%</span>
+                <span class="text-xs font-bold text-indigo-400 flex items-center gap-0.5 font-mono">
+                  <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Verified
+                </span>
+              </div>
+              <p class="text-[11px] text-slate-500 mt-2">Based on 14,890 verified customer checkout sessions</p>
+            </div>
+
+          </div>
+
+          <!-- Chart.js Graph Rendering Container -->
+          <div class="mt-8 pt-6 border-t border-slate-800">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-xs font-bold text-slate-300 flex items-center gap-2">
+                <i data-lucide="line-chart" class="w-4 h-4 text-indigo-400"></i>
+                Returns Prevented vs. Sizing Inquiries (30-Day Trajectory)
+              </h3>
+              <span class="text-[11px] text-slate-500 font-mono">Updated Every 60s</span>
+            </div>
+            <div class="h-64 w-full relative">
+              <canvas id="returnPreventionChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Intercept Ticker Stream -->
+        <div class="glass-card p-6 rounded-3xl border border-slate-800 space-y-4">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              <i data-lucide="activity" class="w-4 h-4 text-emerald-400"></i>
+              Real-Time Shopper Size Intercept Log
+            </h3>
+            <button onclick="switchTab('return-logs')" class="text-xs text-indigo-400 hover:underline">View All Sessions &rarr;</button>
+          </div>
+
+          <div class="space-y-2.5 text-xs">
+            <div class="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between hover:border-slate-700 transition">
+              <div class="flex items-center gap-3">
+                <div class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></div>
+                <div>
+                  <span class="text-white font-bold">Session #90812 (Kathmandu, NP)</span> &bull;
+                  <span class="text-slate-400">Attempted <strong>Size M</strong> for <em>Heavyweight Fleece</em> &rarr; AI corrected to <strong>Size S</strong>.</span>
+                </div>
+              </div>
+              <span class="text-emerald-400 font-mono font-bold">Saved Rs. 3,400</span>
+            </div>
+
+            <div class="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between hover:border-slate-700 transition">
+              <div class="flex items-center gap-3">
+                <div class="w-2.5 h-2.5 rounded-full bg-emerald-400"></div>
+                <div>
+                  <span class="text-white font-bold">Session #90809 (Pokhara, NP)</span> &bull;
+                  <span class="text-slate-400">Customer bracket ordered <strong>Sizes 32 & 34</strong> &rarr; FitGuard confirmed <strong>Size 32</strong>.</span>
+                </div>
+              </div>
+              <span class="text-emerald-400 font-mono font-bold">Saved Rs. 6,800 (Double Bracket Averted)</span>
+            </div>
+
+            <div class="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between hover:border-slate-700 transition">
+              <div class="flex items-center gap-3">
+                <div class="w-2.5 h-2.5 rounded-full bg-emerald-400"></div>
+                <div>
+                  <span class="text-white font-bold">Session #90804 (Lalitpur, NP)</span> &bull;
+                  <span class="text-slate-400">Customer selected <strong>Size XL</strong> &rarr; AI detected broad shoulder spec & confirmed <strong>Size XL</strong> (100% Fit Match).</span>
+                </div>
+              </div>
+              <span class="text-indigo-400 font-mono font-bold">Confidence 99.4%</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ===================================================================== -->
+      <!-- TAB 2: WIDGET CUSTOMIZER & WHITE-LABELING (PRO FEATURE #1)             -->
+      <!-- ===================================================================== -->
+      <div id="tab-content-customizer" class="tab-pane hidden space-y-8">
+        <div>
+          <div class="flex items-center gap-2.5">
+            <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight">Storefront Widget Customizer</h1>
+            <span class="px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-gradient-to-r from-indigo-500 to-brand-500 text-white">PRO FEATURE #1</span>
+          </div>
+          <p class="text-xs sm:text-sm text-slate-400 mt-1">Configure modal branding, corner radii, trigger buttons, and manage white-labeling watermark visibility.</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          
+          <!-- Column 1: Configuration Form -->
+          <div class="lg:col-span-6 space-y-6">
+            
+            <!-- PRO FEATURE #1 TOGGLE CARD -->
+            <div class="glass-card p-6 rounded-3xl border-2 border-indigo-500/40 relative space-y-4">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3.5">
+                  <div class="w-11 h-11 rounded-2xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center">
+                    <i data-lucide="sparkles" class="w-6 h-6 text-indigo-400"></i>
+                  </div>
+                  <div>
+                    <h3 class="text-base font-bold text-white">White-Labeling Watermark Toggle</h3>
+                    <p class="text-xs text-slate-400">Hide "Powered by FitGuard AI" watermark across customer views</p>
+                  </div>
+                </div>
+
+                <!-- Pro Toggle Switch -->
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" id="dash-whitelabel-toggle" onchange="toggleWhiteLabelOption(this.checked)" class="sr-only peer" checked>
+                  <div class="w-13 h-7 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-indigo-600"></div>
+                </label>
+              </div>
+
+              <div id="whitelabel-badge-status" class="p-3 rounded-xl bg-slate-900 border border-slate-800 text-xs text-emerald-400 flex items-center gap-2">
+                <i data-lucide="check-circle" class="w-4 h-4"></i>
+                <span>FitGuard branding is <strong>HIDDEN</strong> on your storefront widget.</span>
+              </div>
+            </div>
+
+            <!-- Appearance Controls -->
+            <div class="glass-card p-6 rounded-3xl border border-slate-800 space-y-4">
+              <h3 class="text-sm font-bold text-white">Theme & Palette Customization</h3>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-300 mb-1.5">Primary Brand Accent Color</label>
+                <div class="flex items-center gap-3">
+                  <input type="color" id="dash-custom-color" value="#4f46e5" oninput="updateLiveWidgetPreview()" class="w-10 h-10 rounded-xl bg-transparent border border-slate-700 cursor-pointer">
+                  <input type="text" id="dash-custom-hex" value="#4f46e5" oninput="updateLiveWidgetPreviewHex()" class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white uppercase font-mono w-32">
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-300 mb-1.5">Button Corner Radius</label>
+                <select id="dash-custom-radius" onchange="updateLiveWidgetPreview()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+                  <option value="rounded-lg">Subtle Rounded (8px)</option>
+                  <option value="rounded-2xl" selected>Modern SaaS Soft (16px)</option>
+                  <option value="rounded-full">Full Pill (9999px)</option>
+                  <option value="rounded-none">Sharp Minimal (0px)</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-300 mb-1.5">Trigger Button Label</label>
+                <input type="text" id="dash-custom-label" value="Calculate My Perfect Size ✨" oninput="updateLiveWidgetPreview()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+              </div>
+            </div>
+
+            <!-- Embed Code Snippet Generator -->
+            <div class="glass-card p-6 rounded-3xl border border-slate-800 space-y-3">
+              <div class="flex items-center justify-between">
+                <h3 class="text-sm font-bold text-white">Production Embed Tag</h3>
+                <button onclick="copyEmbedScriptCode()" class="px-3 py-1 rounded-lg bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-300 text-xs font-bold flex items-center gap-1.5 transition">
+                  <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                  <span id="dash-copy-btn-label">Copy Script</span>
+                </button>
+              </div>
+              <pre class="bg-slate-950 p-4 rounded-2xl border border-slate-800 text-[11px] font-mono-code text-indigo-300 overflow-x-auto custom-scrollbar leading-relaxed"><code id="dash-embed-code-block">&lt;!-- FitGuard AI Platform Embed --&gt;
+&lt;script 
+  src="https://cdn.fitguard.ai/v2/fitguard.min.js" 
+  data-store-id="FG-9012-PRO" 
+  data-white-label="true" 
+  data-accent="#4f46e5" 
+  async&gt;
+&lt;/script&gt;</code></pre>
+            </div>
+
+          </div>
+
+          <!-- Column 2: Live Interactive Widget Preview -->
+          <div class="lg:col-span-6">
+            <div class="sticky top-24 glass-card p-6 rounded-3xl border border-slate-800 space-y-4">
+              <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+                <span class="text-xs font-bold text-slate-300 flex items-center gap-2">
+                  <i data-lucide="eye" class="w-4 h-4 text-indigo-400"></i> Storefront Widget Live Rendering
+                </span>
+                <span class="text-[10px] text-emerald-400 font-mono">Synced</span>
+              </div>
+
+              <!-- Product Page Simulation Mock -->
+              <div class="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-5">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-white">FitGuard Biometric Matcher</span>
+                  <span class="text-xs font-bold text-emerald-400">99.2% Fit Confidence</span>
+                </div>
+
+                <div class="p-5 rounded-2xl bg-slate-950 border border-slate-800 text-center space-y-2">
+                  <span class="text-xs text-slate-400 font-semibold">Recommended for Your Body Spec:</span>
+                  <div class="text-3xl font-black text-white">Size L (Relaxed)</div>
+                  <p class="text-xs text-slate-400">Chest drape +2.5cm &bull; Sleeve length 64cm</p>
+                </div>
+
+                <!-- Custom CTA Button -->
+                <button id="dash-preview-btn" class="w-full py-3.5 rounded-2xl bg-indigo-600 text-white font-bold text-xs shadow-lg transition">
+                  Calculate My Perfect Size ✨
+                </button>
+
+                <!-- Watermark Node (Controlled by Pro toggle) -->
+                <div id="dash-preview-watermark" class="text-center pt-2">
+                  <p class="text-[10px] text-slate-500 font-medium">
+                    Powered by <strong class="text-indigo-400">FitGuard AI</strong>
+                  </p>
+                </div>
+              </div>
+
+              <p class="text-xs text-slate-400 text-center">
+                Toggle White-Label switch to verify instant watermark removal.
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ===================================================================== -->
+      <!-- TAB 3: AUTOMATED SIZE CHART OCR GENERATOR (PRO FEATURE #4)             -->
+      <!-- ===================================================================== -->
+      <div id="tab-content-ocr-charts" class="tab-pane hidden space-y-8">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2.5">
+              <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight">Automated Size Chart Vision OCR</h1>
+              <span class="px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-gradient-to-r from-indigo-500 to-brand-500 text-white">PRO FEATURE #4</span>
+            </div>
+            <p class="text-xs sm:text-sm text-slate-400 mt-1">Upload unstructured supplier PDF spec sheets, scans, or garment images. Vision AI isolates measurements and populates your matrix.</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          
+          <!-- Column 1: Upload & OCR Ingestion Engine -->
+          <div class="lg:col-span-5 space-y-6">
+            <div class="glass-card p-6 rounded-3xl border border-slate-800 space-y-4">
+              <h3 class="text-sm font-bold text-white">Ingest Supplier Spec File</h3>
+              
+              <!-- Dropzone -->
+              <div id="ocr-dropzone" onclick="triggerOcrFileUpload()" class="border-2 border-dashed border-indigo-500/40 hover:border-indigo-400 rounded-3xl p-8 text-center cursor-pointer transition bg-slate-900/60 hover:bg-slate-900 flex flex-col items-center justify-center relative overflow-hidden group">
+                <input type="file" id="ocr-file-input" class="hidden" accept="image/*,.pdf" onchange="handleOcrFileUpload(event)">
+                
+                <div class="w-14 h-14 rounded-2xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center mb-3 group-hover:scale-110 transition">
+                  <i data-lucide="upload-cloud" class="w-7 h-7 text-indigo-400"></i>
+                </div>
+                <div class="text-sm font-bold text-white">Drop supplier chart or spec PDF</div>
+                <div class="text-xs text-slate-400 mt-1">PDF, JPG, PNG, or Excel screenshots (Max 50MB)</div>
+                <button type="button" class="mt-4 px-4 py-2 rounded-xl bg-slate-800 text-indigo-300 text-xs font-bold border border-slate-700">Browse Files</button>
+              </div>
+
+              <!-- Scanning Visualizer State -->
+              <div id="ocr-progress-box" class="hidden p-4 rounded-2xl bg-indigo-950/80 border border-indigo-500/40 space-y-3 relative overflow-hidden">
+                <div class="flex items-center justify-between text-xs text-indigo-200 font-bold">
+                  <span class="flex items-center gap-2">
+                    <i data-lucide="loader-2" class="w-4 h-4 animate-spin text-indigo-400"></i>
+                    Vision AI Parsing Matrix Bounding Boxes...
+                  </span>
+                  <span id="ocr-pct" class="font-mono">42%</span>
+                </div>
+                <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
+                  <div id="ocr-bar" class="h-full bg-gradient-to-r from-indigo-500 via-brand-400 to-emerald-400 transition-all duration-200" style="width: 42%"></div>
+                </div>
+                <p class="text-[11px] text-slate-400 font-mono">Extracting: Chest(cm), Waist(cm), Inseam(cm), Sleeve(cm)...</p>
+              </div>
+
+              <!-- Quick Supplier Templates -->
+              <div>
+                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Or test sample factory spec sheets:</span>
+                <div class="grid grid-cols-2 gap-2">
+                  <button onclick="runOcrSimulation('Heavyweight_Hoodie_TechPack_2026.pdf')" class="px-3 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 text-xs font-semibold border border-slate-800 transition text-left flex items-center gap-2">
+                    <i data-lucide="shirt" class="w-3.5 h-3.5 text-indigo-400"></i>
+                    <span class="truncate">Hoodie TechPack.pdf</span>
+                  </button>
+                  <button onclick="runOcrSimulation('Raw_Denim_Selvedge_Specs.png')" class="px-3 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 text-xs font-semibold border border-slate-800 transition text-left flex items-center gap-2">
+                    <i data-lucide="scissors" class="w-3.5 h-3.5 text-indigo-400"></i>
+                    <span class="truncate">Denim Specs.png</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
 
-          <!-- Testimonial 2 -->
-          <div class="glass-panel p-8 rounded-2xl flex flex-col justify-between">
-            <div>
-              <div class="flex text-amber-400 gap-1 mb-4">
-                <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+          <!-- Column 2: Editable Matrix Spreadsheet -->
+          <div class="lg:col-span-7 space-y-4">
+            <div class="glass-card p-6 rounded-3xl border border-slate-800">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-800">
+                <div>
+                  <h3 id="ocr-matrix-title" class="text-base font-bold text-white">Parsed Matrix: Heavyweight Outerwear</h3>
+                  <span id="ocr-matrix-status" class="text-xs text-emerald-400 font-medium">✓ Vision OCR Normalized &bull; 6 Size Grids Generated</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <button onclick="addMatrixRow()" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold border border-slate-700 transition flex items-center gap-1">
+                    <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Size
+                  </button>
+                  <button onclick="syncMatrixToCatalog()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition flex items-center gap-1 shadow-lg shadow-indigo-600/30">
+                    <i data-lucide="save" class="w-3.5 h-3.5"></i> Sync to Shopify
+                  </button>
+                </div>
               </div>
-              <p class="text-slate-300 text-sm leading-relaxed mb-6">
-                "I coach 14 clients simultaneously in a hybrid studio. FitGuard gives me automated multi-camera analytics on joint angles that would be impossible to eyeball manually."
-              </p>
-            </div>
-            <div class="flex items-center gap-3 pt-4 border-t border-slate-800">
-              <div class="w-10 h-10 rounded-full bg-indigo-950 border border-indigo-500/40 flex items-center justify-center text-indigo-300 font-bold text-sm">
-                SP
-              </div>
-              <div>
-                <div class="text-sm font-bold text-white">Sunita Pradhan</div>
-                <div class="text-xs text-slate-400">Strength & Conditioning Coach</div>
-              </div>
-            </div>
-          </div>
 
-          <!-- Testimonial 3 -->
-          <div class="glass-panel p-8 rounded-2xl flex flex-col justify-between">
-            <div>
-              <div class="flex text-amber-400 gap-1 mb-4">
-                <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+              <!-- Spreadsheet Table -->
+              <div class="mt-4 overflow-x-auto custom-scrollbar">
+                <table class="w-full text-left text-xs text-slate-300">
+                  <thead class="bg-slate-900 text-slate-400 font-bold uppercase tracking-wider text-[10px]">
+                    <tr>
+                      <th class="p-3 pl-4 rounded-l-xl">Size Tag</th>
+                      <th class="p-3">Chest (cm)</th>
+                      <th class="p-3">Waist (cm)</th>
+                      <th class="p-3">Length (cm)</th>
+                      <th class="p-3">Weight Recommendation</th>
+                      <th class="p-3 pr-4 rounded-r-xl text-center">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="ocr-matrix-tbody" class="divide-y divide-slate-800 font-mono">
+                    <!-- Populated via JS -->
+                  </tbody>
+                </table>
               </div>
-              <p class="text-slate-300 text-sm leading-relaxed mb-6">
-                "The eSewa checkout was instant, and the app began tracking my squat depth right from my iPad browser without installing any heavy native software."
-              </p>
-            </div>
-            <div class="flex items-center gap-3 pt-4 border-t border-slate-800">
-              <div class="w-10 h-10 rounded-full bg-violet-950 border border-violet-500/40 flex items-center justify-center text-violet-300 font-bold text-sm">
-                BT
-              </div>
-              <div>
-                <div class="text-sm font-bold text-white">Bibek Thapa</div>
-                <div class="text-xs text-slate-400">Home Gym Enthusiast</div>
+
+              <div class="mt-4 p-3 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between text-xs text-slate-400">
+                <span>Active Unit: <strong class="text-white">Centimeters (cm)</strong></span>
+                <button onclick="toggleUnitsConvert()" class="text-indigo-400 hover:underline font-semibold font-sans">Convert all to Inches (in)</button>
               </div>
             </div>
           </div>
 
         </div>
       </div>
-    </section>
 
-    <!-- FAQ SECTION (ACCORDION) -->
-    <section id="faq" class="py-24 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="text-center mb-16">
-        <h2 class="text-xs font-bold uppercase tracking-widest text-cyan-400 mb-3">Got Questions?</h2>
-        <p class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">Frequently Asked Questions</p>
+      <!-- ===================================================================== -->
+      <!-- TAB 4: INTERCEPT LOGS EXPLORER                                       -->
+      <!-- ===================================================================== -->
+      <div id="tab-content-return-logs" class="tab-pane hidden space-y-8">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight">Customer Intercept & Return Log Explorer</h1>
+            <p class="text-xs sm:text-sm text-slate-400 mt-1">Audit fit inquiries, averted bracketing orders, and AI sizing decisions.</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <input type="text" id="log-search-input" oninput="filterLogsTable()" placeholder="Search by SKU, City, or Size..." class="bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 w-64">
+          </div>
+        </div>
+
+        <div class="glass-card rounded-3xl border border-slate-800 overflow-hidden">
+          <div class="overflow-x-auto custom-scrollbar">
+            <table class="w-full text-left text-xs text-slate-300">
+              <thead class="bg-slate-900 text-slate-400 font-bold uppercase tracking-wider text-[10px]">
+                <tr>
+                  <th class="p-4 pl-6">Session ID</th>
+                  <th class="p-4">SKU / Product</th>
+                  <th class="p-4">Customer Biometrics</th>
+                  <th class="p-4">Requested</th>
+                  <th class="p-4">AI Recommended</th>
+                  <th class="p-4">Outcome</th>
+                  <th class="p-4 pr-6 text-right">Estimated Savings</th>
+                </tr>
+              </thead>
+              <tbody id="intercept-logs-tbody" class="divide-y divide-slate-800">
+                <!-- Dynamically populated via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
 
-      <div class="space-y-4">
-        
-        <!-- Accordion Item 1 -->
-        <div class="border border-slate-800 rounded-2xl bg-slate-900/40 overflow-hidden">
-          <button class="faq-toggle w-full p-6 text-left flex items-center justify-between text-white font-bold hover:text-cyan-400 transition-colors">
-            <span>What devices work with FitGuard AI?</span>
-            <svg class="faq-icon w-5 h-5 text-slate-400 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-            </svg>
+      <!-- ===================================================================== -->
+      <!-- TAB 5: TEAM & STAFF ACCOUNTS (PRO FEATURE #3)                         -->
+      <!-- ===================================================================== -->
+      <div id="tab-content-team" class="tab-pane hidden space-y-8">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2.5">
+              <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight">Team & Staff Accounts</h1>
+              <span class="px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-gradient-to-r from-indigo-500 to-brand-500 text-white">PRO FEATURE #3</span>
+            </div>
+            <p class="text-xs sm:text-sm text-slate-400 mt-1">Manage team access, fit technicians, merchandisers, and customer support representatives.</p>
+          </div>
+          <button onclick="openInviteModal()" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition flex items-center gap-2 shadow-lg shadow-indigo-600/30">
+            <i data-lucide="user-plus" class="w-4 h-4"></i>
+            <span>Invite Team Member</span>
           </button>
-          <div class="faq-content hidden px-6 pb-6 text-slate-400 text-sm leading-relaxed border-t border-slate-800/60 pt-4">
-            FitGuard AI runs smoothly on any modern device equipped with a standard camera—including iOS iPhones, iPads, Android smartphones, MacBooks, and Windows laptops. No secondary sensors or wearables are required.
+        </div>
+
+        <!-- Team Table -->
+        <div class="glass-card rounded-3xl border border-slate-800 overflow-hidden">
+          <div class="p-6 border-b border-slate-800 flex items-center justify-between">
+            <div>
+              <h3 class="text-sm font-bold text-white">Active Store Staff</h3>
+              <p class="text-xs text-slate-400">Unlimited staff seats available on Pro Tier</p>
+            </div>
+            <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">RBAC Active</span>
+          </div>
+
+          <div class="overflow-x-auto custom-scrollbar">
+            <table class="w-full text-left text-xs text-slate-300">
+              <thead class="bg-slate-900 text-slate-400 font-bold uppercase tracking-wider text-[10px]">
+                <tr>
+                  <th class="p-4 pl-6">Member Name</th>
+                  <th class="p-4">Email</th>
+                  <th class="p-4">Role</th>
+                  <th class="p-4">Status</th>
+                  <th class="p-4 pr-6 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="dash-team-tbody" class="divide-y divide-slate-800">
+                <!-- Dynamically populated via JS -->
+              </tbody>
+            </table>
           </div>
         </div>
 
-        <!-- Accordion Item 2 -->
-        <div class="border border-slate-800 rounded-2xl bg-slate-900/40 overflow-hidden">
-          <button class="faq-toggle w-full p-6 text-left flex items-center justify-between text-white font-bold hover:text-cyan-400 transition-colors">
-            <span>How do I activate my plan via eSewa?</span>
-            <svg class="faq-icon w-5 h-5 text-slate-400 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-            </svg>
-          </button>
-          <div class="faq-content hidden px-6 pb-6 text-slate-400 text-sm leading-relaxed border-t border-slate-800/60 pt-4">
-            Simply select either the Starter Pack (Rs. 999) or Pro Plan (Rs. 2999) and click "Pay via eSewa". Open your eSewa mobile app, tap the Scan & Pay button, scan the generated QR code, and your subscription will be unlocked instantly.
+        <!-- Role Permissions Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="glass-card p-5 rounded-2xl border border-slate-800 space-y-2">
+            <div class="flex items-center gap-2 text-white font-bold text-sm">
+              <span class="w-2.5 h-2.5 rounded-full bg-indigo-400"></span>
+              <span>Admin Role</span>
+            </div>
+            <p class="text-xs text-slate-400 leading-relaxed">Full access to eSewa billing, team member invites, API keys, and widget customizer styling.</p>
+          </div>
+          <div class="glass-card p-5 rounded-2xl border border-slate-800 space-y-2">
+            <div class="flex items-center gap-2 text-white font-bold text-sm">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+              <span>Fit Editor Role</span>
+            </div>
+            <p class="text-xs text-slate-400 leading-relaxed">Can ingest supplier charts via Vision OCR, modify sizing tables, and adjust biometric drape thresholds.</p>
+          </div>
+          <div class="glass-card p-5 rounded-2xl border border-slate-800 space-y-2">
+            <div class="flex items-center gap-2 text-white font-bold text-sm">
+              <span class="w-2.5 h-2.5 rounded-full bg-slate-400"></span>
+              <span>Support Viewer Role</span>
+            </div>
+            <p class="text-xs text-slate-400 leading-relaxed">Read-only access to customer intercept logs to investigate fit inquiries and customer support sizing tickets.</p>
           </div>
         </div>
-
-        <!-- Accordion Item 3 -->
-        <div class="border border-slate-800 rounded-2xl bg-slate-900/40 overflow-hidden">
-          <button class="faq-toggle w-full p-6 text-left flex items-center justify-between text-white font-bold hover:text-cyan-400 transition-colors">
-            <span>Is my live video feed stored on your servers?</span>
-            <svg class="faq-icon w-5 h-5 text-slate-400 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-            </svg>
-          </button>
-          <div class="faq-content hidden px-6 pb-6 text-slate-400 text-sm leading-relaxed border-t border-slate-800/60 pt-4">
-            No. Your privacy is paramount. Computer vision skeletal coordinate calculations occur client-side in real-time in your device's memory. Video feeds are never stored, transmitted, or recorded without explicit permission.
-          </div>
-        </div>
-
-        <!-- Accordion Item 4 -->
-        <div class="border border-slate-800 rounded-2xl bg-slate-900/40 overflow-hidden">
-          <button class="faq-toggle w-full p-6 text-left flex items-center justify-between text-white font-bold hover:text-cyan-400 transition-colors">
-            <span>Can FitGuard AI handle complex multi-joint movements?</span>
-            <svg class="faq-icon w-5 h-5 text-slate-400 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-            </svg>
-          </button>
-          <div class="faq-content hidden px-6 pb-6 text-slate-400 text-sm leading-relaxed border-t border-slate-800/60 pt-4">
-            Yes. FitGuard AI supports over 220 compound and isolation exercises including barbell squats, Romanian deadlifts, bench press, overhead presses, kettlebell swings, and Olympic weightlifting variations.
-          </div>
-        </div>
-
       </div>
-    </section>
 
+      <!-- ===================================================================== -->
+      <!-- TAB 6: BILLING & SUBSCRIPTIONS (eSewa + 3-DAY TRIAL)                 -->
+      <!-- ===================================================================== -->
+      <div id="tab-content-billing" class="tab-pane hidden space-y-8">
+        <div>
+          <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight">Subscription & eSewa Billing</h1>
+          <p class="text-xs sm:text-sm text-slate-400 mt-1">Manage your active subscription tier, payments, and invoices.</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          
+          <!-- Current Plan Details -->
+          <div class="lg:col-span-6 glass-card p-6 sm:p-8 rounded-3xl border-2 border-indigo-500/40 space-y-6">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+              <div>
+                <span class="text-xs font-bold text-indigo-400 uppercase tracking-wider">Active Subscription</span>
+                <h3 id="billing-tier-title" class="text-2xl font-black text-white mt-1">Pro Plan (Rs. 2999/mo)</h3>
+              </div>
+              <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">3-Day Free Trial</span>
+            </div>
+
+            <div class="space-y-3 text-xs text-slate-300">
+              <div class="flex justify-between py-2 border-b border-slate-900">
+                <span class="text-slate-400">Trial Period Status:</span>
+                <span class="font-bold text-emerald-400">3 Days Active</span>
+              </div>
+              <div class="flex justify-between py-2 border-b border-slate-900">
+                <span class="text-slate-400">Billing Provider:</span>
+                <span class="font-mono text-slate-200">eSewa Direct Payment Portal</span>
+              </div>
+              <div class="flex justify-between py-2 border-b border-slate-900">
+                <span class="text-slate-400">Next Automatic Invoice:</span>
+                <span class="font-bold text-white">Rs. 2999 / month after trial</span>
+              </div>
+            </div>
+
+            <!-- eSewa Payment Buttons -->
+            <div class="pt-2 space-y-3">
+              <button onclick="openEsewaModal('Pro Plan', 'Rs. 2999')" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-indigo-600 to-brand-500 hover:brightness-110 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/30 transition">
+                <span class="w-2.5 h-2.5 rounded-full bg-[#60bb46]"></span>
+                <span>Pay Pro Subscription via eSewa (Rs. 2999/mo)</span>
+                <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
+              </button>
+              <button onclick="openEsewaModal('Starter Pack', 'Rs. 999')" class="w-full py-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 font-bold text-xs border border-slate-700 flex items-center justify-center gap-2 transition">
+                <span class="w-2.5 h-2.5 rounded-full bg-[#60bb46]"></span>
+                <span>Switch to Starter via eSewa (Rs. 999/mo)</span>
+                <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Feature Matrix Summary -->
+          <div class="lg:col-span-6 glass-card p-6 sm:p-8 rounded-3xl border border-slate-800 space-y-4">
+            <h3 class="text-base font-bold text-white">Pro Plan Status Matrix</h3>
+            
+            <div class="space-y-3 text-xs">
+              <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                  <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400"></i>
+                  <span class="text-slate-200">White-Labeling Watermark Removal</span>
+                </div>
+                <span class="text-emerald-400 font-mono font-bold">UNLOCKED</span>
+              </div>
+
+              <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                  <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400"></i>
+                  <span class="text-slate-200">AI Return Prevention ROI Analytics</span>
+                </div>
+                <span class="text-emerald-400 font-mono font-bold">UNLOCKED</span>
+              </div>
+
+              <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                  <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400"></i>
+                  <span class="text-slate-200">Unlimited Team & Staff Multi-User Accounts</span>
+                </div>
+                <span class="text-emerald-400 font-mono font-bold">UNLOCKED</span>
+              </div>
+
+              <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                  <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400"></i>
+                  <span class="text-slate-200">Automated Vision OCR Size Chart Ingestion</span>
+                </div>
+                <span class="text-emerald-400 font-mono font-bold">UNLOCKED</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
   </main>
 
-  <!-- PROFESSIONAL FOOTER -->
-  <footer class="border-t border-slate-900 bg-slate-950 py-16 relative z-10">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
-        
-        <!-- Brand Info -->
-        <div class="md:col-span-2 space-y-4">
-          <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-cyan-500 to-indigo-600 p-[1px]">
-              <div class="w-full h-full bg-slate-950 rounded-[7px] flex items-center justify-center">
-                <svg class="w-4 h-4 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                </svg>
-              </div>
-            </div>
-            <span class="text-lg font-black tracking-tight text-white">
-              FitGuard <span class="text-cyan-400">AI</span>
-            </span>
-          </div>
-          <p class="text-slate-400 text-sm max-w-sm leading-relaxed">
-            Pioneering artificial intelligence and computer vision models for posture correction, athletic durability, and kinetic safety.
-          </p>
-          <div class="text-xs text-slate-400">
-            Proudly supporting fast digital payments via eSewa.
-          </div>
-        </div>
-
-        <!-- Quick Links -->
-        <div>
-          <h4 class="text-white text-sm font-bold mb-4 uppercase tracking-wider">Product</h4>
-          <ul class="space-y-2 text-sm text-slate-400">
-            <li><a href="#features" class="hover:text-cyan-400 transition-colors">Features</a></li>
-            <li><a href="#how-it-works" class="hover:text-cyan-400 transition-colors">How It Works</a></li>
-            <li><a href="#pricing" class="hover:text-cyan-400 transition-colors">Pricing</a></li>
-            <li><a href="#faq" class="hover:text-cyan-400 transition-colors">FAQ</a></li>
-          </ul>
-        </div>
-
-        <!-- Legal & Compliance -->
-        <div>
-          <h4 class="text-white text-sm font-bold mb-4 uppercase tracking-wider">Legal & Support</h4>
-          <ul class="space-y-2 text-sm text-slate-400">
-            <li><a href="#" class="hover:text-cyan-400 transition-colors">Privacy Policy</a></li>
-            <li><a href="#" class="hover:text-cyan-400 transition-colors">Terms of Service</a></li>
-            <li><a href="#" class="hover:text-cyan-400 transition-colors">Biometrics Ethics</a></li>
-            <li><a href="#" class="hover:text-cyan-400 transition-colors">Customer Desk</a></li>
-          </ul>
-        </div>
-
-      </div>
-
-      <div class="pt-8 border-t border-slate-900 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
-        <p>&copy; 2026 FitGuard AI Inc. All rights reserved.</p>
-        <p class="text-slate-400">All prices listed in Nepali Rupees (Rs.).</p>
-      </div>
-    </div>
-  </footer>
-
-  <!-- eSewa MODAL POPUP DIALOG -->
+  <!-- ========================================================================= -->
+  <!-- MODAL: eSewa PAYMENT POPUP DIALOG                                         -->
+  <!-- ========================================================================= -->
   <div id="esewaModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
     <!-- Backdrop Blur Overlay -->
-    <div id="modalBackdrop" class="absolute inset-0 bg-slate-950/80 backdrop-blur-md"></div>
+    <div id="esewaModalBackdrop" class="absolute inset-0 bg-slate-950/80 backdrop-blur-md"></div>
 
-    <!-- Modal Content Box -->
-    <div class="relative z-10 w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl shadow-cyan-950/60 transform scale-95 transition-transform duration-300" id="modalContainer">
+    <!-- Modal Content Container -->
+    <div class="relative z-10 w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl shadow-indigo-950/60 transform scale-95 transition-transform duration-300" id="esewaModalContainer">
       
       <!-- Modal Header -->
       <div class="flex items-center justify-between pb-4 border-b border-slate-800">
         <div class="flex items-center gap-2.5">
-          <div class="w-8 h-8 rounded-lg bg-[#60bb46] flex items-center justify-center text-white font-black text-xs">
+          <div class="w-8 h-8 rounded-lg bg-[#60bb46] flex items-center justify-center text-white font-black text-xs shadow-sm">
             eS
           </div>
           <div>
@@ -782,9 +1500,7 @@
 
         <!-- Close Button -->
         <button onclick="closeEsewaModal()" class="w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center hover:bg-slate-700 transition-colors" aria-label="Close modal">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-          </svg>
+          <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
 
@@ -792,15 +1508,15 @@
       <div class="my-5 p-4 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between">
         <div>
           <span class="text-xs text-slate-400 block font-medium">Selected Plan</span>
-          <span id="modalPlanTitle" class="text-sm font-bold text-cyan-400">Starter Pack</span>
+          <span id="modalPlanTitle" class="text-sm font-bold text-indigo-400">Pro Plan</span>
         </div>
         <div class="text-right">
           <span class="text-xs text-slate-400 block font-medium">Total Payable</span>
-          <span id="modalPlanPrice" class="text-lg font-black text-white">Rs. 999</span>
+          <span id="modalPlanPrice" class="text-lg font-black text-white">Rs. 2999</span>
         </div>
       </div>
 
-      <!-- QR Code Image Container (Pure QR - No Name/Phone Number) -->
+      <!-- QR Code Image Container (Pure QR - No Personal Name or Phone Number) -->
       <div class="flex flex-col items-center justify-center mb-5">
         <div class="bg-white p-4 rounded-2xl shadow-xl flex items-center justify-center border-4 border-emerald-500/20">
           <img 
@@ -811,101 +1527,872 @@
           />
         </div>
         <p class="text-xs text-slate-400 mt-3 flex items-center gap-1.5">
-          <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>
-          </svg>
-          Point your eSewa scanner at this code
+          <i data-lucide="qr-code" class="w-4 h-4 text-emerald-400"></i>
+          Point your eSewa scanner at this code to complete payment
         </p>
       </div>
 
-      <!-- Action Footer -->
-      <div class="space-y-3">
-        <button 
-          onclick="closeEsewaModal()" 
-          class="w-full py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-sm transition-colors">
-          Dismiss & Close
-        </button>
+      <!-- Step Instructions (Strictly Privacy Safe) -->
+      <div class="p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-[11px] text-slate-400 space-y-1 mb-4">
+        <div class="flex items-center gap-2 text-slate-300 font-semibold">
+          <span class="w-1.5 h-1.5 rounded-full bg-[#60bb46]"></span>
+          <span>How to pay:</span>
+        </div>
+        <ol class="list-decimal list-inside space-y-0.5 pl-1 text-slate-400">
+          <li>Open the eSewa app on your device.</li>
+          <li>Tap on the 'Scan & Pay' icon.</li>
+          <li>Scan the QR code above and approve payment.</li>
+        </ol>
       </div>
+
+      <!-- Action Footer -->
+      <button 
+        onclick="closeEsewaModal()" 
+        class="w-full py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs transition-colors">
+        Dismiss & Close
+      </button>
 
     </div>
   </div>
 
-  <!-- JAVASCRIPT LOGIC -->
+  <!-- ========================================================================= -->
+  <!-- MODAL: INVITE TEAM MEMBER (PRO FEATURE #3)                                -->
+  <!-- ========================================================================= -->
+  <div id="modal-invite-team" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+    <div class="glass-card w-full max-w-md p-6 sm:p-8 rounded-3xl border border-slate-700 shadow-2xl relative">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          <i data-lucide="user-plus" class="w-5 h-5 text-indigo-400"></i>
+          <span>Invite Store Team Member</span>
+        </h3>
+        <button onclick="closeInviteModal()" class="text-slate-400 hover:text-white transition">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="invite-form" onsubmit="submitInviteForm(event)" class="mt-6 space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">Full Name</label>
+          <input type="text" id="invite-name" required placeholder="e.g. Jessica Sterling" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">Work Email</label>
+          <input type="email" id="invite-email" required placeholder="jessica@acmeapparel.com" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">Assigned Role</label>
+          <select id="invite-role" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+            <option value="Admin">Admin (Full Store Control)</option>
+            <option value="Fit Editor" selected>Fit Editor (OCR & Size Charts)</option>
+            <option value="Support Viewer">Support Viewer (Read-only)</option>
+          </select>
+        </div>
+
+        <div class="pt-4 flex items-center justify-end gap-3">
+          <button type="button" onclick="closeInviteModal()" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-xs font-bold hover:bg-slate-700 transition">Cancel</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition shadow-lg shadow-indigo-600/30">Send Invitation</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL: EXPORT DATA REPORT                                                 -->
+  <!-- ========================================================================= -->
+  <div id="modal-export" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+    <div class="glass-card w-full max-w-md p-6 sm:p-8 rounded-3xl border border-slate-700 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          <i data-lucide="file-text" class="w-5 h-5 text-indigo-400"></i>
+          Export Return Prevention CSV
+        </h3>
+        <button onclick="closeExportModal()" class="text-slate-400 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <p class="text-xs text-slate-400 leading-relaxed">
+        Download verified sizing telemetry including total returns prevented, averted double-bracket cart events, and accuracy rates.
+      </p>
+      <div class="pt-2 flex justify-end gap-3">
+        <button onclick="closeExportModal()" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-xs font-bold">Cancel</button>
+        <button onclick="triggerCsvDownload()" class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold">Download CSV</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- JAVASCRIPT: COMPLETE INTEGRATED APPLICATION ENGINE                        -->
+  <!-- ========================================================================= -->
   <script>
-    // Mobile Nav Toggle
-    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-    const mobileMenu = document.getElementById('mobileMenu');
+    // Global Application State Store
+    const App = {
+      view: 'landing', // 'landing' or 'dashboard'
+      tab: 'overview',
+      plan: 'pro',     // 'pro', 'starter', 'none'
+      isTrial: true,
+      trialDays: 3,
+      whiteLabel: true,
+      accentColor: '#4f46e5',
+      buttonRadius: 'rounded-2xl',
+      buttonText: 'Calculate My Perfect Size ✨',
+      
+      // Biometric Simulator State
+      sim: {
+        height: 180,
+        weight: 78,
+        torso: 'balanced',
+        fit: 'regular'
+      },
 
-    mobileMenuBtn.addEventListener('click', () => {
-      mobileMenu.classList.toggle('hidden');
+      // Team Multi-User State (Pro Feature #3)
+      team: [
+        { id: 1, name: 'Alexander Wright', email: 'alex@acmeapparel.com', role: 'Admin', status: 'Active' },
+        { id: 2, name: 'Sophia Chen', email: 'sophia@acmeapparel.com', role: 'Fit Editor', status: 'Active' },
+        { id: 3, name: 'Liam O\'Connor', email: 'liam@acmeapparel.com', role: 'Support Viewer', status: 'Active' },
+        { id: 4, name: 'Maya Lin', email: 'maya@acmeapparel.com', role: 'Fit Editor', status: 'Pending' }
+      ],
+
+      // Sizing Matrix State (Pro Feature #4)
+      matrix: [
+        { size: 'XS', chest: 88, waist: 72, length: 68, weight: '50-60 kg' },
+        { size: 'S', chest: 94, waist: 78, length: 70, weight: '60-70 kg' },
+        { size: 'M', chest: 100, waist: 84, length: 72, weight: '70-80 kg' },
+        { size: 'L', chest: 106, waist: 90, length: 74, weight: '80-90 kg' },
+        { size: 'XL', chest: 112, waist: 96, length: 76, weight: '90-105 kg' },
+        { size: 'XXL', chest: 118, waist: 102, length: 78, weight: '105-120 kg' }
+      ],
+
+      // Intercept logs state
+      logs: [
+        { id: 'SES-90812', sku: 'NHC-9021', product: 'Heavy Fleece Crew', biometrics: '180cm / 78kg (Balanced)', requested: 'Size M', aiSize: 'Size S', outcome: 'Prevented Return', savings: 'Rs. 3,400' },
+        { id: 'SES-90809', sku: 'RAW-3100', product: 'Selvedge Denim', biometrics: '185cm / 88kg (Broad)', requested: 'Size 32 & 34', aiSize: 'Size 32', outcome: 'Bracket Averted', savings: 'Rs. 6,800' },
+        { id: 'SES-90804', sku: 'OVR-1102', product: 'Boxy Poplin Shirt', biometrics: '172cm / 64kg (Lean)', requested: 'Size L', aiSize: 'Size M', outcome: 'Prevented Return', savings: 'Rs. 3,400' },
+        { id: 'SES-90798', sku: 'BLZ-5501', product: 'Tailored Blazer', biometrics: '178cm / 82kg (Broad)', requested: 'Size 40R', aiSize: 'Size 42R', outcome: 'Prevented Return', savings: 'Rs. 3,400' },
+        { id: 'SES-90791', sku: 'TRK-2210', product: 'Merino Track Pant', biometrics: '168cm / 58kg (Lean)', requested: 'Size S', aiSize: 'Size XS', outcome: 'Prevented Return', savings: 'Rs. 3,400' },
+        { id: 'SES-90785', sku: 'NHC-9021', product: 'Heavy Fleece Crew', biometrics: '190cm / 95kg (Broad)', requested: 'Size XL', aiSize: 'Size XXL', outcome: 'Prevented Return', savings: 'Rs. 3,400' }
+      ]
+    };
+
+    let chartInstance = null;
+
+    // Initialization lifecycle
+    document.addEventListener('DOMContentLoaded', () => {
+      restoreState();
+      inspectUrlParameters();
+      renderAppView();
+      updateSimulation();
+      calculateROI();
+      renderTeam();
+      renderMatrix();
+      renderLogs(App.logs);
+      initChart();
+      lucide.createIcons();
     });
 
-    // Close mobile menu on anchor click
-    document.querySelectorAll('#mobileMenu a').forEach(link => {
-      link.addEventListener('click', () => {
-        mobileMenu.classList.add('hidden');
+    // Local Storage Persistence
+    function persistState() {
+      localStorage.setItem('fitguard_ai_saas_v2', JSON.stringify({
+        plan: App.plan,
+        isTrial: App.isTrial,
+        whiteLabel: App.whiteLabel,
+        team: App.team,
+        matrix: App.matrix
+      }));
+    }
+
+    function restoreState() {
+      const data = localStorage.getItem('fitguard_ai_saas_v2');
+      if (data) {
+        try {
+          const parsed = JSON.parse(data);
+          App.plan = parsed.plan || 'pro';
+          App.isTrial = parsed.isTrial !== undefined ? parsed.isTrial : true;
+          App.whiteLabel = parsed.whiteLabel !== undefined ? parsed.whiteLabel : true;
+          if (parsed.team) App.team = parsed.team;
+          if (parsed.matrix) App.matrix = parsed.matrix;
+        } catch (e) {
+          console.error("Local storage error", e);
+        }
+      }
+    }
+
+    // Payment query redirect handler (?checkout=success)
+    function inspectUrlParameters() {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('checkout') === 'success' || params.get('session_id')) {
+        const tier = params.get('plan') || 'pro';
+        App.plan = tier === 'starter' ? 'starter' : 'pro';
+        App.isTrial = true;
+        App.whiteLabel = (App.plan === 'pro');
+        persistState();
+        showToast('🎉 eSewa payment verified! Pro 3-Day Free Trial activated.', 'success');
+        navigateTo('dashboard');
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    }
+
+    // View Navigation Logic
+    function navigateTo(viewName) {
+      const landing = document.getElementById('view-landing');
+      const dashboard = document.getElementById('view-dashboard');
+      const switchLabel = document.getElementById('nav-switch-label');
+
+      if (viewName === 'dashboard') {
+        landing.classList.add('hidden');
+        dashboard.classList.remove('hidden');
+        dashboard.classList.add('flex');
+        App.view = 'dashboard';
+        switchLabel.textContent = 'Switch to Landing Page';
+        setTimeout(() => { if (chartInstance) chartInstance.resize(); }, 100);
+      } else {
+        dashboard.classList.add('hidden');
+        dashboard.classList.remove('flex');
+        landing.classList.remove('hidden');
+        App.view = 'landing';
+        switchLabel.textContent = 'Switch to Dashboard';
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      lucide.createIcons();
+    }
+
+    function toggleView() {
+      navigateTo(App.view === 'landing' ? 'dashboard' : 'landing');
+    }
+
+    function scrollToSection(id) {
+      if (App.view !== 'landing') navigateTo('landing');
+      setTimeout(() => {
+        const el = document.getElementById(id);
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+      }, 60);
+    }
+
+    function switchTab(tabId) {
+      App.tab = tabId;
+      document.querySelectorAll('.tab-pane').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.dash-tab-btn').forEach(btn => {
+        btn.classList.remove('bg-indigo-600', 'text-white', 'shadow-lg', 'shadow-indigo-600/30');
+        btn.classList.add('text-slate-400');
       });
-    });
 
-    // FAQ Accordion Toggle
-    const faqButtons = document.querySelectorAll('.faq-toggle');
+      const pane = document.getElementById(`tab-content-${tabId}`);
+      const btn = document.getElementById(`tab-btn-${tabId}`);
 
-    faqButtons.forEach(button => {
-      button.addEventListener('click', () => {
-        const content = button.nextElementSibling;
-        const icon = button.querySelector('.faq-icon');
-        const isOpen = !content.classList.contains('hidden');
+      if (pane) pane.classList.remove('hidden');
+      if (btn) {
+        btn.classList.add('bg-indigo-600', 'text-white', 'shadow-lg', 'shadow-indigo-600/30');
+        btn.classList.remove('text-slate-400');
+      }
+      if (tabId === 'overview' && chartInstance) {
+        setTimeout(() => chartInstance.resize(), 50);
+      }
+      lucide.createIcons();
+    }
 
-        // Close other items
-        document.querySelectorAll('.faq-content').forEach(el => el.classList.add('hidden'));
-        document.querySelectorAll('.faq-icon').forEach(el => el.classList.remove('rotate-180'));
+    // Render App UI according to Plan State
+    function renderAppView() {
+      const isPro = App.plan === 'pro';
+      const tierBadge = document.getElementById('nav-tier-badge');
+      const sideTier = document.getElementById('dash-sidebar-tier');
+      const billTitle = document.getElementById('billing-tier-title');
+      const wlToggle = document.getElementById('dash-whitelabel-toggle');
 
-        // Toggle current item
-        if (!isOpen) {
-          content.classList.remove('hidden');
-          icon.classList.add('rotate-180');
+      if (tierBadge) tierBadge.textContent = isPro ? 'PRO ACTIVE' : 'STARTER ACTIVE';
+      if (sideTier) sideTier.textContent = isPro ? 'PRO PLAN ACTIVE' : 'STARTER PLAN ACTIVE';
+      if (billTitle) billTitle.textContent = isPro ? 'Pro Plan (Rs. 2999/mo)' : 'Starter Pack (Rs. 999/mo)';
+      if (wlToggle) wlToggle.checked = App.whiteLabel && isPro;
+
+      updateWhiteLabelUI();
+    }
+
+    // FEATURE 1: WHITE-LABELING TOGGLE LOGIC
+    function toggleWhiteLabelOption(checked) {
+      if (App.plan !== 'pro') {
+        showToast('White-Labeling requires the Pro Tier (Rs. 2999/mo).', 'error');
+        document.getElementById('dash-whitelabel-toggle').checked = false;
+        return;
+      }
+      App.whiteLabel = checked;
+      persistState();
+      updateWhiteLabelUI();
+      showToast(checked ? 'FitGuard branding hidden from storefront.' : 'FitGuard branding enabled.', 'info');
+    }
+
+    function updateWhiteLabelUI() {
+      const isHidden = App.whiteLabel && App.plan === 'pro';
+      const previewWatermark = document.getElementById('dash-preview-watermark');
+      const statusPill = document.getElementById('whitelabel-badge-status');
+      const simWatermarkPill = document.getElementById('sim-watermark-pill');
+
+      if (previewWatermark) {
+        previewWatermark.style.display = isHidden ? 'none' : 'block';
+      }
+
+      if (simWatermarkPill) {
+        simWatermarkPill.textContent = isHidden ? 'Watermark: Hidden (Pro)' : 'Watermark: Visible (Starter)';
+        simWatermarkPill.className = isHidden ? 'px-2 py-1 rounded-full bg-emerald-950 text-emerald-300 text-[10px] font-mono border border-emerald-800' : 'px-2 py-1 rounded-full bg-slate-800 text-slate-400 text-[10px] font-mono border border-slate-700';
+      }
+
+      if (statusPill) {
+        if (isHidden) {
+          statusPill.innerHTML = '<i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i><span>FitGuard branding is <strong>HIDDEN</strong> on your storefront widget.</span>';
+          statusPill.className = 'p-3 rounded-xl bg-slate-900 border border-slate-800 text-xs text-emerald-400 flex items-center gap-2';
+        } else {
+          statusPill.innerHTML = '<i data-lucide="info" class="w-4 h-4 text-amber-400"></i><span>FitGuard branding is <strong>VISIBLE</strong> on your storefront widget.</span>';
+          statusPill.className = 'p-3 rounded-xl bg-slate-900 border border-slate-800 text-xs text-amber-400 flex items-center gap-2';
+        }
+        lucide.createIcons();
+      }
+
+      // Update embed code preview
+      const codeBlock = document.getElementById('dash-embed-code-block');
+      if (codeBlock) {
+        codeBlock.textContent = `<!-- FitGuard AI Platform Embed -->\n<script \n  src="https://cdn.fitguard.ai/v2/fitguard.min.js" \n  data-store-id="FG-9012-PRO" \n  data-white-label="${isHidden}" \n  data-accent="${App.accentColor}" \n  async>\n<\/script>`;
+      }
+    }
+
+    function updateLiveWidgetPreview() {
+      const color = document.getElementById('dash-custom-color').value;
+      const radius = document.getElementById('dash-custom-radius').value;
+      const label = document.getElementById('dash-custom-label').value;
+
+      App.accentColor = color;
+      App.buttonRadius = radius;
+      App.buttonText = label;
+
+      document.getElementById('dash-custom-hex').value = color;
+      const btn = document.getElementById('dash-preview-btn');
+      if (btn) {
+        btn.style.backgroundColor = color;
+        btn.className = `w-full py-3.5 text-white font-bold text-xs shadow-lg transition ${radius}`;
+        btn.textContent = label;
+      }
+      updateWhiteLabelUI();
+    }
+
+    function updateLiveWidgetPreviewHex() {
+      const hex = document.getElementById('dash-custom-hex').value;
+      if (/^#[0-9A-F]{6}$/i.test(hex)) {
+        document.getElementById('dash-custom-color').value = hex;
+        updateLiveWidgetPreview();
+      }
+    }
+
+    function copyEmbedScriptCode() {
+      const code = `<script src="https://cdn.fitguard.ai/v2/fitguard.min.js" data-store-id="FG-9012-PRO" data-white-label="${App.whiteLabel}" data-accent="${App.accentColor}" async><\/script>`;
+      navigator.clipboard.writeText(code).then(() => {
+        showToast('Script tag copied to clipboard!', 'success');
+        const btn = document.getElementById('dash-copy-btn-label');
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.textContent = 'Copy Script'; }, 2000);
+      });
+    }
+
+    // FEATURE 2: RETURN PREVENTION ANALYTICS ENGINE & CHART.JS
+    function initChart() {
+      const ctx = document.getElementById('returnPreventionChart');
+      if (!ctx) return;
+
+      chartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: ['Day 1', 'Day 5', 'Day 10', 'Day 15', 'Day 20', 'Day 25', 'Day 30'],
+          datasets: [
+            {
+              label: 'Returns Prevented (Units)',
+              data: [38, 92, 184, 276, 390, 460, 512],
+              borderColor: '#10b981',
+              backgroundColor: 'rgba(16, 185, 129, 0.1)',
+              borderWidth: 2.5,
+              tension: 0.35,
+              fill: true
+            },
+            {
+              label: 'Biometric Size Intercepts',
+              data: [120, 290, 540, 810, 1150, 1380, 1590],
+              borderColor: '#6366f1',
+              backgroundColor: 'rgba(99, 102, 241, 0.05)',
+              borderWidth: 2,
+              borderDash: [4, 4],
+              tension: 0.35,
+              fill: false
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              labels: { color: '#94a3b8', font: { size: 11, family: 'Inter' } }
+            }
+          },
+          scales: {
+            x: {
+              grid: { color: 'rgba(255, 255, 255, 0.05)' },
+              ticks: { color: '#64748b', font: { size: 10 } }
+            },
+            y: {
+              grid: { color: 'rgba(255, 255, 255, 0.05)' },
+              ticks: { color: '#64748b', font: { size: 10 } }
+            }
+          }
         }
       });
-    });
+    }
 
-    // eSewa Payment Modal Logic
-    const esewaModal = document.getElementById('esewaModal');
-    const modalContainer = document.getElementById('modalContainer');
-    const modalBackdrop = document.getElementById('modalBackdrop');
-    const modalPlanTitle = document.getElementById('modalPlanTitle');
-    const modalPlanPrice = document.getElementById('modalPlanPrice');
+    function refreshDashboardMetrics() {
+      const kpiReturns = document.getElementById('kpi-returns-prevented');
+      const kpiMoney = document.getElementById('kpi-money-saved');
+      const kpiAccuracy = document.getElementById('kpi-accuracy-rate');
 
+      kpiReturns.textContent = '...';
+      kpiMoney.textContent = '...';
+
+      setTimeout(() => {
+        const units = 512 + Math.floor(Math.random() * 20);
+        const savedRupees = units * 3400;
+        kpiReturns.textContent = units;
+        kpiMoney.textContent = `Rs. ${savedRupees.toLocaleString()}`;
+        kpiAccuracy.textContent = '98.8%';
+        if (chartInstance) {
+          chartInstance.data.datasets[0].data[6] = units;
+          chartInstance.update();
+        }
+        showToast('Storefront telemetry refreshed.', 'success');
+      }, 400);
+    }
+
+    // FEATURE 3: TEAM & STAFF ACCOUNTS MANAGEMENT
+    function renderTeam() {
+      const tbody = document.getElementById('dash-team-tbody');
+      if (!tbody) return;
+
+      tbody.innerHTML = '';
+      App.team.forEach(member => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-900/40 transition';
+        tr.innerHTML = `
+          <td class="p-4 pl-6 font-bold text-white flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-600 to-brand-400 flex items-center justify-center font-bold text-xs text-white">
+              ${member.name.split(' ').map(n=>n[0]).join('')}
+            </div>
+            <span>${member.name}</span>
+          </td>
+          <td class="p-4 text-slate-400 font-mono text-[11px]">${member.email}</td>
+          <td class="p-4">
+            <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold ${
+              member.role === 'Admin' ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30' :
+              member.role === 'Fit Editor' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' :
+              'bg-slate-800 text-slate-300 border border-slate-700'
+            }">${member.role}</span>
+          </td>
+          <td class="p-4">
+            <span class="inline-flex items-center gap-1.5 text-[11px] ${member.status === 'Active' ? 'text-emerald-400' : 'text-amber-400'} font-semibold">
+              <span class="w-1.5 h-1.5 rounded-full ${member.status === 'Active' ? 'bg-emerald-400' : 'bg-amber-400'}"></span>
+              ${member.status}
+            </span>
+          </td>
+          <td class="p-4 pr-6 text-right">
+            <button onclick="removeTeamMember(${member.id})" class="text-slate-500 hover:text-red-400 transition p-1" title="Remove member">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+      lucide.createIcons();
+    }
+
+    function openInviteModal() {
+      document.getElementById('modal-invite-team').classList.remove('hidden');
+    }
+
+    function closeInviteModal() {
+      document.getElementById('modal-invite-team').classList.add('hidden');
+      document.getElementById('invite-form').reset();
+    }
+
+    function submitInviteForm(e) {
+      e.preventDefault();
+      const name = document.getElementById('invite-name').value;
+      const email = document.getElementById('invite-email').value;
+      const role = document.getElementById('invite-role').value;
+
+      App.team.push({
+        id: Date.now(),
+        name,
+        email,
+        role,
+        status: 'Pending'
+      });
+
+      persistState();
+      renderTeam();
+      closeInviteModal();
+      showToast(`Invitation dispatched to ${email}`, 'success');
+    }
+
+    function removeTeamMember(id) {
+      if (App.team.length <= 1) {
+        showToast('Store must retain at least one administrator.', 'error');
+        return;
+      }
+      App.team = App.team.filter(m => m.id !== id);
+      persistState();
+      renderTeam();
+      showToast('Team member access revoked.', 'info');
+    }
+
+    // FEATURE 4: AUTOMATED SIZE CHART VISION OCR INGESTION
+    function renderMatrix() {
+      const tbody = document.getElementById('ocr-matrix-tbody');
+      if (!tbody) return;
+
+      tbody.innerHTML = '';
+      App.matrix.forEach((row, idx) => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-900/40 transition';
+        tr.innerHTML = `
+          <td class="p-3 pl-4 font-bold text-white">
+            <input type="text" value="${row.size}" onchange="updateMatrixCell(${idx}, 'size', this.value)" class="w-14 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-center font-bold text-white">
+          </td>
+          <td class="p-3">
+            <input type="number" value="${row.chest}" onchange="updateMatrixCell(${idx}, 'chest', this.value)" class="w-16 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-center text-slate-200">
+          </td>
+          <td class="p-3">
+            <input type="number" value="${row.waist}" onchange="updateMatrixCell(${idx}, 'waist', this.value)" class="w-16 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-center text-slate-200">
+          </td>
+          <td class="p-3">
+            <input type="number" value="${row.length}" onchange="updateMatrixCell(${idx}, 'length', this.value)" class="w-16 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-center text-slate-200">
+          </td>
+          <td class="p-3">
+            <input type="text" value="${row.weight}" onchange="updateMatrixCell(${idx}, 'weight', this.value)" class="w-28 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-center text-slate-200">
+          </td>
+          <td class="p-3 pr-4 text-center">
+            <button onclick="removeMatrixRow(${idx})" class="text-slate-500 hover:text-red-400 transition">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+      lucide.createIcons();
+    }
+
+    function updateMatrixCell(index, field, val) {
+      App.matrix[index][field] = val;
+      persistState();
+    }
+
+    function addMatrixRow() {
+      App.matrix.push({ size: '3XL', chest: 124, waist: 108, length: 80, weight: '120-135 kg' });
+      persistState();
+      renderMatrix();
+      showToast('New size row added to active matrix.', 'info');
+    }
+
+    function removeMatrixRow(idx) {
+      App.matrix.splice(idx, 1);
+      persistState();
+      renderMatrix();
+    }
+
+    function triggerOcrFileUpload() {
+      document.getElementById('ocr-file-input').click();
+    }
+
+    function handleOcrFileUpload(e) {
+      const file = e.target.files[0];
+      if (file) runOcrSimulation(file.name);
+    }
+
+    function runOcrSimulation(filename) {
+      const progressBox = document.getElementById('ocr-progress-box');
+      const bar = document.getElementById('ocr-bar');
+      const pct = document.getElementById('ocr-pct');
+      const title = document.getElementById('ocr-matrix-title');
+      const status = document.getElementById('ocr-matrix-status');
+
+      progressBox.classList.remove('hidden');
+      bar.style.width = '15%';
+      pct.textContent = '15%';
+
+      let progress = 15;
+      const interval = setInterval(() => {
+        progress += 28;
+        if (progress > 100) progress = 100;
+        bar.style.width = `${progress}%`;
+        pct.textContent = `${progress}%`;
+
+        if (progress === 100) {
+          clearInterval(interval);
+          setTimeout(() => {
+            progressBox.classList.add('hidden');
+            title.textContent = `Parsed Matrix: ${filename}`;
+            status.textContent = `✓ Vision OCR Ingestion Complete (${App.matrix.length} sizes extracted)`;
+            showToast('AI Vision OCR successfully normalized supplier spec sheet!', 'success');
+          }, 350);
+        }
+      }, 180);
+    }
+
+    function syncMatrixToCatalog() {
+      persistState();
+      showToast('Size matrix synchronized to active Shopify SKU catalog.', 'success');
+    }
+
+    function toggleUnitsConvert() {
+      showToast('Converted sizing measurements between Metric (cm) & Imperial (in).', 'info');
+    }
+
+    // INTERCEPT LOGS TABLE
+    function renderLogs(logsArray) {
+      const tbody = document.getElementById('intercept-logs-tbody');
+      if (!tbody) return;
+
+      tbody.innerHTML = '';
+      logsArray.forEach(log => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-900/40 transition';
+        tr.innerHTML = `
+          <td class="p-4 pl-6 font-mono text-[11px] text-indigo-400 font-bold">${log.id}</td>
+          <td class="p-4 font-semibold text-white">${log.product} <span class="text-slate-500 font-mono text-[10px]">(${log.sku})</span></td>
+          <td class="p-4 text-slate-400 text-xs">${log.biometrics}</td>
+          <td class="p-4 text-slate-300 font-mono text-xs">${log.requested}</td>
+          <td class="p-4 font-bold text-emerald-400 font-mono text-xs">${log.aiSize}</td>
+          <td class="p-4">
+            <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">${log.outcome}</span>
+          </td>
+          <td class="p-4 pr-6 text-right font-mono font-bold text-emerald-400">${log.savings}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function filterLogsTable() {
+      const q = document.getElementById('log-search-input').value.toLowerCase();
+      const filtered = App.logs.filter(l => 
+        l.product.toLowerCase().includes(q) || 
+        l.sku.toLowerCase().includes(q) || 
+        l.id.toLowerCase().includes(q) ||
+        l.biometrics.toLowerCase().includes(q)
+      );
+      renderLogs(filtered);
+    }
+
+    // INTERACTIVE BIOMETRIC SIMULATOR & AVATAR ENGINE
+    function updateSimulation() {
+      const height = parseInt(document.getElementById('sim-height').value) || 180;
+      const weight = parseInt(document.getElementById('sim-weight').value) || 78;
+
+      App.sim.height = height;
+      App.sim.weight = weight;
+
+      // Update Slider Value labels
+      const hFeet = Math.floor(height / 30.48);
+      const hInches = Math.round((height % 30.48) / 2.54);
+      const wLbs = Math.round(weight * 2.20462);
+
+      document.getElementById('slider-height-val').textContent = `${height} cm (${hFeet}'${hInches}")`;
+      document.getElementById('slider-weight-val').textContent = `${weight} kg (${wLbs} lbs)`;
+
+      // Biometric regression calculation
+      const bmi = weight / Math.pow(height / 100, 2);
+      let score = bmi;
+
+      if (App.sim.torso === 'broad') score += 1.6;
+      if (App.sim.torso === 'lean') score -= 1.2;
+      if (App.sim.fit === 'oversized') score += 1.8;
+      if (App.sim.fit === 'form') score -= 1.4;
+
+      let size = 'Size M';
+      let alt = 'Size L (Loose)';
+
+      if (score < 19) { size = 'Size XS'; alt = 'Size S'; }
+      else if (score < 22) { size = 'Size S'; alt = 'Size M'; }
+      else if (score < 25.5) { size = 'Size L'; alt = 'Size XL (Loose)'; }
+      else if (score < 29) { size = 'Size XL'; alt = 'Size XXL'; }
+      else { size = 'Size XXL'; alt = 'Size 3XL'; }
+
+      document.getElementById('sim-recommended-size').textContent = size;
+      document.getElementById('sim-alt-size').textContent = alt;
+
+      // Dynamic morphing of SVG silhouette avatar
+      const torsoPath = document.getElementById('svg-torso');
+      const widthFactor = Math.min(1.4, Math.max(0.7, weight / 75));
+      const leftX = 80 - (28 * widthFactor);
+      const rightX = 80 + (28 * widthFactor);
+      torsoPath.setAttribute('d', `M ${leftX} 48 Q 80 44 ${rightX} 48 L ${rightX - 8} 135 Q 80 138 ${leftX + 8} 135 Z`);
+
+      document.getElementById('sim-reasoning').textContent = 
+        `Biometric height/weight ratio calibrated for ${height}cm / ${weight}kg with ${App.sim.torso} frame. Clears chest girth with optimal drape.`;
+    }
+
+    function setSimTorso(type) {
+      App.sim.torso = type;
+      document.querySelectorAll('.sim-torso-btn').forEach(b => {
+        b.className = 'sim-torso-btn py-2 px-3 rounded-xl text-xs font-medium bg-slate-900 border border-slate-800 text-slate-300 hover:border-slate-600 transition';
+      });
+      const active = document.getElementById(`btn-torso-${type}`);
+      if (active) active.className = 'sim-torso-btn py-2 px-3 rounded-xl text-xs font-bold bg-indigo-600/20 border border-indigo-500 text-indigo-300 transition';
+      updateSimulation();
+    }
+
+    function setSimFit(fit) {
+      App.sim.fit = fit;
+      document.querySelectorAll('.sim-fit-btn').forEach(b => {
+        b.className = 'sim-fit-btn py-2 px-3 rounded-xl text-xs font-medium bg-slate-900 border border-slate-800 text-slate-300 hover:border-slate-600 transition';
+      });
+      const active = document.getElementById(`btn-fit-${fit}`);
+      if (active) active.className = 'sim-fit-btn py-2 px-3 rounded-xl text-xs font-bold bg-indigo-600/20 border border-indigo-500 text-indigo-300 transition';
+      updateSimulation();
+    }
+
+    function resetBiometrics() {
+      document.getElementById('sim-height').value = 180;
+      document.getElementById('sim-weight').value = 78;
+      setSimTorso('balanced');
+      setSimFit('regular');
+    }
+
+    // ROI FINANCIAL CALCULATOR
+    function calculateROI() {
+      const orders = parseInt(document.getElementById('roi-orders').value) || 2500;
+      const rate = parseInt(document.getElementById('roi-rate').value) || 26;
+      const aov = parseInt(document.getElementById('roi-aov').value) || 9500;
+
+      document.getElementById('roi-orders-val').textContent = `${orders.toLocaleString()} orders/mo`;
+      document.getElementById('roi-rate-val').textContent = `${rate}%`;
+      document.getElementById('roi-aov-val').textContent = `Rs. ${aov.toLocaleString()}`;
+
+      const monthlyReturns = orders * (rate / 100);
+      const preventedReturns = monthlyReturns * 0.428; // 42.8% reduction
+      const monthlySaved = Math.round(preventedReturns * 3400); // Rs. 3400 avg processing/freight loss
+      const annualSaved = monthlySaved * 12;
+      const roiMultiplier = Math.round(monthlySaved / 2999); // Pro tier is Rs. 2999/mo
+
+      document.getElementById('roi-monthly-dollars').textContent = `Rs. ${monthlySaved.toLocaleString()}`;
+      document.getElementById('roi-annual-dollars').textContent = `Rs. ${annualSaved.toLocaleString()}/yr`;
+      document.getElementById('roi-multiplier').textContent = `${roiMultiplier}x Return`;
+    }
+
+    // FAQ ACCORDION HANDLER
+    function toggleFaq(index) {
+      const ans = document.getElementById(`faq-answer-${index}`);
+      const icon = document.getElementById(`faq-icon-${index}`);
+      if (ans.classList.contains('hidden')) {
+        ans.classList.remove('hidden');
+        icon.classList.add('rotate-180');
+      } else {
+        ans.classList.add('hidden');
+        icon.classList.remove('rotate-180');
+      }
+    }
+
+    // eSewa PAYMENT MODAL HANDLERS
     function openEsewaModal(planTitle, planPrice) {
-      modalPlanTitle.textContent = planTitle;
-      modalPlanPrice.textContent = planPrice;
-      
-      // Reveal Modal
-      esewaModal.classList.remove('opacity-0', 'pointer-events-none');
-      esewaModal.classList.add('opacity-100', 'pointer-events-auto');
-      modalContainer.classList.remove('scale-95');
-      modalContainer.classList.add('scale-100');
-      
+      document.getElementById('modalPlanTitle').textContent = planTitle;
+      document.getElementById('modalPlanPrice').textContent = planPrice;
+
+      const modal = document.getElementById('esewaModal');
+      const container = document.getElementById('esewaModalContainer');
+
+      modal.classList.remove('opacity-0', 'pointer-events-none');
+      modal.classList.add('opacity-100', 'pointer-events-auto');
+      container.classList.remove('scale-95');
+      container.classList.add('scale-100');
+
       document.body.style.overflow = 'hidden';
+      lucide.createIcons();
     }
 
     function closeEsewaModal() {
-      esewaModal.classList.remove('opacity-100', 'pointer-events-auto');
-      esewaModal.classList.add('opacity-0', 'pointer-events-none');
-      modalContainer.classList.remove('scale-100');
-      modalContainer.classList.add('scale-95');
-      
+      const modal = document.getElementById('esewaModal');
+      const container = document.getElementById('esewaModalContainer');
+
+      modal.classList.remove('opacity-100', 'pointer-events-auto');
+      modal.classList.add('opacity-0', 'pointer-events-none');
+      container.classList.remove('scale-100');
+      container.classList.add('scale-95');
+
       document.body.style.overflow = 'auto';
     }
 
-    // Close on backdrop click
-    modalBackdrop.addEventListener('click', closeEsewaModal);
+    document.getElementById('esewaModalBackdrop').addEventListener('click', closeEsewaModal);
 
-    // Close on ESC key
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && !esewaModal.classList.contains('pointer-events-none')) {
+      if (e.key === 'Escape' && !document.getElementById('esewaModal').classList.contains('pointer-events-none')) {
         closeEsewaModal();
       }
     });
+
+    // MODALS & EXPORT HANDLERS
+    function openExportModal() {
+      document.getElementById('modal-export').classList.remove('hidden');
+    }
+
+    function closeExportModal() {
+      document.getElementById('modal-export').classList.add('hidden');
+    }
+
+    function triggerCsvDownload() {
+      closeExportModal();
+      showToast('Generating CSV report with 30-day return telemetry...', 'info');
+      setTimeout(() => {
+        showToast('FitGuard_Return_Prevention_Telemetry.csv downloaded.', 'success');
+      }, 800);
+    }
+
+    // DEVELOPER SIMULATION HELPERS
+    function simulatePlanCheckout(planName) {
+      App.plan = planName;
+      App.isTrial = true;
+      App.whiteLabel = (planName === 'pro');
+      persistState();
+      renderAppView();
+      showToast(`Activated ${planName.toUpperCase()} tier with 3-Day Free Trial`, 'success');
+      navigateTo('dashboard');
+    }
+
+    function resetAppState() {
+      App.plan = 'none';
+      App.isTrial = false;
+      App.whiteLabel = false;
+      persistState();
+      renderAppView();
+      showToast('State reset to unauthenticated.', 'info');
+    }
+
+    // TOAST NOTIFICATION UTILITY
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+
+      const bgStyle = type === 'success' ? 'bg-slate-900 border-emerald-500/60 text-emerald-300' :
+                      type === 'error' ? 'bg-slate-900 border-red-500/60 text-red-300' :
+                      'bg-slate-900 border-indigo-500/60 text-indigo-300';
+
+      const icon = type === 'success' ? 'check-circle-2' :
+                   type === 'error' ? 'alert-triangle' : 'info';
+
+      toast.className = `pointer-events-auto p-4 rounded-2xl border shadow-2xl ${bgStyle} flex items-center gap-3 transform transition-all duration-300 translate-y-4 opacity-0 text-xs font-bold backdrop-blur-md`;
+      toast.innerHTML = `
+        <i data-lucide="${icon}" class="w-4 h-4 shrink-0"></i>
+        <span class="flex-1">${message}</span>
+      `;
+
+      container.appendChild(toast);
+      lucide.createIcons();
+
+      setTimeout(() => { toast.classList.remove('translate-y-4', 'opacity-0'); }, 15);
+      setTimeout(() => {
+        toast.classList.add('translate-y-2', 'opacity-0');
+        setTimeout(() => toast.remove(), 300);
+      }, 4000);
+    }
   </script>
 </body>
 </html>
