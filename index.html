@@ -1,15 +1,9 @@
-Here is the updated, complete single-file HTML/JS dashboard application. It
-includes a multi-tenant user state engine, a dynamic store-switching selector,
-and complete dynamic data binding across all dashboard sections (Overview &
-Analytics, Widget Customizer, AI Size Chart OCR, Intercept Logs, Team & Staff,
-and Billing & Subscription).
-
 <!DOCTYPE html>
 <html lang="en" class="h-full bg-slate-950 text-slate-100 antialiased selection:bg-indigo-500 selection:text-white">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FitGuard AI — Multi-Tenant Autonomous Sizing & Return Prevention Platform</title>
+  <title>FitGuard AI — Autonomous Sizing Engine & Return Prevention Platform</title>
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -111,6 +105,13 @@ and Billing & Subscription).
     .animate-glow {
       animation: pulse-glow 7s infinite ease-in-out;
     }
+    @keyframes scanline {
+      0% { transform: translateY(-100%); }
+      100% { transform: translateY(1000%); }
+    }
+    .animate-scan {
+      animation: scanline 2.5s linear infinite;
+    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col bg-slate-950 text-slate-100 overflow-x-hidden">
@@ -126,7 +127,7 @@ and Billing & Subscription).
   <div id="top-announcement" class="bg-gradient-to-r from-indigo-900 via-brand-700 to-indigo-950 text-indigo-100 text-xs py-2 px-4 text-center border-b border-indigo-500/20 relative flex items-center justify-center gap-3">
     <span class="inline-flex items-center gap-1.5 font-semibold">
       <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-300"></i>
-      <span>Spring 2026 Release: Automated Vision OCR Size Parser & Multi-Tenant Merchant Isolation now live!</span>
+      <span>Spring 2026 Release: Automated Vision OCR Size Parser & Multi-Staff Accounts now live on Pro Tier!</span>
     </span>
     <a href="#pricing" onclick="navigateTo('landing')" class="underline font-bold text-white hover:text-indigo-200 transition ml-2">Start 3-Day Free Trial &rarr;</a>
     <button onclick="document.getElementById('top-announcement').remove()" class="absolute right-4 text-indigo-300 hover:text-white" aria-label="Close Announcement">
@@ -148,9 +149,9 @@ and Billing & Subscription).
         <div>
           <div class="flex items-center gap-2">
             <span class="text-xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-100 to-indigo-300">FitGuard <span class="text-indigo-400">AI</span></span>
-            <span id="nav-tier-badge" class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 uppercase">PRO ACTIVE</span>
+            <span id="nav-tier-badge" class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">PRO ACTIVE</span>
           </div>
-          <p class="text-[10px] text-slate-400 -mt-0.5 hidden sm:block">Multi-Tenant Return Prevention Platform</p>
+          <p class="text-[10px] text-slate-400 -mt-0.5 hidden sm:block">Autonomous Return Prevention</p>
         </div>
       </div>
 
@@ -194,10 +195,12 @@ and Billing & Subscription).
     
     <!-- Hero Section -->
     <section class="relative pt-20 pb-28 lg:pt-32 lg:pb-36 overflow-hidden">
+      <!-- Ambient Glow Blobs -->
       <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[400px] bg-indigo-600/20 rounded-full blur-[140px] pointer-events-none animate-glow"></div>
       <div class="absolute top-1/3 right-10 w-[450px] h-[450px] bg-emerald-500/10 rounded-full blur-[120px] pointer-events-none"></div>
 
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+        <!-- Floating Pill Tag -->
         <div class="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-slate-900/90 border border-indigo-500/30 text-indigo-300 text-xs font-bold mb-8 shadow-inner shadow-indigo-500/10">
           <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
           <span>Next-Generation E-Commerce Biometric Sizing</span>
@@ -210,7 +213,7 @@ and Billing & Subscription).
         </h1>
 
         <p class="mt-8 text-lg sm:text-xl text-slate-400 max-w-3xl mx-auto font-normal leading-relaxed">
-          FitGuard AI turns sizing uncertainty into confident checkouts. Auto-parse supplier charts with Vision OCR, embed ultra-lightweight size guidance, and monitor multi-tenant return savings in real-time.
+          FitGuard AI turns sizing uncertainty into confident checkouts. Auto-parse supplier charts with Vision OCR, embed ultra-lightweight size guidance, and monitor return savings in real-time.
         </p>
 
         <!-- CTA Buttons -->
@@ -326,7 +329,7 @@ and Billing & Subscription).
                 <span class="text-[10px] font-mono uppercase tracking-widest text-indigo-400 font-bold">FitGuard AI &bull; Autonomous Recommendation</span>
                 <h4 class="text-base font-bold text-white">Live Fit Calculation Output</h4>
               </div>
-              <span id="sim-watermark-pill" class="px-2 py-1 rounded-full bg-slate-800 text-slate-400 text-[10px] font-mono border border-slate-700">Watermark Status</span>
+              <span id="sim-watermark-pill" class="px-2 py-1 rounded-full bg-slate-800 text-slate-400 text-[10px] font-mono border border-slate-700">Watermark Hidden on Pro</span>
             </div>
 
             <!-- Dynamic SVG Silhouette Canvas -->
@@ -335,10 +338,14 @@ and Billing & Subscription).
               <!-- The Morphing Body Graphic -->
               <div class="sm:col-span-5 flex flex-col items-center justify-center p-4 rounded-2xl bg-slate-950/80 border border-slate-800 relative">
                 <svg id="morphing-body-svg" viewBox="0 0 160 220" class="w-36 h-48 drop-shadow-[0_0_15px_rgba(99,102,241,0.3)] transition-all duration-300">
+                  <!-- Head -->
                   <circle cx="80" cy="24" r="16" fill="#4f46e5" fill-opacity="0.8" stroke="#818cf8" stroke-width="2"/>
+                  <!-- Dynamic Torso Path -->
                   <path id="svg-torso" d="M 52 48 Q 80 44 108 48 L 100 135 Q 80 138 60 135 Z" fill="#6366f1" fill-opacity="0.5" stroke="#a5b4fc" stroke-width="2"/>
+                  <!-- Arms -->
                   <path id="svg-left-arm" d="M 50 48 L 30 115" stroke="#818cf8" stroke-width="8" stroke-linecap="round"/>
                   <path id="svg-right-arm" d="M 110 48 L 130 115" stroke="#818cf8" stroke-width="8" stroke-linecap="round"/>
+                  <!-- Legs -->
                   <path d="M 68 135 L 64 210" stroke="#818cf8" stroke-width="10" stroke-linecap="round"/>
                   <path d="M 92 135 L 96 210" stroke="#818cf8" stroke-width="10" stroke-linecap="round"/>
                 </svg>
@@ -452,17 +459,18 @@ and Billing & Subscription).
       </div>
     </section>
 
-    <!-- SECTION: FEATURES GRID -->
+    <!-- SECTION: FEATURES GRID (HIGHLIGHTING ALL 4 PRO FEATURES) -->
     <section id="features" class="py-24 bg-slate-900/40 border-t border-slate-800">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center max-w-3xl mx-auto mb-16">
           <span class="px-3 py-1 rounded-full text-xs font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Enterprise-Grade Capability</span>
           <h2 class="text-3xl sm:text-5xl font-black tracking-tight mt-3">Complete Toolkit For Modern Brands</h2>
-          <p class="mt-3 text-slate-400 text-base">Built from the ground up for high-growth multi-tenant e-commerce merchants on Shopify, WooCommerce, and Headless stores.</p>
+          <p class="mt-3 text-slate-400 text-base">Built from the ground up for high-growth e-commerce merchants on Shopify, WooCommerce, and Headless stores.</p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           
+          <!-- PRO FEATURE 1: White Labeling -->
           <div class="glass-card glass-card-hover p-8 rounded-3xl border border-indigo-500/30 relative">
             <div class="absolute top-6 right-6 px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[10px] font-bold">PRO TIER</div>
             <div class="w-12 h-12 rounded-2xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center mb-6">
@@ -474,6 +482,7 @@ and Billing & Subscription).
             </p>
           </div>
 
+          <!-- PRO FEATURE 2: AI Return Prevention Analytics -->
           <div class="glass-card glass-card-hover p-8 rounded-3xl border border-emerald-500/30 relative">
             <div class="absolute top-6 right-6 px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold">PRO TIER</div>
             <div class="w-12 h-12 rounded-2xl bg-emerald-600/20 border border-emerald-500/30 flex items-center justify-center mb-6">
@@ -485,6 +494,7 @@ and Billing & Subscription).
             </p>
           </div>
 
+          <!-- PRO FEATURE 3: Team Management -->
           <div class="glass-card glass-card-hover p-8 rounded-3xl border border-purple-500/30 relative">
             <div class="absolute top-6 right-6 px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30 text-[10px] font-bold">PRO TIER</div>
             <div class="w-12 h-12 rounded-2xl bg-purple-600/20 border border-purple-500/30 flex items-center justify-center mb-6">
@@ -496,6 +506,7 @@ and Billing & Subscription).
             </p>
           </div>
 
+          <!-- PRO FEATURE 4: Size Chart Generator -->
           <div class="glass-card glass-card-hover p-8 rounded-3xl border border-amber-500/30 relative">
             <div class="absolute top-6 right-6 px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-bold">PRO TIER</div>
             <div class="w-12 h-12 rounded-2xl bg-amber-600/20 border border-amber-500/30 flex items-center justify-center mb-6">
@@ -507,6 +518,7 @@ and Billing & Subscription).
             </p>
           </div>
 
+          <!-- Feature 5: 1-Click Platform Embed -->
           <div class="glass-card glass-card-hover p-8 rounded-3xl border border-slate-800">
             <div class="w-12 h-12 rounded-2xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center mb-6">
               <i data-lucide="code" class="w-6 h-6 text-blue-400"></i>
@@ -517,6 +529,7 @@ and Billing & Subscription).
             </p>
           </div>
 
+          <!-- Feature 6: Edge Biometric Privacy -->
           <div class="glass-card glass-card-hover p-8 rounded-3xl border border-slate-800">
             <div class="w-12 h-12 rounded-2xl bg-emerald-600/20 border border-emerald-500/30 flex items-center justify-center mb-6">
               <i data-lucide="lock" class="w-6 h-6 text-emerald-400"></i>
@@ -531,7 +544,7 @@ and Billing & Subscription).
       </div>
     </section>
 
-    <!-- SECTION: PRICING MATRIX WITH eSewa BILLING -->
+    <!-- SECTION: PRICING MATRIX WITH eSewa BILLING & 3-DAY FREE TRIALS -->
     <section id="pricing" class="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center max-w-3xl mx-auto mb-16">
         <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">3-Day Full-Access Evaluation</span>
@@ -541,7 +554,7 @@ and Billing & Subscription).
 
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-5xl mx-auto items-stretch">
         
-        <!-- STARTER PLAN TIER -->
+        <!-- STARTER PLAN TIER (Rs. 999/mo) -->
         <div class="glass-card p-8 sm:p-10 rounded-3xl border border-slate-800 flex flex-col justify-between hover:border-slate-700 transition">
           <div>
             <div class="flex items-center justify-between">
@@ -603,8 +616,9 @@ and Billing & Subscription).
           </div>
         </div>
 
-        <!-- PRO PLAN TIER -->
+        <!-- PRO PLAN TIER (Rs. 2999/mo - POPULAR & ALL 4 PRO FEATURES) -->
         <div class="glass-card p-8 sm:p-10 rounded-3xl border-2 border-indigo-500 shadow-2xl shadow-indigo-950/80 flex flex-col justify-between relative overflow-hidden">
+          
           <div class="absolute -top-0.5 right-6 px-4 py-1 rounded-b-xl bg-gradient-to-r from-indigo-500 to-brand-500 text-white font-black text-[11px] tracking-wider uppercase shadow-md shadow-indigo-500/40">
             Popular &bull; All 4 Pro Features
           </div>
@@ -670,21 +684,21 @@ and Billing & Subscription).
 
       </div>
 
-      <!-- Quick-Testing Sandbox Switcher -->
+      <!-- Quick-Testing Sandbox Switcher for Evaluators -->
       <div class="mt-16 text-center">
         <div class="inline-flex flex-wrap items-center justify-center gap-3 p-3.5 rounded-2xl glass-card text-xs text-slate-400 border border-slate-800">
           <span class="font-bold text-slate-300 flex items-center gap-1.5">
             <i data-lucide="terminal" class="w-4 h-4 text-indigo-400"></i>
             Instant Developer / Evaluator Mode:
           </span>
-          <button onclick="simulatePlanCheckout('pro')" class="px-3 py-1.5 rounded-xl bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-300 border border-indigo-500/40 transition font-bold">Simulate Pro (Rs. 2999)</button>
+          <button onclick="simulatePlanCheckout('pro')" class="px-3 py-1.5 rounded-xl bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-300 border border-indigo-500/40 transition font-bold">Simulate Pro Checkout (Rs. 2999)</button>
           <button onclick="simulatePlanCheckout('starter')" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition">Simulate Starter (Rs. 999)</button>
           <button onclick="resetAppState()" class="px-3 py-1.5 rounded-xl bg-red-950/50 hover:bg-red-900/50 text-red-300 border border-red-800/40 transition">Reset Demo State</button>
         </div>
       </div>
     </section>
 
-    <!-- SECTION: FREQUENTLY ASKED QUESTIONS -->
+    <!-- SECTION: FREQUENTLY ASKED QUESTIONS (ACCORDION) -->
     <section id="faq" class="py-24 bg-slate-900/50 border-t border-slate-800">
       <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-14">
@@ -693,13 +707,14 @@ and Billing & Subscription).
         </div>
 
         <div class="space-y-4" id="faq-accordion">
+          
           <div class="glass-card rounded-2xl border border-slate-800 overflow-hidden">
             <button onclick="toggleFaq(1)" class="w-full p-5 text-left font-bold text-sm text-white flex items-center justify-between">
-              <span>How does multi-tenant store isolation work in FitGuard AI?</span>
+              <span>How does the 3-day free trial work with eSewa?</span>
               <i id="faq-icon-1" data-lucide="chevron-down" class="w-4 h-4 text-indigo-400 transition-transform"></i>
             </button>
             <div id="faq-answer-1" class="px-5 pb-5 text-xs text-slate-400 leading-relaxed hidden">
-              Each merchant profile operates in an isolated tenant context. Intercept telemetry, team RBAC lists, widget presets, and OCR charts are scoped strictly to the authenticated store ID without cross-store data leakage.
+              When you click "Pay via eSewa", simply scan the QR code using your eSewa mobile app. You get full Pro or Starter access for 3 days to evaluate ROI, sizing accuracy, and team workflows with zero lock-in.
             </div>
           </div>
 
@@ -709,7 +724,7 @@ and Billing & Subscription).
               <i id="faq-icon-2" data-lucide="chevron-down" class="w-4 h-4 text-indigo-400 transition-transform"></i>
             </button>
             <div id="faq-answer-2" class="px-5 pb-5 text-xs text-slate-400 leading-relaxed hidden">
-              Our edge biometrics engine uses morphological regression models trained on over 2.4 million 3D body scans. By combining height, weight, build morphology, and preferred drape, it predicts chest, waist, and hip circumferences with 98.6% precision.
+              Our edge biometrics engine uses biometric morphological regression models trained on over 2.4 million 3D body scans. By combining height, weight, build morphology, and preferred drape, it predicts chest, waist, and hip circumferences with 98.6% precision.
             </div>
           </div>
 
@@ -732,6 +747,7 @@ and Billing & Subscription).
               Yes. The Pro tier (Rs. 2999/mo) includes our White-Label toggle. When activated, all "Powered by FitGuard AI" watermark badges are removed from your shopper modals and embedded drawer triggers.
             </div>
           </div>
+
         </div>
       </div>
     </section>
@@ -745,7 +761,7 @@ and Billing & Subscription).
           </div>
           <div>
             <span class="font-bold text-slate-300">FitGuard AI Technologies Inc.</span>
-            <p class="text-[11px] text-slate-600">&copy; 2026. Multi-Tenant Protected Architecture. Supported payments via eSewa.</p>
+            <p class="text-[11px] text-slate-600">&copy; 2026. All rights reserved. Supported payments via eSewa.</p>
           </div>
         </div>
         <div class="flex items-center gap-6">
@@ -759,7 +775,7 @@ and Billing & Subscription).
   </main>
 
   <!-- ========================================================================= -->
-  <!-- VIEW 2: INTERACTIVE DYNAMIC MULTI-TENANT MERCHANT DASHBOARD               -->
+  <!-- VIEW 2: INTERACTIVE MERCHANT DASHBOARD                                    -->
   <!-- ========================================================================= -->
   <main id="view-dashboard" class="flex-1 hidden flex-col lg:flex-row min-h-[calc(100vh-4rem)]">
     
@@ -767,30 +783,25 @@ and Billing & Subscription).
     <aside class="w-full lg:w-72 glass-card border-r border-slate-800/80 p-5 flex flex-col justify-between shrink-0">
       <div class="space-y-6">
         
-        <!-- Multi-Tenant Dynamic Store Selector -->
-        <div class="space-y-1.5">
-          <div class="flex items-center justify-between text-[10px] uppercase font-bold text-slate-400 tracking-wider px-1">
-            <span>Active Tenant Account</span>
-            <span class="text-indigo-400 font-mono">Isolated</span>
-          </div>
-          <div class="relative">
-            <select id="dash-tenant-select" onchange="switchStoreTenant(this.value)" class="w-full bg-slate-900 hover:bg-slate-850 border border-slate-700 hover:border-indigo-500 rounded-2xl px-3.5 py-3 text-xs font-bold text-white appearance-none cursor-pointer focus:outline-none focus:border-indigo-500 transition shadow-inner">
-              <!-- Dynamically populated options -->
-            </select>
-            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3.5 text-slate-400">
-              <i data-lucide="chevrons-up-down" class="w-4 h-4"></i>
+        <!-- Active Store Selector -->
+        <div class="p-3.5 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-between">
+          <div class="flex items-center gap-3 overflow-hidden">
+            <div class="w-9 h-9 rounded-xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center shrink-0">
+              <i data-lucide="store" class="w-4 h-4 text-indigo-400"></i>
+            </div>
+            <div class="truncate">
+              <div class="text-xs font-bold text-white truncate">Acme Apparel Global</div>
+              <div class="text-[10px] text-slate-400 flex items-center gap-1 font-mono">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> shopify_live_9012
+              </div>
             </div>
           </div>
-          <div class="px-1 text-[11px] text-slate-400 flex items-center justify-between font-mono">
-            <span id="tenant-handle-badge" class="flex items-center gap-1.5">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> shopify_live_9012
-            </span>
-            <span id="tenant-id-badge" class="text-slate-500">FG-9012-PRO</span>
-          </div>
+          <i data-lucide="chevrons-up-down" class="w-4 h-4 text-slate-500 shrink-0"></i>
         </div>
 
         <!-- Dashboard Navigation Menu (6 Active Tabs) -->
         <nav class="space-y-1.5" id="dashboard-sidebar-nav">
+          <!-- 1. Overview Tab Button -->
           <button onclick="switchTab('overview')" id="tab-btn-overview" class="dash-tab-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-xs font-bold transition bg-indigo-600 text-white shadow-lg shadow-indigo-600/30">
             <div class="flex items-center gap-3">
               <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
@@ -798,6 +809,7 @@ and Billing & Subscription).
             </div>
           </button>
 
+          <!-- 2. PRO FEATURE 1: Widget Customizer & White-Label Tab Button -->
           <button onclick="switchTab('customizer')" id="tab-btn-customizer" class="dash-tab-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-xs font-semibold transition text-slate-400 hover:text-slate-200 hover:bg-slate-900">
             <div class="flex items-center gap-3">
               <i data-lucide="sliders" class="w-4 h-4"></i>
@@ -806,6 +818,7 @@ and Billing & Subscription).
             <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Pro #1</span>
           </button>
 
+          <!-- 3. PRO FEATURE 4: Automated Size Chart OCR Generator Tab Button -->
           <button onclick="switchTab('ocr-charts')" id="tab-btn-ocr-charts" class="dash-tab-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-xs font-semibold transition text-slate-400 hover:text-slate-200 hover:bg-slate-900">
             <div class="flex items-center gap-3">
               <i data-lucide="scan" class="w-4 h-4"></i>
@@ -814,22 +827,24 @@ and Billing & Subscription).
             <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Pro #4</span>
           </button>
 
+          <!-- 4. Intercept Logs Explorer Tab Button -->
           <button onclick="switchTab('logs')" id="tab-btn-logs" class="dash-tab-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-xs font-semibold transition text-slate-400 hover:text-slate-200 hover:bg-slate-900">
             <div class="flex items-center gap-3">
               <i data-lucide="package-x" class="w-4 h-4"></i>
               <span>Intercept Logs</span>
             </div>
-            <span id="sidebar-logs-count" class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 font-bold">6</span>
           </button>
 
+          <!-- 5. PRO FEATURE 3: Team Management Tab Button -->
           <button onclick="switchTab('team')" id="tab-btn-team" class="dash-tab-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-xs font-semibold transition text-slate-400 hover:text-slate-200 hover:bg-slate-900">
             <div class="flex items-center gap-3">
               <i data-lucide="users" class="w-4 h-4"></i>
               <span>Team & Staff</span>
             </div>
-            <span id="sidebar-team-count" class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">4</span>
+            <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Pro #3</span>
           </button>
 
+          <!-- 6. Billing & Settings Tab Button -->
           <button onclick="switchTab('billing')" id="tab-btn-billing" class="dash-tab-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-xs font-semibold transition text-slate-400 hover:text-slate-200 hover:bg-slate-900">
             <div class="flex items-center gap-3">
               <i data-lucide="credit-card" class="w-4 h-4"></i>
@@ -839,17 +854,17 @@ and Billing & Subscription).
         </nav>
       </div>
 
-      <!-- Dynamic Plan Status Sidebar Widget -->
+      <!-- Plan Status Sidebar Widget -->
       <div class="mt-8 pt-4 border-t border-slate-800">
         <div id="dash-sidebar-plan-card" class="p-4 rounded-2xl bg-gradient-to-br from-slate-900 to-indigo-950/60 border border-indigo-500/30 space-y-2.5">
           <div class="flex items-center justify-between">
-            <span id="dash-sidebar-tier" class="text-xs font-black text-white uppercase">PRO PLAN ACTIVE</span>
-            <span id="dash-sidebar-trial-tag" class="px-2 py-0.5 text-[9px] font-bold rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">3-Day Trial</span>
+            <span id="dash-sidebar-tier" class="text-xs font-black text-white">PRO PLAN ACTIVE</span>
+            <span class="px-2 py-0.5 text-[9px] font-bold rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">3-Day Trial</span>
           </div>
-          <p id="dash-sidebar-plan-desc" class="text-[11px] text-slate-400 leading-tight">All Pro Tier enterprise features are active for this merchant account.</p>
+          <p class="text-[11px] text-slate-400 leading-tight">All 4 Pro Tier enterprise features are unlocked for this store.</p>
           <div class="pt-1">
-            <button onclick="openEsewaModal(currentUser.plan === 'pro' ? 'Pro Plan' : 'Starter Pack', currentUser.plan === 'pro' ? 'Rs. 2999' : 'Rs. 999')" class="w-full py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition">
-              <span>eSewa Billing Portal</span>
+            <button onclick="openEsewaModal('Pro Plan', 'Rs. 2999')" class="w-full py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition">
+              <span>eSewa Billing Details</span>
               <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
             </button>
           </div>
@@ -865,15 +880,11 @@ and Billing & Subscription).
       <!-- ===================================================================== -->
       <div id="panel-overview" class="tab-pane space-y-8">
         
-        <!-- Dynamic Header -->
+        <!-- Workspace Header -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight">
-              <span id="overview-store-name">Acme Apparel Global</span> &bull; Telemetry & ROI
-            </h1>
-            <p class="text-xs sm:text-sm text-slate-400 mt-1" id="overview-store-subtext">
-              Real-time apparel sizing accuracy and return interception metrics for account ID: FG-9012-PRO.
-            </p>
+            <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight">Executive Telemetry & ROI Dashboard</h1>
+            <p class="text-xs sm:text-sm text-slate-400 mt-1">Real-time apparel sizing accuracy and return interception metrics for Acme Apparel Global.</p>
           </div>
           <div class="flex items-center gap-3">
             <button onclick="refreshDashboardMetrics()" class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-700 text-xs font-bold flex items-center gap-2 transition">
@@ -887,7 +898,7 @@ and Billing & Subscription).
           </div>
         </div>
 
-        <!-- DEDICATED AI RETURN PREVENTION ANALYTICS CARD -->
+        <!-- PRO FEATURE #2: DEDICATED AI RETURN PREVENTION ANALYTICS CARD -->
         <div class="glass-card p-6 sm:p-8 rounded-3xl border-2 border-indigo-500/40 bg-gradient-to-br from-slate-900/90 via-indigo-950/30 to-slate-900/90 shadow-2xl relative overflow-hidden">
           
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-6 border-b border-slate-800">
@@ -898,20 +909,21 @@ and Billing & Subscription).
               <div>
                 <div class="flex items-center gap-2.5">
                   <h2 class="text-lg font-black text-white">AI Return Prevention Engine</h2>
-                  <span id="analytics-tier-badge" class="px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-gradient-to-r from-indigo-500 to-brand-500 text-white shadow-sm">PRO FEATURE #2</span>
+                  <span class="px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-gradient-to-r from-indigo-500 to-brand-500 text-white shadow-sm">PRO TIER FEATURE #2</span>
                 </div>
                 <p class="text-xs text-slate-400">Biometric regression model intercepting fit errors before cart checkout</p>
               </div>
             </div>
             <div class="flex items-center gap-2 text-xs font-bold text-emerald-400 bg-emerald-500/10 px-3 py-1.5 rounded-xl border border-emerald-500/25">
               <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-              <span>Tenant Ingestion Stream Active</span>
+              <span>Live Ingestion Active</span>
             </div>
           </div>
 
-          <!-- The 3 Dynamic Metrics Cards -->
+          <!-- The 3 Core Pro Metrics Cards -->
           <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
             
+            <!-- Metric 1: Total Returns Prevented -->
             <div class="p-6 rounded-2xl bg-slate-900/90 border border-slate-800 flex flex-col justify-between">
               <div class="flex items-center justify-between">
                 <span class="text-xs font-black text-slate-400 uppercase tracking-wider">Total Returns Prevented</span>
@@ -921,16 +933,17 @@ and Billing & Subscription).
               </div>
               <div class="mt-4 flex items-baseline gap-2">
                 <span id="kpi-returns-prevented" class="text-4xl font-black text-white font-mono">512</span>
-                <span id="kpi-returns-growth" class="text-xs font-bold text-emerald-400 flex items-center gap-0.5 font-mono">
+                <span class="text-xs font-bold text-emerald-400 flex items-center gap-0.5 font-mono">
                   <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i> +18.4%
                 </span>
               </div>
               <p class="text-[11px] text-slate-500 mt-2">Prevented through automated size corrections</p>
             </div>
 
+            <!-- Metric 2: Estimated Money Saved (Rs.) -->
             <div class="p-6 rounded-2xl bg-slate-900/90 border border-slate-800 flex flex-col justify-between">
               <div class="flex items-center justify-between">
-                <span class="text-xs font-black text-slate-400 uppercase tracking-wider">Estimated Money Saved</span>
+                <span class="text-xs font-black text-slate-400 uppercase tracking-wider">Estimated Money Saved (Rs.)</span>
                 <div class="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
                   <i data-lucide="coins" class="w-4 h-4 text-emerald-400"></i>
                 </div>
@@ -944,6 +957,7 @@ and Billing & Subscription).
               <p class="text-[11px] text-slate-500 mt-2">Saved on freight, repackaging, & unsellable inventory</p>
             </div>
 
+            <!-- Metric 3: Size Accuracy Rate -->
             <div class="p-6 rounded-2xl bg-slate-900/90 border border-slate-800 flex flex-col justify-between">
               <div class="flex items-center justify-between">
                 <span class="text-xs font-black text-slate-400 uppercase tracking-wider">Size Accuracy Rate</span>
@@ -957,19 +971,19 @@ and Billing & Subscription).
                   <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Verified
                 </span>
               </div>
-              <p id="kpi-sessions-label" class="text-[11px] text-slate-500 mt-2">Based on verified customer checkout sessions</p>
+              <p class="text-[11px] text-slate-500 mt-2">Based on 14,890 verified customer checkout sessions</p>
             </div>
 
           </div>
 
-          <!-- Dynamic Tenant Chart.js Graph Rendering Container -->
+          <!-- Chart.js Graph Rendering Container -->
           <div class="mt-8 pt-6 border-t border-slate-800">
             <div class="flex items-center justify-between mb-4">
               <h3 class="text-xs font-bold text-slate-300 flex items-center gap-2">
                 <i data-lucide="line-chart" class="w-4 h-4 text-indigo-400"></i>
                 Returns Prevented vs. Sizing Inquiries (30-Day Trajectory)
               </h3>
-              <span class="text-[11px] text-slate-500 font-mono">Live Tenant Telemetry</span>
+              <span class="text-[11px] text-slate-500 font-mono">Updated Every 60s</span>
             </div>
             <div class="h-64 w-full relative">
               <canvas id="returnPreventionChart"></canvas>
@@ -977,7 +991,7 @@ and Billing & Subscription).
           </div>
         </div>
 
-        <!-- Dynamic Live Intercept Ticker Stream -->
+        <!-- Live Intercept Ticker Stream -->
         <div class="glass-card p-6 rounded-3xl border border-slate-800 space-y-4">
           <div class="flex items-center justify-between">
             <h3 class="text-sm font-bold text-white flex items-center gap-2">
@@ -987,8 +1001,39 @@ and Billing & Subscription).
             <button onclick="switchTab('logs')" class="text-xs text-indigo-400 hover:underline">View All Sessions &rarr;</button>
           </div>
 
-          <div id="overview-ticker-container" class="space-y-2.5 text-xs">
-            <!-- Dynamically populated from active tenant logs -->
+          <div class="space-y-2.5 text-xs">
+            <div class="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between hover:border-slate-700 transition">
+              <div class="flex items-center gap-3">
+                <div class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></div>
+                <div>
+                  <span class="text-white font-bold">Session #90812 (Kathmandu, NP)</span> &bull;
+                  <span class="text-slate-400">Attempted <strong>Size M</strong> for <em>Heavyweight Fleece</em> &rarr; AI corrected to <strong>Size S</strong>.</span>
+                </div>
+              </div>
+              <span class="text-emerald-400 font-mono font-bold">Saved Rs. 3,400</span>
+            </div>
+
+            <div class="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between hover:border-slate-700 transition">
+              <div class="flex items-center gap-3">
+                <div class="w-2.5 h-2.5 rounded-full bg-emerald-400"></div>
+                <div>
+                  <span class="text-white font-bold">Session #90809 (Pokhara, NP)</span> &bull;
+                  <span class="text-slate-400">Customer bracket ordered <strong>Sizes 32 & 34</strong> &rarr; FitGuard confirmed <strong>Size 32</strong>.</span>
+                </div>
+              </div>
+              <span class="text-emerald-400 font-mono font-bold">Saved Rs. 6,800 (Double Bracket Averted)</span>
+            </div>
+
+            <div class="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between hover:border-slate-700 transition">
+              <div class="flex items-center gap-3">
+                <div class="w-2.5 h-2.5 rounded-full bg-emerald-400"></div>
+                <div>
+                  <span class="text-white font-bold">Session #90804 (Lalitpur, NP)</span> &bull;
+                  <span class="text-slate-400">Customer selected <strong>Size XL</strong> &rarr; AI detected broad shoulder spec & confirmed <strong>Size XL</strong> (100% Fit Match).</span>
+                </div>
+              </div>
+              <span class="text-indigo-400 font-mono font-bold">Confidence 99.4%</span>
+            </div>
           </div>
         </div>
 
@@ -1003,7 +1048,7 @@ and Billing & Subscription).
             <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight">Storefront Widget Customizer</h1>
             <span class="px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-gradient-to-r from-indigo-500 to-brand-500 text-white">PRO FEATURE #1</span>
           </div>
-          <p class="text-xs sm:text-sm text-slate-400 mt-1">Configure modal branding, corner radii, trigger buttons, and manage white-labeling watermark visibility for this store.</p>
+          <p class="text-xs sm:text-sm text-slate-400 mt-1">Configure modal branding, corner radii, trigger buttons, and manage white-labeling watermark visibility.</p>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -1011,7 +1056,7 @@ and Billing & Subscription).
           <!-- Column 1: Configuration Form -->
           <div class="lg:col-span-6 space-y-6">
             
-            <!-- WHITE-LABEL TOGGLE CARD -->
+            <!-- PRO FEATURE #1 TOGGLE CARD -->
             <div class="glass-card p-6 rounded-3xl border-2 border-indigo-500/40 relative space-y-4">
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-3.5">
@@ -1024,8 +1069,9 @@ and Billing & Subscription).
                   </div>
                 </div>
 
+                <!-- Pro Toggle Switch -->
                 <label class="relative inline-flex items-center cursor-pointer">
-                  <input type="checkbox" id="dash-whitelabel-toggle" onchange="toggleWhiteLabelOption(this.checked)" class="sr-only peer">
+                  <input type="checkbox" id="dash-whitelabel-toggle" onchange="toggleWhiteLabelOption(this.checked)" class="sr-only peer" checked>
                   <div class="w-13 h-7 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-indigo-600"></div>
                 </label>
               </div>
@@ -1052,7 +1098,7 @@ and Billing & Subscription).
                 <label class="block text-xs font-bold text-slate-300 mb-1.5">Button Corner Radius</label>
                 <select id="dash-custom-radius" onchange="updateLiveWidgetPreview()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500">
                   <option value="rounded-lg">Subtle Rounded (8px)</option>
-                  <option value="rounded-2xl">Modern SaaS Soft (16px)</option>
+                  <option value="rounded-2xl" selected>Modern SaaS Soft (16px)</option>
                   <option value="rounded-full">Full Pill (9999px)</option>
                   <option value="rounded-none">Sharp Minimal (0px)</option>
                 </select>
@@ -1064,16 +1110,23 @@ and Billing & Subscription).
               </div>
             </div>
 
-            <!-- Dynamic Embed Code Snippet Generator -->
+            <!-- Embed Code Snippet Generator -->
             <div class="glass-card p-6 rounded-3xl border border-slate-800 space-y-3">
               <div class="flex items-center justify-between">
-                <h3 class="text-sm font-bold text-white">Store Embed Script Tag</h3>
+                <h3 class="text-sm font-bold text-white">Production Embed Tag</h3>
                 <button onclick="copyEmbedScriptCode()" class="px-3 py-1 rounded-lg bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-300 text-xs font-bold flex items-center gap-1.5 transition">
                   <i data-lucide="copy" class="w-3.5 h-3.5"></i>
                   <span id="dash-copy-btn-label">Copy Script</span>
                 </button>
               </div>
-              <pre class="bg-slate-950 p-4 rounded-2xl border border-slate-800 text-[11px] font-mono-code text-indigo-300 overflow-x-auto custom-scrollbar leading-relaxed"><code id="dash-embed-code-block"><!-- Dynamic Script Tag --></code></pre>
+              <pre class="bg-slate-950 p-4 rounded-2xl border border-slate-800 text-[11px] font-mono-code text-indigo-300 overflow-x-auto custom-scrollbar leading-relaxed"><code id="dash-embed-code-block">&lt;!-- FitGuard AI Platform Embed --&gt;
+&lt;script 
+  src="https://cdn.fitguard.ai/v2/fitguard.min.js" 
+  data-store-id="FG-9012-PRO" 
+  data-white-label="true" 
+  data-accent="#4f46e5" 
+  async&gt;
+&lt;/script&gt;</code></pre>
             </div>
 
           </div>
@@ -1106,7 +1159,7 @@ and Billing & Subscription).
                   Calculate My Perfect Size ✨
                 </button>
 
-                <!-- Watermark Node -->
+                <!-- Watermark Node (Controlled by Pro toggle) -->
                 <div id="dash-preview-watermark" class="text-center pt-2">
                   <p class="text-[10px] text-slate-500 font-medium">
                     Powered by <strong class="text-indigo-400">FitGuard AI</strong>
@@ -1133,7 +1186,7 @@ and Billing & Subscription).
               <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight">Automated Size Chart Vision OCR</h1>
               <span class="px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-gradient-to-r from-indigo-500 to-brand-500 text-white">PRO FEATURE #4</span>
             </div>
-            <p class="text-xs sm:text-sm text-slate-400 mt-1">Upload unstructured supplier PDF spec sheets or images. Vision AI isolates measurements and populates your store matrix.</p>
+            <p class="text-xs sm:text-sm text-slate-400 mt-1">Upload unstructured supplier PDF spec sheets, scans, or garment images. Vision AI isolates measurements and populates your matrix.</p>
           </div>
         </div>
 
@@ -1171,11 +1224,18 @@ and Billing & Subscription).
                 <p class="text-[11px] text-slate-400 font-mono">Extracting: Chest(cm), Waist(cm), Inseam(cm), Sleeve(cm)...</p>
               </div>
 
-              <!-- Tenant Sample Tech Packs -->
+              <!-- Quick Supplier Templates -->
               <div>
-                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Test catalog factory spec sheets:</span>
-                <div class="grid grid-cols-2 gap-2" id="tenant-sample-ocr-buttons">
-                  <!-- Injected based on active tenant -->
+                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Or test sample factory spec sheets:</span>
+                <div class="grid grid-cols-2 gap-2">
+                  <button onclick="runOcrSimulation('Heavyweight_Hoodie_TechPack_2026.pdf')" class="px-3 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 text-xs font-semibold border border-slate-800 transition text-left flex items-center gap-2">
+                    <i data-lucide="shirt" class="w-3.5 h-3.5 text-indigo-400"></i>
+                    <span class="truncate">Hoodie TechPack.pdf</span>
+                  </button>
+                  <button onclick="runOcrSimulation('Raw_Denim_Selvedge_Specs.png')" class="px-3 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 text-xs font-semibold border border-slate-800 transition text-left flex items-center gap-2">
+                    <i data-lucide="scissors" class="w-3.5 h-3.5 text-indigo-400"></i>
+                    <span class="truncate">Denim Specs.png</span>
+                  </button>
                 </div>
               </div>
             </div>
@@ -1186,15 +1246,15 @@ and Billing & Subscription).
             <div class="glass-card p-6 rounded-3xl border border-slate-800">
               <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-800">
                 <div>
-                  <h3 id="ocr-matrix-title" class="text-base font-bold text-white">Parsed Matrix: Active Catalog</h3>
-                  <span id="ocr-matrix-status" class="text-xs text-emerald-400 font-medium">✓ Vision OCR Normalized &bull; Editable Matrix</span>
+                  <h3 id="ocr-matrix-title" class="text-base font-bold text-white">Parsed Matrix: Heavyweight Outerwear</h3>
+                  <span id="ocr-matrix-status" class="text-xs text-emerald-400 font-medium">✓ Vision OCR Normalized &bull; 6 Size Grids Generated</span>
                 </div>
                 <div class="flex items-center gap-2">
                   <button onclick="addMatrixRow()" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold border border-slate-700 transition flex items-center gap-1">
                     <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Size
                   </button>
                   <button onclick="syncMatrixToCatalog()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition flex items-center gap-1 shadow-lg shadow-indigo-600/30">
-                    <i data-lucide="save" class="w-3.5 h-3.5"></i> Sync Catalog
+                    <i data-lucide="save" class="w-3.5 h-3.5"></i> Sync to Shopify
                   </button>
                 </div>
               </div>
@@ -1213,7 +1273,7 @@ and Billing & Subscription).
                     </tr>
                   </thead>
                   <tbody id="ocr-matrix-tbody" class="divide-y divide-slate-800 font-mono">
-                    <!-- Populated via JS for active tenant -->
+                    <!-- Populated via JS -->
                   </tbody>
                 </table>
               </div>
@@ -1235,7 +1295,7 @@ and Billing & Subscription).
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight">Customer Intercept & Return Log Explorer</h1>
-            <p class="text-xs sm:text-sm text-slate-400 mt-1">Audit fit inquiries, averted bracketing orders, and AI sizing decisions for this store.</p>
+            <p class="text-xs sm:text-sm text-slate-400 mt-1">Audit fit inquiries, averted bracketing orders, and AI sizing decisions.</p>
           </div>
           <div class="flex items-center gap-3">
             <input type="text" id="log-search-input" oninput="filterLogsTable()" placeholder="Search by SKU, City, or Size..." class="bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 w-64">
@@ -1257,7 +1317,7 @@ and Billing & Subscription).
                 </tr>
               </thead>
               <tbody id="intercept-logs-tbody" class="divide-y divide-slate-800">
-                <!-- Dynamically populated strictly for active tenant -->
+                <!-- Dynamically populated via JS -->
               </tbody>
             </table>
           </div>
@@ -1287,7 +1347,7 @@ and Billing & Subscription).
           <div class="p-6 border-b border-slate-800 flex items-center justify-between">
             <div>
               <h3 class="text-sm font-bold text-white">Active Store Staff</h3>
-              <p class="text-xs text-slate-400" id="team-seats-desc">Multi-user seats for this store</p>
+              <p class="text-xs text-slate-400">Unlimited staff seats available on Pro Tier</p>
             </div>
             <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">RBAC Active</span>
           </div>
@@ -1304,7 +1364,7 @@ and Billing & Subscription).
                 </tr>
               </thead>
               <tbody id="dash-team-tbody" class="divide-y divide-slate-800">
-                <!-- Dynamically populated strictly for active tenant -->
+                <!-- Dynamically populated via JS -->
               </tbody>
             </table>
           </div>
@@ -1342,7 +1402,7 @@ and Billing & Subscription).
       <div id="panel-billing" class="tab-pane hidden space-y-8">
         <div>
           <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight">Subscription & eSewa Billing</h1>
-          <p class="text-xs sm:text-sm text-slate-400 mt-1">Manage your active subscription tier, payments, and invoices for this store account.</p>
+          <p class="text-xs sm:text-sm text-slate-400 mt-1">Manage your active subscription tier, payments, and invoices.</p>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -1354,17 +1414,13 @@ and Billing & Subscription).
                 <span class="text-xs font-bold text-indigo-400 uppercase tracking-wider">Active Subscription</span>
                 <h3 id="billing-tier-title" class="text-2xl font-black text-white mt-1">Pro Plan (Rs. 2999/mo)</h3>
               </div>
-              <span id="billing-trial-badge" class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">3-Day Free Trial</span>
+              <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">3-Day Free Trial</span>
             </div>
 
             <div class="space-y-3 text-xs text-slate-300">
               <div class="flex justify-between py-2 border-b border-slate-900">
-                <span class="text-slate-400">Store Account ID:</span>
-                <span id="billing-store-id" class="font-mono text-indigo-400 font-bold">FG-9012-PRO</span>
-              </div>
-              <div class="flex justify-between py-2 border-b border-slate-900">
                 <span class="text-slate-400">Trial Period Status:</span>
-                <span id="billing-trial-status" class="font-bold text-emerald-400">3 Days Active</span>
+                <span class="font-bold text-emerald-400">3 Days Active</span>
               </div>
               <div class="flex justify-between py-2 border-b border-slate-900">
                 <span class="text-slate-400">Billing Provider:</span>
@@ -1372,7 +1428,7 @@ and Billing & Subscription).
               </div>
               <div class="flex justify-between py-2 border-b border-slate-900">
                 <span class="text-slate-400">Next Automatic Invoice:</span>
-                <span id="billing-next-invoice" class="font-bold text-white">Rs. 2999 / month after trial</span>
+                <span class="font-bold text-white">Rs. 2999 / month after trial</span>
               </div>
             </div>
 
@@ -1393,10 +1449,40 @@ and Billing & Subscription).
 
           <!-- Feature Matrix Summary -->
           <div class="lg:col-span-6 glass-card p-6 sm:p-8 rounded-3xl border border-slate-800 space-y-4">
-            <h3 class="text-base font-bold text-white">Plan Capabilities Matrix</h3>
+            <h3 class="text-base font-bold text-white">Pro Plan Status Matrix</h3>
             
-            <div id="billing-features-matrix" class="space-y-3 text-xs">
-              <!-- Dynamically populated based on active tier -->
+            <div class="space-y-3 text-xs">
+              <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                  <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400"></i>
+                  <span class="text-slate-200">White-Labeling Watermark Removal</span>
+                </div>
+                <span class="text-emerald-400 font-mono font-bold">UNLOCKED</span>
+              </div>
+
+              <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                  <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400"></i>
+                  <span class="text-slate-200">AI Return Prevention ROI Analytics</span>
+                </div>
+                <span class="text-emerald-400 font-mono font-bold">UNLOCKED</span>
+              </div>
+
+              <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                  <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400"></i>
+                  <span class="text-slate-200">Unlimited Team & Staff Multi-User Accounts</span>
+                </div>
+                <span class="text-emerald-400 font-mono font-bold">UNLOCKED</span>
+              </div>
+
+              <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                  <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400"></i>
+                  <span class="text-slate-200">Automated Vision OCR Size Chart Ingestion</span>
+                </div>
+                <span class="text-emerald-400 font-mono font-bold">UNLOCKED</span>
+              </div>
             </div>
           </div>
 
@@ -1410,9 +1496,13 @@ and Billing & Subscription).
   <!-- MODAL: eSewa PAYMENT POPUP DIALOG                                         -->
   <!-- ========================================================================= -->
   <div id="esewaModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
+    <!-- Backdrop Blur Overlay -->
     <div id="esewaModalBackdrop" class="absolute inset-0 bg-slate-950/80 backdrop-blur-md"></div>
 
+    <!-- Modal Content Container -->
     <div class="relative z-10 w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl shadow-indigo-950/60 transform scale-95 transition-transform duration-300" id="esewaModalContainer">
+      
+      <!-- Modal Header -->
       <div class="flex items-center justify-between pb-4 border-b border-slate-800">
         <div class="flex items-center gap-2.5">
           <div class="w-8 h-8 rounded-lg bg-[#60bb46] flex items-center justify-center text-white font-black text-xs shadow-sm">
@@ -1424,11 +1514,13 @@ and Billing & Subscription).
           </div>
         </div>
 
+        <!-- Close Button -->
         <button onclick="closeEsewaModal()" class="w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center hover:bg-slate-700 transition-colors" aria-label="Close modal">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
 
+      <!-- Plan Info Card -->
       <div class="my-5 p-4 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between">
         <div>
           <span class="text-xs text-slate-400 block font-medium">Selected Plan</span>
@@ -1440,6 +1532,7 @@ and Billing & Subscription).
         </div>
       </div>
 
+      <!-- QR Code Image Container (Pure QR - No Personal Name or Phone Number) -->
       <div class="flex flex-col items-center justify-center mb-5">
         <div class="bg-white p-4 rounded-2xl shadow-xl flex items-center justify-center border-4 border-emerald-500/20">
           <img 
@@ -1455,6 +1548,7 @@ and Billing & Subscription).
         </p>
       </div>
 
+      <!-- Step Instructions (Strictly Privacy Safe) -->
       <div class="p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-[11px] text-slate-400 space-y-1 mb-4">
         <div class="flex items-center gap-2 text-slate-300 font-semibold">
           <span class="w-1.5 h-1.5 rounded-full bg-[#60bb46]"></span>
@@ -1467,11 +1561,13 @@ and Billing & Subscription).
         </ol>
       </div>
 
+      <!-- Action Footer -->
       <button 
         onclick="closeEsewaModal()" 
         class="w-full py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs transition-colors">
         Dismiss & Close
       </button>
+
     </div>
   </div>
 
@@ -1498,7 +1594,7 @@ and Billing & Subscription).
 
         <div>
           <label class="block text-xs font-bold text-slate-300 mb-1">Work Email</label>
-          <input type="email" id="invite-email" required placeholder="jessica@store.com" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+          <input type="email" id="invite-email" required placeholder="jessica@acmeapparel.com" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500">
         </div>
 
         <div>
@@ -1533,7 +1629,7 @@ and Billing & Subscription).
         </button>
       </div>
       <p class="text-xs text-slate-400 leading-relaxed">
-        Download verified sizing telemetry for <strong id="export-store-name" class="text-white">Active Store</strong> including total returns prevented, averted double-bracket cart events, and accuracy rates.
+        Download verified sizing telemetry including total returns prevented, averted double-bracket cart events, and accuracy rates.
       </p>
       <div class="pt-2 flex justify-end gap-3">
         <button onclick="closeExportModal()" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-xs font-bold">Cancel</button>
@@ -1543,467 +1639,271 @@ and Billing & Subscription).
   </div>
 
   <!-- ========================================================================= -->
-  <!-- JAVASCRIPT: CENTRALIZED MULTI-TENANT USER STATE & DYNAMIC RENDERING       -->
+  <!-- JAVASCRIPT: COMPLETE INTEGRATED APPLICATION ENGINE                        -->
   <!-- ========================================================================= -->
   <script>
-    /**
-     * MULTI-TENANT STORE DATA STORE (Mock Store Database)
-     * Defines isolated, non-leaking accounts with specific data across all sections.
-     */
-    const STORE_DATABASE = {
-      'acme-global': {
-        storeId: 'FG-9012-PRO',
-        storeName: 'Acme Apparel Global',
-        handle: 'shopify_live_9012',
-        platform: 'Shopify Plus',
-        plan: 'pro',
-        isTrial: true,
-        trialDays: 3,
-        analytics: {
-          returnsPrevented: 512,
-          moneySaved: 1740800,
-          accuracyRate: '98.7%',
-          growthRate: '+18.4%',
-          verifiedSessions: 14890,
-          chartTimeline: {
-            labels: ['Day 1', 'Day 5', 'Day 10', 'Day 15', 'Day 20', 'Day 25', 'Day 30'],
-            returnsPrevented: [38, 92, 184, 276, 390, 460, 512],
-            inquiries: [120, 290, 540, 810, 1150, 1380, 1590]
-          }
-        },
-        customizer: {
-          whiteLabel: true,
-          accentColor: '#4f46e5',
-          buttonRadius: 'rounded-2xl',
-          buttonText: 'Calculate My Perfect Size ✨'
-        },
-        ocrHistory: {
-          activeMatrixTitle: 'Parsed Matrix: Heavyweight Fleece & Outerwear',
-          samples: [
-            { label: 'Hoodie TechPack.pdf', file: 'Heavyweight_Hoodie_TechPack_2026.pdf', icon: 'shirt' },
-            { label: 'Denim Specs.png', file: 'Raw_Denim_Selvedge_Specs.png', icon: 'scissors' }
-          ]
-        },
-        matrix: [
-          { size: 'XS', chest: 88, waist: 72, length: 68, weight: '50-60 kg' },
-          { size: 'S', chest: 94, waist: 78, length: 70, weight: '60-70 kg' },
-          { size: 'M', chest: 100, waist: 84, length: 72, weight: '70-80 kg' },
-          { size: 'L', chest: 106, waist: 90, length: 74, weight: '80-90 kg' },
-          { size: 'XL', chest: 112, waist: 96, length: 76, weight: '90-105 kg' },
-          { size: 'XXL', chest: 118, waist: 102, length: 78, weight: '105-120 kg' }
-        ],
-        logs: [
-          { id: 'SES-90812', sku: 'NHC-9021', product: 'Heavy Fleece Crew', biometrics: '180cm / 78kg (Balanced)', requested: 'Size M', aiSize: 'Size S', outcome: 'Prevented Return', savings: 'Rs. 3,400' },
-          { id: 'SES-90809', sku: 'RAW-3100', product: 'Selvedge Denim', biometrics: '185cm / 88kg (Broad)', requested: 'Size 32 & 34', aiSize: 'Size 32', outcome: 'Bracket Averted', savings: 'Rs. 6,800' },
-          { id: 'SES-90804', sku: 'OVR-1102', product: 'Boxy Poplin Shirt', biometrics: '172cm / 64kg (Lean)', requested: 'Size L', aiSize: 'Size M', outcome: 'Prevented Return', savings: 'Rs. 3,400' },
-          { id: 'SES-90798', sku: 'BLZ-5501', product: 'Tailored Blazer', biometrics: '178cm / 82kg (Broad)', requested: 'Size 40R', aiSize: 'Size 42R', outcome: 'Prevented Return', savings: 'Rs. 3,400' },
-          { id: 'SES-90791', sku: 'TRK-2210', product: 'Merino Track Pant', biometrics: '168cm / 58kg (Lean)', requested: 'Size S', aiSize: 'Size XS', outcome: 'Prevented Return', savings: 'Rs. 3,400' },
-          { id: 'SES-90785', sku: 'NHC-9021', product: 'Heavy Fleece Crew', biometrics: '190cm / 95kg (Broad)', requested: 'Size XL', aiSize: 'Size XXL', outcome: 'Prevented Return', savings: 'Rs. 3,400' }
-        ],
-        team: [
-          { id: 101, name: 'Alexander Wright', email: 'alex@acmeapparel.com', role: 'Admin', status: 'Active' },
-          { id: 102, name: 'Sophia Chen', email: 'sophia@acmeapparel.com', role: 'Fit Editor', status: 'Active' },
-          { id: 103, name: 'Liam O\'Connor', email: 'liam@acmeapparel.com', role: 'Support Viewer', status: 'Active' },
-          { id: 104, name: 'Maya Lin', email: 'maya@acmeapparel.com', role: 'Fit Editor', status: 'Pending' }
-        ]
-      },
-
-      'velocity-athletics': {
-        storeId: 'FG-4421-STR',
-        storeName: 'Velocity Athletics',
-        handle: 'shopify_live_4421',
-        platform: 'Shopify 2.0',
-        plan: 'starter',
-        isTrial: true,
-        trialDays: 3,
-        analytics: {
-          returnsPrevented: 142,
-          moneySaved: 482800,
-          accuracyRate: '97.2%',
-          growthRate: '+11.2%',
-          verifiedSessions: 3920,
-          chartTimeline: {
-            labels: ['Day 1', 'Day 5', 'Day 10', 'Day 15', 'Day 20', 'Day 25', 'Day 30'],
-            returnsPrevented: [10, 28, 52, 79, 105, 126, 142],
-            inquiries: [40, 95, 180, 260, 340, 420, 510]
-          }
-        },
-        customizer: {
-          whiteLabel: false,
-          accentColor: '#10b981',
-          buttonRadius: 'rounded-full',
-          buttonText: 'Find Your Athlete Fit 🏃‍♂️'
-        },
-        ocrHistory: {
-          activeMatrixTitle: 'Parsed Matrix: Compression & Activewear Performance',
-          samples: [
-            { label: 'Active Compression Spec.pdf', file: 'Velocity_Compression_Spec.pdf', icon: 'zap' },
-            { label: 'Runner Short Matrix.png', file: 'Velocity_Shorts_Matrix.png', icon: 'activity' }
-          ]
-        },
-        matrix: [
-          { size: 'S (Slim)', chest: 90, waist: 74, length: 66, weight: '55-65 kg' },
-          { size: 'M (Athletic)', chest: 98, waist: 80, length: 69, weight: '65-78 kg' },
-          { size: 'L (Pro Fit)', chest: 104, waist: 86, length: 72, weight: '78-90 kg' },
-          { size: 'XL (Max Drape)', chest: 110, waist: 92, length: 75, weight: '90-105 kg' }
-        ],
-        logs: [
-          { id: 'SES-44109', sku: 'VEL-COMP-01', product: 'Pro Compression Top', biometrics: '175cm / 70kg (Lean)', requested: 'Size L', aiSize: 'Size M', outcome: 'Prevented Return', savings: 'Rs. 3,400' },
-          { id: 'SES-44102', sku: 'VEL-RUN-09', product: 'Aero Running Singlet', biometrics: '182cm / 79kg (Balanced)', requested: 'Size M & L', aiSize: 'Size M', outcome: 'Bracket Averted', savings: 'Rs. 6,800' },
-          { id: 'SES-44095', sku: 'VEL-TIGHT-3', product: 'Thermal Training Tight', biometrics: '168cm / 62kg (Lean)', requested: 'Size M', aiSize: 'Size S', outcome: 'Prevented Return', savings: 'Rs. 3,400' }
-        ],
-        team: [
-          { id: 201, name: 'Marcus Vance', email: 'marcus@velocityathletics.com', role: 'Admin', status: 'Active' },
-          { id: 202, name: 'Elena Rostova', email: 'elena@velocityathletics.com', role: 'Support Viewer', status: 'Active' }
-        ]
-      },
-
-      'sezanne-atelier': {
-        storeId: 'FG-7833-PRO',
-        storeName: 'Atelier Sézanne',
-        handle: 'headless_live_7833',
-        platform: 'Next.js Headless',
-        plan: 'pro',
-        isTrial: true,
-        trialDays: 3,
-        analytics: {
-          returnsPrevented: 890,
-          moneySaved: 3026000,
-          accuracyRate: '99.4%',
-          growthRate: '+24.6%',
-          verifiedSessions: 26400,
-          chartTimeline: {
-            labels: ['Day 1', 'Day 5', 'Day 10', 'Day 15', 'Day 20', 'Day 25', 'Day 30'],
-            returnsPrevented: [75, 190, 340, 520, 680, 810, 890],
-            inquiries: [210, 580, 1100, 1690, 2250, 2710, 3120]
-          }
-        },
-        customizer: {
-          whiteLabel: true,
-          accentColor: '#e11d48',
-          buttonRadius: 'rounded-none',
-          buttonText: 'Consulter Votre Taille Sur-Mesure ✨'
-        },
-        ocrHistory: {
-          activeMatrixTitle: 'Parsed Matrix: Silk Dresses & Tailored Trench Coats',
-          samples: [
-            { label: 'Silk Dress SpecPack.pdf', file: 'Sezanne_Silk_SpecPack.pdf', icon: 'sparkles' },
-            { label: 'Trench Coat Drape.pdf', file: 'Sezanne_Trench_Drape.pdf', icon: 'file-text' }
-          ]
-        },
-        matrix: [
-          { size: 'FR 34 (XS)', chest: 82, waist: 64, length: 110, weight: '45-52 kg' },
-          { size: 'FR 36 (S)', chest: 86, waist: 68, length: 112, weight: '52-58 kg' },
-          { size: 'FR 38 (M)', chest: 90, waist: 72, length: 114, weight: '58-65 kg' },
-          { size: 'FR 40 (L)', chest: 94, waist: 76, length: 116, weight: '65-72 kg' },
-          { size: 'FR 42 (XL)', chest: 98, waist: 80, length: 118, weight: '72-82 kg' }
-        ],
-        logs: [
-          { id: 'SES-78012', sku: 'SZ-SLK-401', product: 'Silk Wrap Midi Dress', biometrics: '168cm / 54kg (Lean)', requested: 'FR 38', aiSize: 'FR 36', outcome: 'Prevented Return', savings: 'Rs. 3,400' },
-          { id: 'SES-78009', sku: 'SZ-TRN-101', product: 'Belted Gabardine Trench', biometrics: '175cm / 68kg (Balanced)', requested: 'FR 40 & FR 42', aiSize: 'FR 40', outcome: 'Bracket Averted', savings: 'Rs. 6,800' },
-          { id: 'SES-78004', sku: 'SZ-WOL-505', product: 'Cashmere Knit Cardigan', biometrics: '162cm / 50kg (Lean)', requested: 'FR 36', aiSize: 'FR 34', outcome: 'Prevented Return', savings: 'Rs. 3,400' },
-          { id: 'SES-77998', sku: 'SZ-BLZ-204', product: 'Structured Wool Blazer', biometrics: '170cm / 60kg (Balanced)', requested: 'FR 40', aiSize: 'FR 38', outcome: 'Prevented Return', savings: 'Rs. 3,400' }
-        ],
-        team: [
-          { id: 301, name: 'Camille Dupont', email: 'camille@sezanne.com', role: 'Admin', status: 'Active' },
-          { id: 302, name: 'Jean-Luc Moreau', email: 'jeanluc@sezanne.com', role: 'Fit Editor', status: 'Active' },
-          { id: 303, name: 'Claire Fontaine', email: 'claire@sezanne.com', role: 'Fit Editor', status: 'Active' },
-          { id: 304, name: 'Antoine Blanc', email: 'antoine@sezanne.com', role: 'Support Viewer', status: 'Active' }
-        ]
-      }
-    };
-
-    /**
-     * GLOBAL RUNTIME APPLICATION STATE
-     */
-    let currentTenantKey = 'acme-global';
-    let currentUser = null;
-    let chartInstance = null;
-
-    const AppState = {
-      view: 'landing',
+    // Global Application State Store
+    const App = {
+      view: 'landing', // 'landing' or 'dashboard'
       tab: 'overview',
+      plan: 'pro',     // 'pro', 'starter', 'none'
+      isTrial: true,
+      trialDays: 3,
+      whiteLabel: true,
+      accentColor: '#4f46e5',
+      buttonRadius: 'rounded-2xl',
+      buttonText: 'Calculate My Perfect Size ✨',
+      
+      // Biometric Simulator State
       sim: {
         height: 180,
         weight: 78,
         torso: 'balanced',
         fit: 'regular'
-      }
+      },
+
+      // Team Multi-User State (Pro Feature #3)
+      team: [
+        { id: 1, name: 'Alexander Wright', email: 'alex@acmeapparel.com', role: 'Admin', status: 'Active' },
+        { id: 2, name: 'Sophia Chen', email: 'sophia@acmeapparel.com', role: 'Fit Editor', status: 'Active' },
+        { id: 3, name: 'Liam O\'Connor', email: 'liam@acmeapparel.com', role: 'Support Viewer', status: 'Active' },
+        { id: 4, name: 'Maya Lin', email: 'maya@acmeapparel.com', role: 'Fit Editor', status: 'Pending' }
+      ],
+
+      // Sizing Matrix State (Pro Feature #4)
+      matrix: [
+        { size: 'XS', chest: 88, waist: 72, length: 68, weight: '50-60 kg' },
+        { size: 'S', chest: 94, waist: 78, length: 70, weight: '60-70 kg' },
+        { size: 'M', chest: 100, waist: 84, length: 72, weight: '70-80 kg' },
+        { size: 'L', chest: 106, waist: 90, length: 74, weight: '80-90 kg' },
+        { size: 'XL', chest: 112, waist: 96, length: 76, weight: '90-105 kg' },
+        { size: 'XXL', chest: 118, waist: 102, length: 78, weight: '105-120 kg' }
+      ],
+
+      // Intercept logs state
+      logs: [
+        { id: 'SES-90812', sku: 'NHC-9021', product: 'Heavy Fleece Crew', biometrics: '180cm / 78kg (Balanced)', requested: 'Size M', aiSize: 'Size S', outcome: 'Prevented Return', savings: 'Rs. 3,400' },
+        { id: 'SES-90809', sku: 'RAW-3100', product: 'Selvedge Denim', biometrics: '185cm / 88kg (Broad)', requested: 'Size 32 & 34', aiSize: 'Size 32', outcome: 'Bracket Averted', savings: 'Rs. 6,800' },
+        { id: 'SES-90804', sku: 'OVR-1102', product: 'Boxy Poplin Shirt', biometrics: '172cm / 64kg (Lean)', requested: 'Size L', aiSize: 'Size M', outcome: 'Prevented Return', savings: 'Rs. 3,400' },
+        { id: 'SES-90798', sku: 'BLZ-5501', product: 'Tailored Blazer', biometrics: '178cm / 82kg (Broad)', requested: 'Size 40R', aiSize: 'Size 42R', outcome: 'Prevented Return', savings: 'Rs. 3,400' },
+        { id: 'SES-90791', sku: 'TRK-2210', product: 'Merino Track Pant', biometrics: '168cm / 58kg (Lean)', requested: 'Size S', aiSize: 'Size XS', outcome: 'Prevented Return', savings: 'Rs. 3,400' },
+        { id: 'SES-90785', sku: 'NHC-9021', product: 'Heavy Fleece Crew', biometrics: '190cm / 95kg (Broad)', requested: 'Size XL', aiSize: 'Size XXL', outcome: 'Prevented Return', savings: 'Rs. 3,400' }
+      ]
     };
+
+    let chartInstance = null;
 
     // Initialization lifecycle
     document.addEventListener('DOMContentLoaded', () => {
-      initMultiTenantStore();
+      restoreState();
       inspectUrlParameters();
-      renderAllDynamicTabs();
+      renderAppView();
       updateSimulation();
       calculateROI();
+      renderTeam();
+      renderMatrix();
+      renderLogs(App.logs);
+      initChart();
+      switchTab('overview');
       lucide.createIcons();
     });
 
-    /**
-     * 1. USER CONTEXT & INITIALIZATION ENGINE
-     */
-    function initMultiTenantStore() {
-      // Check saved tenant in localStorage
-      const savedTenant = localStorage.getItem('fitguard_active_tenant');
-      if (savedTenant && STORE_DATABASE[savedTenant]) {
-        currentTenantKey = savedTenant;
-      }
-
-      // Populate Tenant Selector dropdown
-      const select = document.getElementById('dash-tenant-select');
-      if (select) {
-        select.innerHTML = '';
-        Object.keys(STORE_DATABASE).forEach(key => {
-          const opt = document.createElement('option');
-          opt.value = key;
-          opt.textContent = `${STORE_DATABASE[key].storeName} (${STORE_DATABASE[key].plan.toUpperCase()})`;
-          if (key === currentTenantKey) opt.selected = true;
-          select.appendChild(opt);
-        });
-      }
-
-      fetchUserData(currentTenantKey);
+    // Local Storage Persistence
+    function persistState() {
+      localStorage.setItem('fitguard_ai_saas_v2', JSON.stringify({
+        plan: App.plan,
+        isTrial: App.isTrial,
+        whiteLabel: App.whiteLabel,
+        team: App.team,
+        matrix: App.matrix
+      }));
     }
 
-    /**
-     * Centralized function to bind active tenant account
-     */
-    function fetchUserData(tenantKey) {
-      if (!STORE_DATABASE[tenantKey]) tenantKey = 'acme-global';
-      currentTenantKey = tenantKey;
-      localStorage.setItem('fitguard_active_tenant', tenantKey);
-
-      // Deep copy to state
-      currentUser = STORE_DATABASE[tenantKey];
-      renderAllDynamicTabs();
-    }
-
-    /**
-     * Multi-Tenant Switcher Event Handler
-     */
-    function switchStoreTenant(tenantKey) {
-      fetchUserData(tenantKey);
-      showToast(`Switched active workspace to ${currentUser.storeName}`, 'info');
-    }
-
-    /**
-     * 2. DYNAMIC RENDERING FOR ALL 5 DASHBOARD SECTIONS
-     */
-    function renderAllDynamicTabs() {
-      if (!currentUser) return;
-
-      const isPro = currentUser.plan === 'pro';
-
-      // Global Navigation Badges
-      const navBadge = document.getElementById('nav-tier-badge');
-      if (navBadge) {
-        navBadge.textContent = isPro ? 'PRO ACTIVE' : 'STARTER ACTIVE';
-        navBadge.className = isPro ? 'px-2 py-0.5 text-[10px] font-bold rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 uppercase' : 'px-2 py-0.5 text-[10px] font-bold rounded-full bg-slate-800 text-slate-400 border border-slate-700 uppercase';
+    function restoreState() {
+      const data = localStorage.getItem('fitguard_ai_saas_v2');
+      if (data) {
+        try {
+          const parsed = JSON.parse(data);
+          App.plan = parsed.plan || 'pro';
+          App.isTrial = parsed.isTrial !== undefined ? parsed.isTrial : true;
+          App.whiteLabel = parsed.whiteLabel !== undefined ? parsed.whiteLabel : true;
+          if (parsed.team) App.team = parsed.team;
+          if (parsed.matrix) App.matrix = parsed.matrix;
+        } catch (e) {
+          console.error("Local storage error", e);
+        }
       }
+    }
 
-      // Sidebar Details
-      const tenantHandle = document.getElementById('tenant-handle-badge');
-      const tenantIdBadge = document.getElementById('tenant-id-badge');
-      const sideTier = document.getElementById('dash-sidebar-tier');
-      const sideDesc = document.getElementById('dash-sidebar-plan-desc');
-      const logsCountBadge = document.getElementById('sidebar-logs-count');
-      const teamCountBadge = document.getElementById('sidebar-team-count');
+    // Payment query redirect handler (?checkout=success)
+    function inspectUrlParameters() {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('checkout') === 'success' || params.get('session_id')) {
+        const tier = params.get('plan') || 'pro';
+        App.plan = tier === 'starter' ? 'starter' : 'pro';
+        App.isTrial = true;
+        App.whiteLabel = (App.plan === 'pro');
+        persistState();
+        showToast('🎉 eSewa payment verified! Pro 3-Day Free Trial activated.', 'success');
+        navigateTo('dashboard');
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    }
 
-      if (tenantHandle) tenantHandle.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> ${currentUser.handle}`;
-      if (tenantIdBadge) tenantIdBadge.textContent = currentUser.storeId;
-      if (sideTier) sideTier.textContent = isPro ? 'PRO PLAN ACTIVE' : 'STARTER PLAN ACTIVE';
-      if (sideDesc) sideDesc.textContent = isPro ? `All Pro features active for ${currentUser.storeName}.` : `Starter tier active for ${currentUser.storeName}.`;
-      if (logsCountBadge) logsCountBadge.textContent = currentUser.logs.length;
-      if (teamCountBadge) teamCountBadge.textContent = currentUser.team.length;
+    // View Navigation Logic
+    function navigateTo(viewName) {
+      const landing = document.getElementById('view-landing');
+      const dashboard = document.getElementById('view-dashboard');
+      const switchLabel = document.getElementById('nav-switch-label');
 
-      // Render Section 1: Overview & Analytics
-      renderDynamicOverview();
-
-      // Render Section 2: Widget Customizer
-      renderDynamicCustomizer();
-
-      // Render Section 3: AI Size Chart OCR
-      renderDynamicOcrMatrix();
-
-      // Render Section 4: Intercept Logs
-      renderDynamicLogs(currentUser.logs);
-
-      // Render Section 5: Team & Staff
-      renderDynamicTeam();
-
-      // Render Section 6: Billing & Subscription
-      renderDynamicBilling();
-
+      if (viewName === 'dashboard') {
+        landing.classList.add('hidden');
+        dashboard.classList.remove('hidden');
+        dashboard.classList.add('flex');
+        App.view = 'dashboard';
+        switchLabel.textContent = 'Switch to Landing Page';
+        switchTab(App.tab || 'overview');
+      } else {
+        dashboard.classList.add('hidden');
+        dashboard.classList.remove('flex');
+        landing.classList.remove('hidden');
+        App.view = 'landing';
+        switchLabel.textContent = 'Switch to Dashboard';
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       lucide.createIcons();
     }
 
-    /**
-     * Section 1: Dynamic Overview & Analytics Render
-     */
-    function renderDynamicOverview() {
-      document.getElementById('overview-store-name').textContent = currentUser.storeName;
-      document.getElementById('overview-store-subtext').textContent = `Real-time apparel sizing accuracy and return interception metrics for ${currentUser.storeName} (${currentUser.storeId}).`;
-      
-      const kpiReturns = document.getElementById('kpi-returns-prevented');
-      const kpiMoney = document.getElementById('kpi-money-saved');
-      const kpiAccuracy = document.getElementById('kpi-accuracy-rate');
-      const kpiGrowth = document.getElementById('kpi-returns-growth');
-      const kpiSessions = document.getElementById('kpi-sessions-label');
-
-      if (kpiReturns) kpiReturns.textContent = currentUser.analytics.returnsPrevented.toLocaleString();
-      if (kpiMoney) kpiMoney.textContent = `Rs. ${currentUser.analytics.moneySaved.toLocaleString()}`;
-      if (kpiAccuracy) kpiAccuracy.textContent = currentUser.analytics.accuracyRate;
-      if (kpiGrowth) kpiGrowth.innerHTML = `<i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i> ${currentUser.analytics.growthRate}`;
-      if (kpiSessions) kpiSessions.textContent = `Based on ${currentUser.analytics.verifiedSessions.toLocaleString()} verified customer sessions`;
-
-      // Render Overview Ticker Stream
-      const tickerContainer = document.getElementById('overview-ticker-container');
-      if (tickerContainer) {
-        tickerContainer.innerHTML = '';
-        const recentLogs = currentUser.logs.slice(0, 3);
-        recentLogs.forEach(log => {
-          const div = document.createElement('div');
-          div.className = 'p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between hover:border-slate-700 transition';
-          div.innerHTML = `
-            <div class="flex items-center gap-3">
-              <div class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></div>
-              <div>
-                <span class="text-white font-bold">${log.id} (${currentUser.storeName})</span> &bull;
-                <span class="text-slate-400">${log.product} &bull; Requested <strong>${log.requested}</strong> &rarr; FitGuard confirmed <strong>${log.aiSize}</strong>.</span>
-              </div>
-            </div>
-            <span class="text-emerald-400 font-mono font-bold">${log.savings}</span>
-          `;
-          tickerContainer.appendChild(div);
-        });
-      }
-
-      // Update Chart.js Data for this tenant
-      renderDynamicChart();
+    function toggleView() {
+      navigateTo(App.view === 'landing' ? 'dashboard' : 'landing');
     }
 
-    function renderDynamicChart() {
-      const ctx = document.getElementById('returnPreventionChart');
-      if (!ctx) return;
-
-      const timeline = currentUser.analytics.chartTimeline;
-
-      if (chartInstance) {
-        chartInstance.data.labels = timeline.labels;
-        chartInstance.data.datasets[0].data = timeline.returnsPrevented;
-        chartInstance.data.datasets[1].data = timeline.inquiries;
-        chartInstance.update();
-      } else {
-        chartInstance = new Chart(ctx, {
-          type: 'line',
-          data: {
-            labels: timeline.labels,
-            datasets: [
-              {
-                label: 'Returns Prevented (Units)',
-                data: timeline.returnsPrevented,
-                borderColor: '#10b981',
-                backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                borderWidth: 2.5,
-                tension: 0.35,
-                fill: true
-              },
-              {
-                label: 'Biometric Size Intercepts',
-                data: timeline.inquiries,
-                borderColor: '#6366f1',
-                backgroundColor: 'rgba(99, 102, 241, 0.05)',
-                borderWidth: 2,
-                borderDash: [4, 4],
-                tension: 0.35,
-                fill: false
-              }
-            ]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-              legend: {
-                labels: { color: '#94a3b8', font: { size: 11, family: 'Inter' } }
-              }
-            },
-            scales: {
-              x: {
-                grid: { color: 'rgba(255, 255, 255, 0.05)' },
-                ticks: { color: '#64748b', font: { size: 10 } }
-              },
-              y: {
-                grid: { color: 'rgba(255, 255, 255, 0.05)' },
-                ticks: { color: '#64748b', font: { size: 10 } }
-              }
-            }
-          }
-        });
-      }
+    function scrollToSection(id) {
+      if (App.view !== 'landing') navigateTo('landing');
+      setTimeout(() => {
+        const el = document.getElementById(id);
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+      }, 60);
     }
 
     /**
-     * Section 2: Dynamic Widget Customizer Render
+     * Bulletproof Dashboard Tab Switcher
+     * @param {string} tabKey - 'overview', 'customizer', 'ocr-charts', 'logs', 'team', 'billing'
      */
-    function renderDynamicCustomizer() {
-      const c = currentUser.customizer;
-      const isPro = currentUser.plan === 'pro';
+    function switchTab(tabKey) {
+      App.tab = tabKey;
 
+      const activeBtnClasses = ['bg-indigo-600', 'text-white', 'shadow-lg', 'shadow-indigo-600/30', 'font-bold'];
+      const inactiveBtnClasses = ['text-slate-400', 'hover:text-slate-200', 'hover:bg-slate-900', 'font-semibold'];
+
+      // 1. Hide all panels
+      const allPanels = document.querySelectorAll('.tab-pane');
+      allPanels.forEach(panel => {
+        panel.classList.add('hidden');
+      });
+
+      // 2. Reset all sidebar buttons
+      const allButtons = document.querySelectorAll('.dash-tab-btn');
+      allButtons.forEach(btn => {
+        btn.classList.remove(...activeBtnClasses);
+        btn.classList.add(...inactiveBtnClasses);
+      });
+
+      // 3. Find target panel and button
+      let targetPanel = document.getElementById(`panel-${tabKey}`);
+      let targetButton = document.getElementById(`tab-btn-${tabKey}`);
+
+      // Fallback if ID misnamed
+      if (!targetPanel) {
+        console.warn(`Panel "panel-${tabKey}" not found. Falling back to overview.`);
+        tabKey = 'overview';
+        App.tab = 'overview';
+        targetPanel = document.getElementById('panel-overview');
+        targetButton = document.getElementById('tab-btn-overview');
+      }
+
+      // 4. Reveal panel
+      if (targetPanel) {
+        targetPanel.classList.remove('hidden');
+      }
+
+      // 5. Highlight button
+      if (targetButton) {
+        targetButton.classList.remove(...inactiveBtnClasses);
+        targetButton.classList.add(...activeBtnClasses);
+      }
+
+      // 6. Handle Chart.js resizing if overview tab opened
+      if (tabKey === 'overview' && typeof chartInstance !== 'undefined' && chartInstance) {
+        setTimeout(() => chartInstance.resize(), 50);
+      }
+
+      // 7. Re-render icons
+      if (window.lucide) {
+        lucide.createIcons();
+      }
+    }
+
+    // Render App UI according to Plan State
+    function renderAppView() {
+      const isPro = App.plan === 'pro';
+      const tierBadge = document.getElementById('nav-tier-badge');
+      const sideTier = document.getElementById('dash-sidebar-tier');
+      const billTitle = document.getElementById('billing-tier-title');
       const wlToggle = document.getElementById('dash-whitelabel-toggle');
-      const colorInput = document.getElementById('dash-custom-color');
-      const hexInput = document.getElementById('dash-custom-hex');
-      const radiusSelect = document.getElementById('dash-custom-radius');
-      const labelInput = document.getElementById('dash-custom-label');
-      const previewBtn = document.getElementById('dash-preview-btn');
-      const previewWatermark = document.getElementById('dash-preview-watermark');
-      const statusPill = document.getElementById('whitelabel-badge-status');
 
-      if (wlToggle) wlToggle.checked = c.whiteLabel && isPro;
-      if (colorInput) colorInput.value = c.accentColor;
-      if (hexInput) hexInput.value = c.accentColor;
-      if (radiusSelect) radiusSelect.value = c.buttonRadius;
-      if (labelInput) labelInput.value = c.buttonText;
+      if (tierBadge) tierBadge.textContent = isPro ? 'PRO ACTIVE' : 'STARTER ACTIVE';
+      if (sideTier) sideTier.textContent = isPro ? 'PRO PLAN ACTIVE' : 'STARTER PLAN ACTIVE';
+      if (billTitle) billTitle.textContent = isPro ? 'Pro Plan (Rs. 2999/mo)' : 'Starter Pack (Rs. 999/mo)';
+      if (wlToggle) wlToggle.checked = App.whiteLabel && isPro;
 
-      if (previewBtn) {
-        previewBtn.style.backgroundColor = c.accentColor;
-        previewBtn.className = `w-full py-3.5 text-white font-bold text-xs shadow-lg transition ${c.buttonRadius}`;
-        previewBtn.textContent = c.buttonText;
-      }
-
-      const isHidden = c.whiteLabel && isPro;
-      if (previewWatermark) {
-        previewWatermark.style.display = isHidden ? 'none' : 'block';
-      }
-
-      if (statusPill) {
-        if (isHidden) {
-          statusPill.innerHTML = '<i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i><span>FitGuard branding is <strong>HIDDEN</strong> on this storefront widget.</span>';
-          statusPill.className = 'p-3 rounded-xl bg-slate-900 border border-slate-800 text-xs text-emerald-400 flex items-center gap-2';
-        } else {
-          statusPill.innerHTML = '<i data-lucide="info" class="w-4 h-4 text-amber-400"></i><span>FitGuard branding is <strong>VISIBLE</strong> on this storefront widget.</span>';
-          statusPill.className = 'p-3 rounded-xl bg-slate-900 border border-slate-800 text-xs text-amber-400 flex items-center gap-2';
-        }
-      }
-
-      // Dynamic Embed Code
-      const codeBlock = document.getElementById('dash-embed-code-block');
-      if (codeBlock) {
-        codeBlock.textContent = `<!-- FitGuard AI Embed: ${currentUser.storeName} -->\n<script \n  src="https://cdn.fitguard.ai/v2/fitguard.min.js" \n  data-store-id="${currentUser.storeId}" \n  data-white-label="${isHidden}" \n  data-accent="${c.accentColor}" \n  async>\n<\/script>`;
-      }
+      updateWhiteLabelUI();
     }
 
+    // FEATURE 1: WHITE-LABELING TOGGLE LOGIC
     function toggleWhiteLabelOption(checked) {
-      if (currentUser.plan !== 'pro') {
+      if (App.plan !== 'pro') {
         showToast('White-Labeling requires the Pro Tier (Rs. 2999/mo).', 'error');
         document.getElementById('dash-whitelabel-toggle').checked = false;
         return;
       }
-      currentUser.customizer.whiteLabel = checked;
-      renderDynamicCustomizer();
-      showToast(checked ? `Branding hidden for ${currentUser.storeName}.` : `Branding enabled for ${currentUser.storeName}.`, 'info');
+      App.whiteLabel = checked;
+      persistState();
+      updateWhiteLabelUI();
+      showToast(checked ? 'FitGuard branding hidden from storefront.' : 'FitGuard branding enabled.', 'info');
+    }
+
+    function updateWhiteLabelUI() {
+      const isHidden = App.whiteLabel && App.plan === 'pro';
+      const previewWatermark = document.getElementById('dash-preview-watermark');
+      const statusPill = document.getElementById('whitelabel-badge-status');
+      const simWatermarkPill = document.getElementById('sim-watermark-pill');
+
+      if (previewWatermark) {
+        previewWatermark.style.display = isHidden ? 'none' : 'block';
+      }
+
+      if (simWatermarkPill) {
+        simWatermarkPill.textContent = isHidden ? 'Watermark: Hidden (Pro)' : 'Watermark: Visible (Starter)';
+        simWatermarkPill.className = isHidden ? 'px-2 py-1 rounded-full bg-emerald-950 text-emerald-300 text-[10px] font-mono border border-emerald-800' : 'px-2 py-1 rounded-full bg-slate-800 text-slate-400 text-[10px] font-mono border border-slate-700';
+      }
+
+      if (statusPill) {
+        if (isHidden) {
+          statusPill.innerHTML = '<i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i><span>FitGuard branding is <strong>HIDDEN</strong> on your storefront widget.</span>';
+          statusPill.className = 'p-3 rounded-xl bg-slate-900 border border-slate-800 text-xs text-emerald-400 flex items-center gap-2';
+        } else {
+          statusPill.innerHTML = '<i data-lucide="info" class="w-4 h-4 text-amber-400"></i><span>FitGuard branding is <strong>VISIBLE</strong> on your storefront widget.</span>';
+          statusPill.className = 'p-3 rounded-xl bg-slate-900 border border-slate-800 text-xs text-amber-400 flex items-center gap-2';
+        }
+        lucide.createIcons();
+      }
+
+      // Update embed code preview
+      const codeBlock = document.getElementById('dash-embed-code-block');
+      if (codeBlock) {
+        codeBlock.textContent = `<!-- FitGuard AI Platform Embed -->\n<script \n  src="https://cdn.fitguard.ai/v2/fitguard.min.js" \n  data-store-id="FG-9012-PRO" \n  data-white-label="${isHidden}" \n  data-accent="${App.accentColor}" \n  async>\n<\/script>`;
+      }
     }
 
     function updateLiveWidgetPreview() {
@@ -2011,12 +1911,18 @@ and Billing & Subscription).
       const radius = document.getElementById('dash-custom-radius').value;
       const label = document.getElementById('dash-custom-label').value;
 
-      currentUser.customizer.accentColor = color;
-      currentUser.customizer.buttonRadius = radius;
-      currentUser.customizer.buttonText = label;
+      App.accentColor = color;
+      App.buttonRadius = radius;
+      App.buttonText = label;
 
       document.getElementById('dash-custom-hex').value = color;
-      renderDynamicCustomizer();
+      const btn = document.getElementById('dash-preview-btn');
+      if (btn) {
+        btn.style.backgroundColor = color;
+        btn.className = `w-full py-3.5 text-white font-bold text-xs shadow-lg transition ${radius}`;
+        btn.textContent = label;
+      }
+      updateWhiteLabelUI();
     }
 
     function updateLiveWidgetPreviewHex() {
@@ -2028,204 +1934,103 @@ and Billing & Subscription).
     }
 
     function copyEmbedScriptCode() {
-      const isHidden = currentUser.customizer.whiteLabel && currentUser.plan === 'pro';
-      const code = `<script src="https://cdn.fitguard.ai/v2/fitguard.min.js" data-store-id="${currentUser.storeId}" data-white-label="${isHidden}" data-accent="${currentUser.customizer.accentColor}" async><\/script>`;
+      const code = `<script src="https://cdn.fitguard.ai/v2/fitguard.min.js" data-store-id="FG-9012-PRO" data-white-label="${App.whiteLabel}" data-accent="${App.accentColor}" async><\/script>`;
       navigator.clipboard.writeText(code).then(() => {
-        showToast('Embed script copied to clipboard!', 'success');
+        showToast('Script tag copied to clipboard!', 'success');
         const btn = document.getElementById('dash-copy-btn-label');
-        if (btn) {
-          btn.textContent = 'Copied!';
-          setTimeout(() => { btn.textContent = 'Copy Script'; }, 2000);
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.textContent = 'Copy Script'; }, 2000);
+      });
+    }
+
+    // FEATURE 2: RETURN PREVENTION ANALYTICS ENGINE & CHART.JS
+    function initChart() {
+      const ctx = document.getElementById('returnPreventionChart');
+      if (!ctx) return;
+
+      chartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: ['Day 1', 'Day 5', 'Day 10', 'Day 15', 'Day 20', 'Day 25', 'Day 30'],
+          datasets: [
+            {
+              label: 'Returns Prevented (Units)',
+              data: [38, 92, 184, 276, 390, 460, 512],
+              borderColor: '#10b981',
+              backgroundColor: 'rgba(16, 185, 129, 0.1)',
+              borderWidth: 2.5,
+              tension: 0.35,
+              fill: true
+            },
+            {
+              label: 'Biometric Size Intercepts',
+              data: [120, 290, 540, 810, 1150, 1380, 1590],
+              borderColor: '#6366f1',
+              backgroundColor: 'rgba(99, 102, 241, 0.05)',
+              borderWidth: 2,
+              borderDash: [4, 4],
+              tension: 0.35,
+              fill: false
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              labels: { color: '#94a3b8', font: { size: 11, family: 'Inter' } }
+            }
+          },
+          scales: {
+            x: {
+              grid: { color: 'rgba(255, 255, 255, 0.05)' },
+              ticks: { color: '#64748b', font: { size: 10 } }
+            },
+            y: {
+              grid: { color: 'rgba(255, 255, 255, 0.05)' },
+              ticks: { color: '#64748b', font: { size: 10 } }
+            }
+          }
         }
       });
     }
 
-    /**
-     * Section 3: Dynamic AI Size Chart OCR Render
-     */
-    function renderDynamicOcrMatrix() {
-      const title = document.getElementById('ocr-matrix-title');
-      const tbody = document.getElementById('ocr-matrix-tbody');
-      const sampleContainer = document.getElementById('tenant-sample-ocr-buttons');
+    function refreshDashboardMetrics() {
+      const kpiReturns = document.getElementById('kpi-returns-prevented');
+      const kpiMoney = document.getElementById('kpi-money-saved');
+      const kpiAccuracy = document.getElementById('kpi-accuracy-rate');
 
-      if (title) title.textContent = currentUser.ocrHistory.activeMatrixTitle;
+      kpiReturns.textContent = '...';
+      kpiMoney.textContent = '...';
 
-      // Ingest sample buttons
-      if (sampleContainer) {
-        sampleContainer.innerHTML = '';
-        currentUser.ocrHistory.samples.forEach(sample => {
-          const btn = document.createElement('button');
-          btn.onclick = () => runOcrSimulation(sample.file);
-          btn.className = 'px-3 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 text-xs font-semibold border border-slate-800 transition text-left flex items-center gap-2';
-          btn.innerHTML = `
-            <i data-lucide="${sample.icon || 'file-text'}" class="w-3.5 h-3.5 text-indigo-400"></i>
-            <span class="truncate">${sample.label}</span>
-          `;
-          sampleContainer.appendChild(btn);
-        });
-      }
-
-      // Render Matrix Table
-      if (tbody) {
-        tbody.innerHTML = '';
-        currentUser.matrix.forEach((row, idx) => {
-          const tr = document.createElement('tr');
-          tr.className = 'hover:bg-slate-900/40 transition';
-          tr.innerHTML = `
-            <td class="p-3 pl-4 font-bold text-white">
-              <input type="text" value="${row.size}" onchange="updateMatrixCell(${idx}, 'size', this.value)" class="w-24 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-center font-bold text-white">
-            </td>
-            <td class="p-3">
-              <input type="number" value="${row.chest}" onchange="updateMatrixCell(${idx}, 'chest', this.value)" class="w-16 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-center text-slate-200">
-            </td>
-            <td class="p-3">
-              <input type="number" value="${row.waist}" onchange="updateMatrixCell(${idx}, 'waist', this.value)" class="w-16 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-center text-slate-200">
-            </td>
-            <td class="p-3">
-              <input type="number" value="${row.length}" onchange="updateMatrixCell(${idx}, 'length', this.value)" class="w-16 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-center text-slate-200">
-            </td>
-            <td class="p-3">
-              <input type="text" value="${row.weight}" onchange="updateMatrixCell(${idx}, 'weight', this.value)" class="w-28 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-center text-slate-200">
-            </td>
-            <td class="p-3 pr-4 text-center">
-              <button onclick="removeMatrixRow(${idx})" class="text-slate-500 hover:text-red-400 transition" aria-label="Delete row">
-                <i data-lucide="trash-2" class="w-4 h-4"></i>
-              </button>
-            </td>
-          `;
-          tbody.appendChild(tr);
-        });
-      }
-    }
-
-    function updateMatrixCell(index, field, val) {
-      if (currentUser.matrix[index]) {
-        currentUser.matrix[index][field] = val;
-      }
-    }
-
-    function addMatrixRow() {
-      currentUser.matrix.push({ size: 'Custom', chest: 105, waist: 88, length: 75, weight: '75-85 kg' });
-      renderDynamicOcrMatrix();
-      showToast(`Size row added to ${currentUser.storeName} matrix.`, 'info');
-      lucide.createIcons();
-    }
-
-    function removeMatrixRow(idx) {
-      currentUser.matrix.splice(idx, 1);
-      renderDynamicOcrMatrix();
-      lucide.createIcons();
-    }
-
-    function triggerOcrFileUpload() {
-      document.getElementById('ocr-file-input').click();
-    }
-
-    function handleOcrFileUpload(e) {
-      const file = e.target.files[0];
-      if (file) runOcrSimulation(file.name);
-    }
-
-    function runOcrSimulation(filename) {
-      const progressBox = document.getElementById('ocr-progress-box');
-      const bar = document.getElementById('ocr-bar');
-      const pct = document.getElementById('ocr-pct');
-      const title = document.getElementById('ocr-matrix-title');
-      const status = document.getElementById('ocr-matrix-status');
-
-      progressBox.classList.remove('hidden');
-      bar.style.width = '15%';
-      pct.textContent = '15%';
-
-      let progress = 15;
-      const interval = setInterval(() => {
-        progress += 28;
-        if (progress > 100) progress = 100;
-        bar.style.width = `${progress}%`;
-        pct.textContent = `${progress}%`;
-
-        if (progress === 100) {
-          clearInterval(interval);
-          setTimeout(() => {
-            progressBox.classList.add('hidden');
-            title.textContent = `Parsed Matrix: ${filename}`;
-            currentUser.ocrHistory.activeMatrixTitle = `Parsed Matrix: ${filename}`;
-            status.textContent = `✓ Vision OCR Ingestion Complete (${currentUser.matrix.length} sizes extracted)`;
-            showToast(`Vision OCR successfully normalized ${filename} for ${currentUser.storeName}!`, 'success');
-          }, 350);
+      setTimeout(() => {
+        const units = 512 + Math.floor(Math.random() * 20);
+        const savedRupees = units * 3400;
+        kpiReturns.textContent = units;
+        kpiMoney.textContent = `Rs. ${savedRupees.toLocaleString()}`;
+        kpiAccuracy.textContent = '98.8%';
+        if (chartInstance) {
+          chartInstance.data.datasets[0].data[6] = units;
+          chartInstance.update();
         }
-      }, 180);
+        showToast('Storefront telemetry refreshed.', 'success');
+      }, 400);
     }
 
-    function syncMatrixToCatalog() {
-      showToast(`Matrix synchronized to ${currentUser.platform} catalog for ${currentUser.storeName}!`, 'success');
-    }
-
-    function toggleUnitsConvert() {
-      showToast('Converted sizing measurements between Metric (cm) & Imperial (in).', 'info');
-    }
-
-    /**
-     * Section 4: Dynamic Intercept Logs Render
-     */
-    function renderDynamicLogs(logsArray) {
-      const tbody = document.getElementById('intercept-logs-tbody');
-      if (!tbody) return;
-
-      tbody.innerHTML = '';
-
-      if (!logsArray || logsArray.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-slate-500 text-xs">No intercept sessions found for this query in ${currentUser.storeName}.</td></tr>`;
-        return;
-      }
-
-      logsArray.forEach(log => {
-        const tr = document.createElement('tr');
-        tr.className = 'hover:bg-slate-900/40 transition';
-        tr.innerHTML = `
-          <td class="p-4 pl-6 font-mono text-[11px] text-indigo-400 font-bold">${log.id}</td>
-          <td class="p-4 font-semibold text-white">${log.product} <span class="text-slate-500 font-mono text-[10px]">(${log.sku})</span></td>
-          <td class="p-4 text-slate-400 text-xs">${log.biometrics}</td>
-          <td class="p-4 text-slate-300 font-mono text-xs">${log.requested}</td>
-          <td class="p-4 font-bold text-emerald-400 font-mono text-xs">${log.aiSize}</td>
-          <td class="p-4">
-            <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">${log.outcome}</span>
-          </td>
-          <td class="p-4 pr-6 text-right font-mono font-bold text-emerald-400">${log.savings}</td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
-
-    function filterLogsTable() {
-      const q = document.getElementById('log-search-input').value.toLowerCase();
-      const filtered = currentUser.logs.filter(l => 
-        l.product.toLowerCase().includes(q) || 
-        l.sku.toLowerCase().includes(q) || 
-        l.id.toLowerCase().includes(q) ||
-        l.biometrics.toLowerCase().includes(q)
-      );
-      renderDynamicLogs(filtered);
-    }
-
-    /**
-     * Section 5: Dynamic Team & Staff Render
-     */
-    function renderDynamicTeam() {
+    // FEATURE 3: TEAM & STAFF ACCOUNTS MANAGEMENT
+    function renderTeam() {
       const tbody = document.getElementById('dash-team-tbody');
-      const desc = document.getElementById('team-seats-desc');
-      if (desc) desc.textContent = `${currentUser.team.length} active staff accounts on ${currentUser.storeName}`;
-
       if (!tbody) return;
-      tbody.innerHTML = '';
 
-      currentUser.team.forEach(member => {
+      tbody.innerHTML = '';
+      App.team.forEach(member => {
         const tr = document.createElement('tr');
         tr.className = 'hover:bg-slate-900/40 transition';
         tr.innerHTML = `
           <td class="p-4 pl-6 font-bold text-white flex items-center gap-3">
             <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-600 to-brand-400 flex items-center justify-center font-bold text-xs text-white">
-              ${member.name.split(' ').map(n => n[0]).join('')}
+              ${member.name.split(' ').map(n=>n[0]).join('')}
             </div>
             <span>${member.name}</span>
           </td>
@@ -2269,7 +2074,7 @@ and Billing & Subscription).
       const email = document.getElementById('invite-email').value;
       const role = document.getElementById('invite-role').value;
 
-      currentUser.team.push({
+      App.team.push({
         id: Date.now(),
         name,
         email,
@@ -2277,193 +2082,169 @@ and Billing & Subscription).
         status: 'Pending'
       });
 
-      renderDynamicTeam();
-      const teamCountBadge = document.getElementById('sidebar-team-count');
-      if (teamCountBadge) teamCountBadge.textContent = currentUser.team.length;
-
+      persistState();
+      renderTeam();
       closeInviteModal();
-      showToast(`Invitation dispatched to ${email} for ${currentUser.storeName}`, 'success');
+      showToast(`Invitation dispatched to ${email}`, 'success');
     }
 
     function removeTeamMember(id) {
-      if (currentUser.team.length <= 1) {
+      if (App.team.length <= 1) {
         showToast('Store must retain at least one administrator.', 'error');
         return;
       }
-      currentUser.team = currentUser.team.filter(m => m.id !== id);
-      renderDynamicTeam();
-      const teamCountBadge = document.getElementById('sidebar-team-count');
-      if (teamCountBadge) teamCountBadge.textContent = currentUser.team.length;
+      App.team = App.team.filter(m => m.id !== id);
+      persistState();
+      renderTeam();
       showToast('Team member access revoked.', 'info');
     }
 
-    /**
-     * Section 6: Dynamic Billing & Subscription Render
-     */
-    function renderDynamicBilling() {
-      const isPro = currentUser.plan === 'pro';
-      const title = document.getElementById('billing-tier-title');
-      const storeIdEl = document.getElementById('billing-store-id');
-      const trialBadge = document.getElementById('billing-trial-badge');
-      const trialStatus = document.getElementById('billing-trial-status');
-      const nextInvoice = document.getElementById('billing-next-invoice');
-      const matrixContainer = document.getElementById('billing-features-matrix');
+    // FEATURE 4: AUTOMATED SIZE CHART VISION OCR INGESTION
+    function renderMatrix() {
+      const tbody = document.getElementById('ocr-matrix-tbody');
+      if (!tbody) return;
 
-      if (title) title.textContent = isPro ? 'Pro Plan (Rs. 2999/mo)' : 'Starter Pack (Rs. 999/mo)';
-      if (storeIdEl) storeIdEl.textContent = currentUser.storeId;
-      if (trialBadge) trialBadge.textContent = currentUser.isTrial ? '3-Day Free Trial' : 'Active Paid Tier';
-      if (trialStatus) trialStatus.textContent = currentUser.isTrial ? '3 Days Trial Active' : 'Monthly Retainer Active';
-      if (nextInvoice) nextInvoice.textContent = isPro ? 'Rs. 2999 / month after trial' : 'Rs. 999 / month after trial';
-
-      if (matrixContainer) {
-        matrixContainer.innerHTML = `
-          <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
-            <div class="flex items-center gap-2.5">
-              <i data-lucide="${isPro ? 'check-circle-2' : 'x-circle'}" class="w-4 h-4 ${isPro ? 'text-emerald-400' : 'text-slate-600'}"></i>
-              <span class="text-slate-200">White-Labeling Watermark Removal</span>
-            </div>
-            <span class="${isPro ? 'text-emerald-400 font-bold' : 'text-slate-500 font-semibold'} font-mono">${isPro ? 'UNLOCKED' : 'PRO ONLY'}</span>
-          </div>
-
-          <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
-            <div class="flex items-center gap-2.5">
-              <i data-lucide="${isPro ? 'check-circle-2' : 'x-circle'}" class="w-4 h-4 ${isPro ? 'text-emerald-400' : 'text-slate-600'}"></i>
-              <span class="text-slate-200">AI Return Prevention ROI Analytics</span>
-            </div>
-            <span class="${isPro ? 'text-emerald-400 font-bold' : 'text-slate-500 font-semibold'} font-mono">${isPro ? 'UNLOCKED' : 'PRO ONLY'}</span>
-          </div>
-
-          <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
-            <div class="flex items-center gap-2.5">
-              <i data-lucide="${isPro ? 'check-circle-2' : 'x-circle'}" class="w-4 h-4 ${isPro ? 'text-emerald-400' : 'text-slate-600'}"></i>
-              <span class="text-slate-200">Unlimited Team & Staff Multi-User Accounts</span>
-            </div>
-            <span class="${isPro ? 'text-emerald-400 font-bold' : 'text-slate-500 font-semibold'} font-mono">${isPro ? 'UNLOCKED' : 'PRO ONLY'}</span>
-          </div>
-
-          <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
-            <div class="flex items-center gap-2.5">
-              <i data-lucide="${isPro ? 'check-circle-2' : 'x-circle'}" class="w-4 h-4 ${isPro ? 'text-emerald-400' : 'text-slate-600'}"></i>
-              <span class="text-slate-200">Automated Vision OCR Size Chart Ingestion</span>
-            </div>
-            <span class="${isPro ? 'text-emerald-400 font-bold' : 'text-slate-500 font-semibold'} font-mono">${isPro ? 'UNLOCKED' : 'PRO ONLY'}</span>
-          </div>
+      tbody.innerHTML = '';
+      App.matrix.forEach((row, idx) => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-900/40 transition';
+        tr.innerHTML = `
+          <td class="p-3 pl-4 font-bold text-white">
+            <input type="text" value="${row.size}" onchange="updateMatrixCell(${idx}, 'size', this.value)" class="w-14 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-center font-bold text-white">
+          </td>
+          <td class="p-3">
+            <input type="number" value="${row.chest}" onchange="updateMatrixCell(${idx}, 'chest', this.value)" class="w-16 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-center text-slate-200">
+          </td>
+          <td class="p-3">
+            <input type="number" value="${row.waist}" onchange="updateMatrixCell(${idx}, 'waist', this.value)" class="w-16 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-center text-slate-200">
+          </td>
+          <td class="p-3">
+            <input type="number" value="${row.length}" onchange="updateMatrixCell(${idx}, 'length', this.value)" class="w-16 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-center text-slate-200">
+          </td>
+          <td class="p-3">
+            <input type="text" value="${row.weight}" onchange="updateMatrixCell(${idx}, 'weight', this.value)" class="w-28 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-center text-slate-200">
+          </td>
+          <td class="p-3 pr-4 text-center">
+            <button onclick="removeMatrixRow(${idx})" class="text-slate-500 hover:text-red-400 transition" aria-label="Delete row">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
+          </td>
         `;
-      }
-    }
-
-    /**
-     * 3. BULLETPROOF TAB SWITCHER
-     */
-    function switchTab(tabKey) {
-      AppState.tab = tabKey;
-
-      const activeBtnClasses = ['bg-indigo-600', 'text-white', 'shadow-lg', 'shadow-indigo-600/30', 'font-bold'];
-      const inactiveBtnClasses = ['text-slate-400', 'hover:text-slate-200', 'hover:bg-slate-900', 'font-semibold'];
-
-      const allPanels = document.querySelectorAll('.tab-pane');
-      allPanels.forEach(panel => panel.classList.add('hidden'));
-
-      const allButtons = document.querySelectorAll('.dash-tab-btn');
-      allButtons.forEach(btn => {
-        btn.classList.remove(...activeBtnClasses);
-        btn.classList.add(...inactiveBtnClasses);
+        tbody.appendChild(tr);
       });
-
-      let targetPanel = document.getElementById(`panel-${tabKey}`);
-      let targetButton = document.getElementById(`tab-btn-${tabKey}`);
-
-      if (!targetPanel) {
-        tabKey = 'overview';
-        AppState.tab = 'overview';
-        targetPanel = document.getElementById('panel-overview');
-        targetButton = document.getElementById('tab-btn-overview');
-      }
-
-      if (targetPanel) targetPanel.classList.remove('hidden');
-      if (targetButton) {
-        targetButton.classList.remove(...inactiveBtnClasses);
-        targetButton.classList.add(...activeBtnClasses);
-      }
-
-      if (tabKey === 'overview' && chartInstance) {
-        setTimeout(() => chartInstance.resize(), 60);
-      }
-
       lucide.createIcons();
     }
 
-    // View Navigation Logic
-    function navigateTo(viewName) {
-      const landing = document.getElementById('view-landing');
-      const dashboard = document.getElementById('view-dashboard');
-      const switchLabel = document.getElementById('nav-switch-label');
-
-      if (viewName === 'dashboard') {
-        landing.classList.add('hidden');
-        dashboard.classList.remove('hidden');
-        dashboard.classList.add('flex');
-        AppState.view = 'dashboard';
-        switchLabel.textContent = 'Switch to Landing Page';
-        switchTab(AppState.tab || 'overview');
-      } else {
-        dashboard.classList.add('hidden');
-        dashboard.classList.remove('flex');
-        landing.classList.remove('hidden');
-        AppState.view = 'landing';
-        switchLabel.textContent = 'Switch to Dashboard';
-      }
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      lucide.createIcons();
+    function updateMatrixCell(index, field, val) {
+      App.matrix[index][field] = val;
+      persistState();
     }
 
-    function toggleView() {
-      navigateTo(AppState.view === 'landing' ? 'dashboard' : 'landing');
+    function addMatrixRow() {
+      App.matrix.push({ size: '3XL', chest: 124, waist: 108, length: 80, weight: '120-135 kg' });
+      persistState();
+      renderMatrix();
+      showToast('New size row added to active matrix.', 'info');
     }
 
-    function scrollToSection(id) {
-      if (AppState.view !== 'landing') navigateTo('landing');
-      setTimeout(() => {
-        const el = document.getElementById(id);
-        if (el) el.scrollIntoView({ behavior: 'smooth' });
-      }, 60);
+    function removeMatrixRow(idx) {
+      App.matrix.splice(idx, 1);
+      persistState();
+      renderMatrix();
     }
 
-    function inspectUrlParameters() {
-      const params = new URLSearchParams(window.location.search);
-      if (params.get('checkout') === 'success' || params.get('session_id')) {
-        const tier = params.get('plan') || 'pro';
-        currentUser.plan = tier === 'starter' ? 'starter' : 'pro';
-        currentUser.isTrial = true;
-        renderAllDynamicTabs();
-        showToast('🎉 eSewa payment verified! Pro 3-Day Free Trial activated.', 'success');
-        navigateTo('dashboard');
-        window.history.replaceState({}, document.title, window.location.pathname);
-      }
+    function triggerOcrFileUpload() {
+      document.getElementById('ocr-file-input').click();
     }
 
-    function refreshDashboardMetrics() {
-      const kpiReturns = document.getElementById('kpi-returns-prevented');
-      const kpiMoney = document.getElementById('kpi-money-saved');
-      kpiReturns.textContent = '...';
-      kpiMoney.textContent = '...';
-
-      setTimeout(() => {
-        currentUser.analytics.returnsPrevented += Math.floor(Math.random() * 5) + 1;
-        currentUser.analytics.moneySaved = currentUser.analytics.returnsPrevented * 3400;
-        renderDynamicOverview();
-        showToast(`Refreshed live telemetry for ${currentUser.storeName}.`, 'success');
-      }, 400);
+    function handleOcrFileUpload(e) {
+      const file = e.target.files[0];
+      if (file) runOcrSimulation(file.name);
     }
 
-    // BIOMETRIC SIMULATOR
+    function runOcrSimulation(filename) {
+      const progressBox = document.getElementById('ocr-progress-box');
+      const bar = document.getElementById('ocr-bar');
+      const pct = document.getElementById('ocr-pct');
+      const title = document.getElementById('ocr-matrix-title');
+      const status = document.getElementById('ocr-matrix-status');
+
+      progressBox.classList.remove('hidden');
+      bar.style.width = '15%';
+      pct.textContent = '15%';
+
+      let progress = 15;
+      const interval = setInterval(() => {
+        progress += 28;
+        if (progress > 100) progress = 100;
+        bar.style.width = `${progress}%`;
+        pct.textContent = `${progress}%`;
+
+        if (progress === 100) {
+          clearInterval(interval);
+          setTimeout(() => {
+            progressBox.classList.add('hidden');
+            title.textContent = `Parsed Matrix: ${filename}`;
+            status.textContent = `✓ Vision OCR Ingestion Complete (${App.matrix.length} sizes extracted)`;
+            showToast('AI Vision OCR successfully normalized supplier spec sheet!', 'success');
+          }, 350);
+        }
+      }, 180);
+    }
+
+    function syncMatrixToCatalog() {
+      persistState();
+      showToast('Size matrix synchronized to active Shopify SKU catalog.', 'success');
+    }
+
+    function toggleUnitsConvert() {
+      showToast('Converted sizing measurements between Metric (cm) & Imperial (in).', 'info');
+    }
+
+    // INTERCEPT LOGS TABLE
+    function renderLogs(logsArray) {
+      const tbody = document.getElementById('intercept-logs-tbody');
+      if (!tbody) return;
+
+      tbody.innerHTML = '';
+      logsArray.forEach(log => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-900/40 transition';
+        tr.innerHTML = `
+          <td class="p-4 pl-6 font-mono text-[11px] text-indigo-400 font-bold">${log.id}</td>
+          <td class="p-4 font-semibold text-white">${log.product} <span class="text-slate-500 font-mono text-[10px]">(${log.sku})</span></td>
+          <td class="p-4 text-slate-400 text-xs">${log.biometrics}</td>
+          <td class="p-4 text-slate-300 font-mono text-xs">${log.requested}</td>
+          <td class="p-4 font-bold text-emerald-400 font-mono text-xs">${log.aiSize}</td>
+          <td class="p-4">
+            <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">${log.outcome}</span>
+          </td>
+          <td class="p-4 pr-6 text-right font-mono font-bold text-emerald-400">${log.savings}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function filterLogsTable() {
+      const q = document.getElementById('log-search-input').value.toLowerCase();
+      const filtered = App.logs.filter(l => 
+        l.product.toLowerCase().includes(q) || 
+        l.sku.toLowerCase().includes(q) || 
+        l.id.toLowerCase().includes(q) ||
+        l.biometrics.toLowerCase().includes(q)
+      );
+      renderLogs(filtered);
+    }
+
+    // INTERACTIVE BIOMETRIC SIMULATOR & AVATAR ENGINE
     function updateSimulation() {
       const height = parseInt(document.getElementById('sim-height').value) || 180;
       const weight = parseInt(document.getElementById('sim-weight').value) || 78;
 
-      AppState.sim.height = height;
-      AppState.sim.weight = weight;
+      App.sim.height = height;
+      App.sim.weight = weight;
 
+      // Update Slider Value labels
       const hFeet = Math.floor(height / 30.48);
       const hInches = Math.round((height % 30.48) / 2.54);
       const wLbs = Math.round(weight * 2.20462);
@@ -2471,13 +2252,14 @@ and Billing & Subscription).
       document.getElementById('slider-height-val').textContent = `${height} cm (${hFeet}'${hInches}")`;
       document.getElementById('slider-weight-val').textContent = `${weight} kg (${wLbs} lbs)`;
 
+      // Biometric regression calculation
       const bmi = weight / Math.pow(height / 100, 2);
       let score = bmi;
 
-      if (AppState.sim.torso === 'broad') score += 1.6;
-      if (AppState.sim.torso === 'lean') score -= 1.2;
-      if (AppState.sim.fit === 'oversized') score += 1.8;
-      if (AppState.sim.fit === 'form') score -= 1.4;
+      if (App.sim.torso === 'broad') score += 1.6;
+      if (App.sim.torso === 'lean') score -= 1.2;
+      if (App.sim.fit === 'oversized') score += 1.8;
+      if (App.sim.fit === 'form') score -= 1.4;
 
       let size = 'Size M';
       let alt = 'Size L (Loose)';
@@ -2491,6 +2273,7 @@ and Billing & Subscription).
       document.getElementById('sim-recommended-size').textContent = size;
       document.getElementById('sim-alt-size').textContent = alt;
 
+      // Dynamic morphing of SVG silhouette avatar
       const torsoPath = document.getElementById('svg-torso');
       const widthFactor = Math.min(1.4, Math.max(0.7, weight / 75));
       const leftX = 80 - (28 * widthFactor);
@@ -2498,11 +2281,11 @@ and Billing & Subscription).
       torsoPath.setAttribute('d', `M ${leftX} 48 Q 80 44 ${rightX} 48 L ${rightX - 8} 135 Q 80 138 ${leftX + 8} 135 Z`);
 
       document.getElementById('sim-reasoning').textContent = 
-        `Biometric height/weight ratio calibrated for ${height}cm / ${weight}kg with ${AppState.sim.torso} frame. Clears chest girth with optimal drape.`;
+        `Biometric height/weight ratio calibrated for ${height}cm / ${weight}kg with ${App.sim.torso} frame. Clears chest girth with optimal drape.`;
     }
 
     function setSimTorso(type) {
-      AppState.sim.torso = type;
+      App.sim.torso = type;
       document.querySelectorAll('.sim-torso-btn').forEach(b => {
         b.className = 'sim-torso-btn py-2 px-3 rounded-xl text-xs font-medium bg-slate-900 border border-slate-800 text-slate-300 hover:border-slate-600 transition';
       });
@@ -2512,7 +2295,7 @@ and Billing & Subscription).
     }
 
     function setSimFit(fit) {
-      AppState.sim.fit = fit;
+      App.sim.fit = fit;
       document.querySelectorAll('.sim-fit-btn').forEach(b => {
         b.className = 'sim-fit-btn py-2 px-3 rounded-xl text-xs font-medium bg-slate-900 border border-slate-800 text-slate-300 hover:border-slate-600 transition';
       });
@@ -2528,7 +2311,7 @@ and Billing & Subscription).
       setSimFit('regular');
     }
 
-    // ROI CALCULATOR
+    // ROI FINANCIAL CALCULATOR
     function calculateROI() {
       const orders = parseInt(document.getElementById('roi-orders').value) || 2500;
       const rate = parseInt(document.getElementById('roi-rate').value) || 26;
@@ -2539,17 +2322,17 @@ and Billing & Subscription).
       document.getElementById('roi-aov-val').textContent = `Rs. ${aov.toLocaleString()}`;
 
       const monthlyReturns = orders * (rate / 100);
-      const preventedReturns = monthlyReturns * 0.428;
-      const monthlySaved = Math.round(preventedReturns * 3400);
+      const preventedReturns = monthlyReturns * 0.428; // 42.8% reduction
+      const monthlySaved = Math.round(preventedReturns * 3400); // Rs. 3400 avg processing/freight loss
       const annualSaved = monthlySaved * 12;
-      const roiMultiplier = Math.round(monthlySaved / 2999);
+      const roiMultiplier = Math.round(monthlySaved / 2999); // Pro tier is Rs. 2999/mo
 
       document.getElementById('roi-monthly-dollars').textContent = `Rs. ${monthlySaved.toLocaleString()}`;
       document.getElementById('roi-annual-dollars').textContent = `Rs. ${annualSaved.toLocaleString()}/yr`;
       document.getElementById('roi-multiplier').textContent = `${roiMultiplier}x Return`;
     }
 
-    // FAQ ACCORDION
+    // FAQ ACCORDION HANDLER
     function toggleFaq(index) {
       const ans = document.getElementById(`faq-answer-${index}`);
       const icon = document.getElementById(`faq-icon-${index}`);
@@ -2599,9 +2382,8 @@ and Billing & Subscription).
       }
     });
 
-    // EXPORT MODAL HANDLERS
+    // MODALS & EXPORT HANDLERS
     function openExportModal() {
-      document.getElementById('export-store-name').textContent = currentUser.storeName;
       document.getElementById('modal-export').classList.remove('hidden');
     }
 
@@ -2611,28 +2393,33 @@ and Billing & Subscription).
 
     function triggerCsvDownload() {
       closeExportModal();
-      showToast(`Generating CSV report for ${currentUser.storeName}...`, 'info');
+      showToast('Generating CSV report with 30-day return telemetry...', 'info');
       setTimeout(() => {
-        showToast(`${currentUser.handle}_Return_Prevention_Telemetry.csv downloaded.`, 'success');
-      }, 700);
+        showToast('FitGuard_Return_Prevention_Telemetry.csv downloaded.', 'success');
+      }, 800);
     }
 
     // DEVELOPER SIMULATION HELPERS
     function simulatePlanCheckout(planName) {
-      currentUser.plan = planName;
-      currentUser.isTrial = true;
-      if (planName === 'starter') currentUser.customizer.whiteLabel = false;
-      renderAllDynamicTabs();
-      showToast(`Activated ${planName.toUpperCase()} tier for ${currentUser.storeName}`, 'success');
+      App.plan = planName;
+      App.isTrial = true;
+      App.whiteLabel = (planName === 'pro');
+      persistState();
+      renderAppView();
+      showToast(`Activated ${planName.toUpperCase()} tier with 3-Day Free Trial`, 'success');
       navigateTo('dashboard');
     }
 
     function resetAppState() {
-      initMultiTenantStore();
-      showToast('Reset multi-tenant state to default.', 'info');
+      App.plan = 'none';
+      App.isTrial = false;
+      App.whiteLabel = false;
+      persistState();
+      renderAppView();
+      showToast('State reset to unauthenticated.', 'info');
     }
 
-    // TOAST UTILITY
+    // TOAST NOTIFICATION UTILITY
     function showToast(message, type = 'info') {
       const container = document.getElementById('toast-container');
       const toast = document.createElement('div');
@@ -2662,33 +2449,3 @@ and Billing & Subscription).
   </script>
 </body>
 </html>
-
-Highlights of Multi-Tenant Updates:
-
-1.  Centralized User State Context (STORE_DATABASE & fetchUserData):
-      - Contains completely separated datasets for tenants (acme-global,
-        velocity-athletics, sezanne-atelier).
-      - Defines store IDs (FG-9012-PRO, FG-4421-STR, FG-7833-PRO), platform
-        badges, plan tiers (pro vs starter), trial status, analytics, widget
-        configurations, OCR history, matrices, logs, and staff lists.
-2.  Multi-Store Dynamic Switcher:
-      - A dropdown selector in the sidebar lets you switch tenant stores
-        instantaneously.
-      - Re-renders all metrics, graphs, customizer previews, OCR history,
-        tables, staff lists, and billing without leaking data or breaking tab
-        switching.
-3.  Dynamic Rendering Across All Tabs:
-      - Overview & Analytics: Telemetry numbers, growth badges, verified
-        sessions, 30-day Chart.js curves, and live intercept stream bound
-        strictly to the active store.
-      - Widget Customizer: Re-binds brand accent colors, corner radii, trigger
-        button copy, white-label watermark toggle, and tenant script embeds
-        (data-store-id).
-      - AI Size Chart OCR: Loads store-specific tech pack sample buttons and
-        dynamically editable measurement spreadsheets.
-      - Intercept Logs: Cleared out static rows and populated dynamically via
-        loop for each merchant account with live SKU/biometric filtering.
-      - Team & Staff: Isolated staff list with role badges, invite member modal,
-        and removal handlers scoped to the active tenant.
-      - Billing & Subscriptions: Displays dynamic plan tiers, pricing
-        (Rs. 2999/mo vs Rs. 999/mo), and feature permission matrix per account.
