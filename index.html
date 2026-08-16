@@ -2428,5 +2428,202 @@
         </div>
     </div>
 </div>
+  <!-- ========================================================================= -->
+<!-- VIEW 2: MERCHANT DASHBOARD (Post-Login / Management View)               -->
+<!-- ========================================================================= -->
+<main id="view-dashboard" class="flex-1 hidden flex flex-col max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
+    
+    <!-- Dashboard Header -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-800">
+        <div>
+            <div class="flex items-center gap-2">
+                <h1 class="text-2xl font-black text-white">Merchant Command Center</h1>
+                <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold border border-emerald-500/30">Pro Active</span>
+            </div>
+            <p class="text-xs text-slate-400 mt-1">Manage your active storefront widgets, telemetry, and OCR size sheets.</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <button onclick="triggerOcrUploadModal()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow-lg shadow-indigo-600/30 transition flex items-center gap-2">
+                <i data-lucide="upload" class="w-4 h-4"></i>
+                <span>Upload Size Chart (OCR)</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Dashboard Metrics Overview -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 my-6">
+        <div class="glass-card p-5 rounded-3xl border border-slate-800">
+            <span class="text-xs text-slate-400 font-semibold">Total Revenue Protected</span>
+            <div class="text-2xl font-black text-emerald-400 mt-1">Rs. 342,800</div>
+            <span class="text-[10px] text-emerald-400/80 font-mono mt-1 block">&uarr; +14.2% vs last month</span>
+        </div>
+        <div class="glass-card p-5 rounded-3xl border border-slate-800">
+            <span class="text-xs text-slate-400 font-semibold">Widget Scans Today</span>
+            <div class="text-2xl font-black text-white mt-1">1,284</div>
+            <span class="text-[10px] text-slate-400 font-mono mt-1 block">Active on 3 product pages</span>
+        </div>
+        <div class="glass-card p-5 rounded-3xl border border-slate-800">
+            <span class="text-xs text-slate-400 font-semibold">First-Time Fit Rate</span>
+            <div class="text-2xl font-black text-indigo-400 mt-1">98.9%</div>
+            <span class="text-[10px] text-indigo-300 font-mono mt-1 block">Zero bracketing recorded</span>
+        </div>
+        <div class="glass-card p-5 rounded-3xl border border-slate-800">
+            <span class="text-xs text-slate-400 font-semibold">API Latency Status</span>
+            <div class="text-2xl font-black text-purple-400 mt-1">12ms</div>
+            <span class="text-[10px] text-purple-300 font-mono mt-1 block">Edge CDN operational</span>
+        </div>
+    </div>
+
+    <!-- Store Widget Embed Code Snippet Generator Box -->
+    <div class="glass-card p-6 sm:p-8 rounded-3xl border border-slate-800 mb-8">
+        <h3 class="text-base font-bold text-white mb-2 flex items-center gap-2">
+            <i data-lucide="code" class="w-4 h-4 text-indigo-400"></i>
+            Your Storefront Integration Snippet
+        </h3>
+        <p class="text-xs text-slate-400 mb-4">Paste this asynchronous script tag right before the closing `&lt;/head&gt;` tag of your Shopify or custom e-commerce theme.</p>
+        <div class="relative bg-slate-950 p-4 rounded-xl border border-slate-800 font-mono text-xs text-indigo-300 overflow-x-auto">
+            <code>&lt;script src="https://your-username.github.io/your-repo/fitguard-widget.js" data-merchant-id="live_active" async&gt;&lt;/script&gt;</code>
+        </div>
+    </div>
+
+</main>
+  <script>
+    // Toggle between Landing Page and Dashboard View
+    function navigateTo(viewName) {
+        const landingView = document.getElementById('view-landing');
+        const dashboardView = document.getElementById('view-dashboard');
+        const landingLinks = document.getElementById('nav-landing-links');
+        const switchLabel = document.getElementById('nav-switch-label');
+
+        if (viewName === 'dashboard') {
+            landingView.classList.add('hidden');
+            dashboardView.classList.remove('hidden');
+            if (landingLinks) landingLinks.classList.add('hidden');
+            if (switchLabel) switchLabel.textContent = 'Switch to Landing';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+            dashboardView.classList.add('hidden');
+            landingView.classList.remove('hidden');
+            if (landingLinks) landingLinks.classList.remove('hidden');
+            if (switchLabel) switchLabel.textContent = 'Switch to Dashboard';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        // Re-initialize Lucide icons for dynamically added elements
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    }
+
+    // Toggle button handler linked to navbar switch button
+    function toggleView() {
+        const dashboardView = document.getElementById('view-dashboard');
+        if (dashboardView.classList.contains('hidden')) {
+            navigateTo('dashboard');
+        } else {
+            navigateTo('landing');
+        }
+    }
+
+    // Smooth scroll helper for landing page internal links
+    function scrollToSection(sectionId) {
+        navigateTo('landing');
+        setTimeout(() => {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+            }
+        }, 100);
+    }
+
+    // Modal Control Functions for Auth
+    function openAuthModal() {
+        const modal = document.getElementById('auth-modal');
+        if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeAuthModal() {
+        const modal = document.getElementById('auth-modal');
+        if (modal) modal.classList.add('hidden');
+    }
+
+    function handleAuthSubmit(event) {
+        event.preventDefault();
+        const email = document.getElementById('auth-email').value;
+        if (email) {
+            closeAuthModal();
+            navigateTo('dashboard');
+            // Show toast notification if available
+            showToast('Successfully signed in! Welcome to your Command Center.');
+        }
+    }
+
+    // Simple toast notification helper
+    function showToast(message) {
+        const container = document.getElementById('toast-container');
+        if (!container) return;
+        const toast = document.createElement('div');
+        toast.className = 'glass-card p-4 rounded-2xl border border-indigo-500/40 text-xs text-white shadow-2xl flex items-center gap-3 animate-bounce';
+        toast.innerHTML = `<i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i><span>${message}</span>`;
+        container.appendChild(toast);
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+        setTimeout(() => {
+            toast.remove();
+        }, 4000);
+    }
+</script>
+  <!-- ========================================================================= -->
+<!-- OCR SIZE CHART UPLOAD MODAL                                               -->
+<!-- ========================================================================= -->
+<div id="ocr-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 p-8 rounded-3xl max-w-md w-full relative shadow-2xl">
+        <button onclick="closeOcrUploadModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-xl font-bold">×</button>
+        
+        <div class="text-center mb-6">
+            <div class="w-12 h-12 rounded-2xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center mx-auto mb-3">
+                <i data-lucide="scan-line" class="w-6 h-6 text-indigo-400"></i>
+            </div>
+            <h3 class="text-xl font-bold text-white">FitGuard Vision OCR Parser</h3>
+            <p class="text-xs text-slate-400 mt-1">Upload an image or PDF of your factory size chart</p>
+        </div>
+
+        <div class="border-2 border-dashed border-slate-700 hover:border-indigo-500 rounded-2xl p-6 text-center cursor-pointer transition bg-slate-950/50">
+            <input type="file" id="ocr-file-input" class="hidden" accept="image/*,.pdf" onchange="handleOcrFileSelected(this)">
+            <label for="ocr-file-input" class="cursor-pointer">
+                <i data-lucide="upload-cloud" class="w-8 h-8 text-indigo-400 mx-auto mb-2"></i>
+                <span class="text-xs font-bold text-white block">Click to browse or drop file here</span>
+                <span class="text-[10px] text-slate-500 mt-1 block">Supports PNG, JPG, or PDF spec sheets</span>
+            </label>
+        </div>
+
+        <div id="ocr-loading" class="hidden mt-4 text-center text-xs text-indigo-400 animate-pulse font-mono">
+            Scanning dimensions with Vision OCR model...
+        </div>
+    </div>
+</div>
+
+<script>
+    function triggerOcrUploadModal() {
+        const modal = document.getElementById('ocr-modal');
+        if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeOcrUploadModal() {
+        const modal = document.getElementById('ocr-modal');
+        if (modal) modal.classList.add('hidden');
+    }
+
+    function handleOcrFileSelected(input) {
+        if (input.files && input.files[0]) {
+            const loading = document.getElementById('ocr-loading');
+            if (loading) loading.classList.remove('hidden');
+            
+            setTimeout(() => {
+                if (loading) loading.classList.add('hidden');
+                closeOcrUploadModal();
+                showToast('Size chart successfully parsed! Matrix populated.');
+            }, 2000);
+        }
+    }
+</script>
 </body>
 </html>
