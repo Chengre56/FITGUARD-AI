@@ -2652,5 +2652,54 @@
     }
 }
   </script>
+  <script>
+    // Universal tab switcher that catches all naming styles
+    function switchTab(tabId) {
+        showPanel(tabId);
+    }
+    function switchDashboardTab(tabId) {
+        showPanel(tabId);
+    }
+
+    function showPanel(tabId) {
+        // 1. Hide all possible dashboard panels
+        const panels = document.querySelectorAll('.dashboard-panel, .dash-panel, [id^="panel-"]');
+        panels.forEach(panel => {
+            if (!panel.id.startsWith('view-')) {
+                panel.classList.add('hidden');
+            }
+        });
+
+        // 2. Try to find and show the target panel using different ID patterns
+        let targetPanel = document.getElementById('panel-' + tabId) || 
+                          document.getElementById('dash-panel-' + tabId) || 
+                          document.getElementById(tabId);
+
+        if (targetPanel) {
+            targetPanel.classList.remove('hidden');
+        } else {
+            // Fallback: if specific panel isn't found, show the first available one so screen isn't blank
+            const firstPanel = document.querySelector('.dashboard-panel, .dash-panel');
+            if (firstPanel) firstPanel.classList.remove('hidden');
+        }
+
+        // 3. Update button active states
+        const buttons = document.querySelectorAll('.dash-tab-btn, .sidebar-btn');
+        buttons.forEach(btn => btn.classList.remove('bg-indigo-600/25', 'border-indigo-500/50', 'bg-indigo-600/20'));
+
+        // Re-render icons if Lucide is loaded
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    }
+
+    // Auto-show overview panel on load so the screen isn't black when opening dashboard
+    window.addEventListener('DOMContentLoaded', () => {
+        const defaultPanel = document.getElementById('panel-overview') || document.querySelector('.dashboard-panel, .dash-panel');
+        if (defaultPanel) {
+            defaultPanel.classList.remove('hidden');
+        }
+    });
+</script>
 </body>
 </html>
